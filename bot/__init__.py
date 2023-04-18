@@ -180,7 +180,7 @@ QUEUE_UPLOAD = int(QUEUE_UPLOAD) if QUEUE_UPLOAD else ''
 QUEUE_COMPLETE = environ.get('QUEUE_COMPLETE', 'False').lower() == 'true'
 
 DISABLE_MIRROR_LEECH = environ.get('DISABLE_MIRROR_LEECH', '')
-GCLONE_URL = environ.get('GCLONE_URL', 'https://td.allindex.workers.dev/0:/gclone')
+GCLONE_URL = environ.get('GCLONE_URL', 'https://td.allindex.workers.dev/0:/GClone/gclone')
 INDEX_URL = environ.get('INDEX_URL', '').rstrip('/')
 INCOMPLETE_TASK_NOTIFIER = environ.get('INCOMPLETE_TASK_NOTIFIER', 'False').lower() == 'true'
 USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', 'False').lower() == 'true'
