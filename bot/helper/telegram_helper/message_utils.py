@@ -1,7 +1,7 @@
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from aiohttp import ClientSession
-from asyncio import sleep
+from asyncio import sleep, gather
 from datetime import datetime, timedelta
 from pyrogram.errors import FloodWait
 from pyrogram.types import Message, InlineKeyboardMarkup, InputMediaPhoto, ChatPermissions
@@ -129,12 +129,8 @@ async def editPhoto(caption: str, message: Message, photo, reply_markup: InlineK
 
 
 async def deleteMessage(*args: Message):
-    for msg in args:
-        if msg:
-            try:
-                await msg.delete()
-            except:
-                pass
+    msgs = [msg.delete() for msg in args if msg]
+    await gather(*msgs, return_exceptions=True)
 
 
 async def sendFile(message: Message, doc: str, caption: str ='', thumb=None):
