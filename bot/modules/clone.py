@@ -72,7 +72,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         if not drive_id:
             await editMessage('Google Drive ID could not be found in the provided link', editable)
             return
-        await editMessage(f'Getting detail from <i><code>{link}</code></i>', editable)
+        await editMessage(f'<i>Getting detail from</i>\n<code>{link}</code>', editable)
         name, mime_type, size, files, folders = await sync_to_async(gd.count, link)
         await deleteMessage(editable)
         if CLONE_LIMIT := config_dict['CLONE_LIMIT']:
