@@ -41,6 +41,14 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         config_path = ospath.join('rclone', f'{user_id}.conf')
     else:
         config_path = 'rclone.conf'
+    if is_sharar(link):
+        host = urlparse(link).netloc
+        await editMessage(f'<i>Checking {host} link...</i>\n<code>{link}</code>', editable)
+        try:
+            link = await sync_to_async(direct_link_generator, link)
+        except DirectDownloadLinkException as e:
+            await editMessage(f'{tag}, {e}', editable)
+            return
     if not await aiopath.exists(config_path):
         await editMessage(f'Rclone Config: {config_path} not Exists!', editable)
         return
@@ -50,14 +58,6 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
             await editMessage(dst_path, editable)
             return
     dst_path = (dst_path or config_dict['RCLONE_PATH']).strip('/')
-    if is_sharar(link):
-        host = urlparse(link).netloc
-        await editMessage(f'<i>Checking {host} link...</i>\n<code>{link}</code>', editable)
-        try:
-            link = await sync_to_async(direct_link_generator, link)
-        except DirectDownloadLinkException as e:
-            await editMessage(f'{tag}, {e}', editable)
-            return
     if dst_path.startswith('mrcc:'):
         if config_path != ospath.join('rclone', f'{user_id}.conf'):
             await editMessage('You should use same rclone.conf to clone between pathies!', editable)
