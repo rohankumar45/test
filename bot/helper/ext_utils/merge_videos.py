@@ -37,22 +37,23 @@ class Merge:
     async def __progress(self, progress):
         while self.__listener.suproc != 0:
             await sleep(1)
-            async with aiopen(progress, 'r+') as f:
-                text = await f.read()
-                await f.truncate(0)
-            time_used = re_findall('out_time_ms=(\d+)', text)
-            prog = re_findall('progress=(\w+)', text)
-            speed = re_findall('speed=(\d+\.?\d*)', text)
-            total_size = re_findall('total_size=(\d+)', text)
-            if len(prog) and prog[-1] == 'end':
-                break
-            time_used = time_used[-1] if len(time_used) else 1
-            speed = speed[-1] if len(speed) else 1
-            elapsed_time = int(time_used) / 1000000
+            if await ospath.exists(progress):
+                async with aiopen(progress, 'r+') as f:
+                    text = await f.read()
+                    await f.truncate(0)
+                time_used = re_findall('out_time_ms=(\d+)', text)
+                prog = re_findall('progress=(\w+)', text)
+                speed = re_findall('speed=(\d+\.?\d*)', text)
+                total_size = re_findall('total_size=(\d+)', text)
+                if len(prog) and prog[-1] == 'end':
+                    break
+                time_used = time_used[-1] if len(time_used) else 1
+                speed = speed[-1] if len(speed) else 1
+                elapsed_time = int(time_used) / 1000000
 
-            self.__processed_bytes = int(total_size[-1]) if len(total_size) else 1
-            self.__eta = floor((self.__duration - elapsed_time) / float(speed))
-            self.__percent = floor(elapsed_time * 100 / self.__duration)
+                self.__processed_bytes = int(total_size[-1]) if len(total_size) else 1
+                self.__eta = floor((self.__duration - elapsed_time) / float(speed))
+                self.__percent = floor(elapsed_time * 100 / self.__duration)
 
     async def merge_vids(self, path, gid):
         list_files, remove_files = [], []
