@@ -190,7 +190,7 @@ def get_readable_message():
         msg += f'<code>{escape(str(download.sname))}</code>'
         if isSuperGoup:
             link = f'https://t.me/c/{str(message.chat.id)[4:]}/{message.id if not reply_to or reply_to.from_user.is_bot else reply_to.id}'
-            msg += f'\n<b>┌ <a href="{link}"><i>{download.status()}</i></a></b>'
+            msg += f'\n<b>┌ <a href="{link}"><i>{download.status()}...</i></a></b>'
         else:
             msg += f'\n<b>┌ <i>{download.status()}...</i></b>'
         extend_info += f'\n<b>├ Engine:<i> {download.eng()}</i></b>'

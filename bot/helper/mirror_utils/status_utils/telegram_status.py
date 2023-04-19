@@ -54,7 +54,7 @@ class TelegramStatus:
     @property
     def sname(self):
         name = self.name()
-        if not self.__listener.newname:
+        if self.__status == 'dl' and not self.__listener.newname:
             name = presuf_remname_name(self.__listener.user_dict, name)
         return name
 
