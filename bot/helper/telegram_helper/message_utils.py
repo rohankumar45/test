@@ -146,9 +146,7 @@ async def sendFile(message: Message, doc: str, caption: str ='', thumb=None):
             if await aiopath.exists('thumb.png'):
                 thumbnail = 'thumb.png'
         await message.reply_document(doc, caption=caption, quote=True, thumb=thumbnail)
-        for file in [doc, 'thumb.png']:
-            if file != 'log.txt':
-                await clean_target(file)
+        await gather(*[clean_target(file) for file in [doc, 'thumb.png'] if file != 'log.txt'])
     except FloodWait as f:
         LOGGER.warning(f)
         await sleep(f.value * 1.2)

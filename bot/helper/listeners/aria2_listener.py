@@ -1,4 +1,5 @@
 from aiofiles.os import path as aiopath
+from asyncio import gather
 from asyncio import sleep
 from time import time
 
@@ -115,10 +116,7 @@ async def __onBtDownloadComplete(api, gid):
         listener = dl.listener()
         if listener.select:
             res = download.files
-            for file_o in res:
-                f_path = file_o.path
-                if not file_o.selected and await aiopath.exists(f_path):
-                    await clean_target(f_path)
+            await gather(*[clean_target(file_o.path) for file_o in res if not file_o.selected])
             await clean_unwanted(download.dir)
         if listener.seed:
             try:

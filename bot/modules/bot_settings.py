@@ -1,6 +1,6 @@
 from aiofiles import open as aiopen
 from aiofiles.os import rename, path as aiopath
-from asyncio import create_subprocess_exec, create_subprocess_shell, sleep
+from asyncio import create_subprocess_exec, create_subprocess_shell, sleep, gather
 from dotenv import load_dotenv
 from functools import partial
 from os import getcwd, environ
@@ -287,8 +287,7 @@ async def update_private_file(client: Client, message: Message, omsg: Message):
         if file_name != 'config.env':
             await clean_target(fn)
         if fn == 'accounts':
-            await clean_target('accounts')
-            await clean_target('rclone_sa')
+            await gather(clean_target('accounts'), clean_target('rclone_sa'))
             config_dict['USE_SERVICE_ACCOUNTS'] = False
             if DATABASE_URL:
                 await DbManger().update_config({'USE_SERVICE_ACCOUNTS': False})
@@ -310,8 +309,7 @@ async def update_private_file(client: Client, message: Message, omsg: Message):
         file_name = doc.file_name
         await message.download(file_name=f'{getcwd()}/{file_name}')
         if file_name == 'accounts.zip':
-            await clean_target('accounts')
-            await clean_target('rclone_sa')
+            await gather(clean_target('accounts'), clean_target('rclone_sa'))
             await (await create_subprocess_exec('7z', 'x', '-o.', '-aoa', 'accounts.zip', 'accounts/*.json')).wait()
             await (await create_subprocess_exec('chmod', '-R', '777', 'accounts')).wait()
             config_dict['USE_SERVICE_ACCOUNTS'] = True

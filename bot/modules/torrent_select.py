@@ -1,4 +1,5 @@
 from aiofiles.os import path as aiopath
+from asyncio import gather
 from pyrogram import Client
 from pyrogram.filters import command, regex
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
@@ -108,15 +109,12 @@ async def get_confirm(client: Client, query: CallbackQuery):
             res = await sync_to_async(client.torrents_files, torrent_hash=id_)
             for f in res:
                 if f.priority == 0:
-                    f_paths = [f'{path}/{f.name}', f'{path}/{f.name}.!qB']
-                    for f_path in f_paths:
-                        if await aiopath.exists(f_path):
-                            await clean_target(f_path)
+                    await gather(*[clean_target(f_path) for f_path in [f'{path}/{f.name}', f'{path}/{f.name}.!qB']])
             await sync_to_async(client.torrents_resume, torrent_hashes=id_)
         else:
             res = await sync_to_async(aria2.client.get_files, id_)
             for f in res:
-                if f['selected'] == 'false' and await aiopath.exists(f['path']):
+                if f['selected'] == 'false':
                     await clean_target(f['path'])
             try:
                 await sync_to_async(aria2.client.unpause, id_)
