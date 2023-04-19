@@ -46,8 +46,7 @@ class GdriveStatus:
 
     def eta(self):
         try:
-            seconds = (self.__size - self.__obj.processed_bytes) / self.__obj.speed
-            return f'{get_readable_time(seconds)}'
+            return f'{get_readable_time((self.__size - self.__obj.processed_bytes) / self.__obj.speed)}'
         except:
             return '~'
 

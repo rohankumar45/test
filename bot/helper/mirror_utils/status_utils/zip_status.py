@@ -48,8 +48,7 @@ class ZipStatus:
 
     def eta(self):
         try:
-            seconds = (self.__size - self.processed_raw()) / self.speed_raw()
-            return f'{get_readable_time(seconds)}'
+            return f'{get_readable_time((self.__size - self.processed_raw()) / self.speed_raw())}'
         except:
             return '~'
 

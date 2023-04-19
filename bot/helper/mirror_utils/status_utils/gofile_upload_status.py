@@ -34,8 +34,7 @@ class GofileUploadStatus:
 
     def eta(self):
         try:
-            seconds = (self.__size - self.__obj.uploaded_bytes) / self.__obj.speed
-            return f'{get_readable_time(seconds)}'
+            return f'{get_readable_time((self.__size - self.__obj.uploaded_bytes) / self.__obj.speed)}'
         except ZeroDivisionError:
             return '~'
 
