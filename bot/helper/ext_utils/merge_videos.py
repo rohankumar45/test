@@ -16,8 +16,7 @@ from bot.helper.telegram_helper.message_utils import update_all_messages
 
 class Merge:
     def __init__(self, listener):
-        self.__self.__listener = listener
-        self.__proc = None
+        self.__listener = listener
         self.__processed_bytes = 0
         self.__percent = 0
         self.__eta = 0
