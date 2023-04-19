@@ -151,7 +151,7 @@ class MirrorLeechListener:
         await start_from_queued()
         if self.isZip:
             if self.user_dict.get('merge_vid'):
-                if not await Merge().merge_vids(m_path, gid, self):
+                if not await Merge(self).merge_vids(m_path, gid):
                     return
             zipmode = self.user_dict.get('zipmode', 'zfolder')
             if zipmode in ['zfolder', 'zfpart']:
@@ -262,7 +262,7 @@ class MirrorLeechListener:
         else:
             path = m_path
         if not self.isZip and self.user_dict.get('merge_vid'):
-            if not await Merge().merge_vids(path, gid, self):
+            if not await Merge(self).merge_vids(path, gid):
                 return
         up_dir, up_name = path.rsplit('/', 1)
         size = await get_path_size(up_dir)

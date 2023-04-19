@@ -15,7 +15,8 @@ from bot.helper.telegram_helper.message_utils import update_all_messages
 
 
 class Merge:
-    def __init__(self):
+    def __init__(self, listener):
+        self.__self.__listener = listener
         self.__proc = None
         self.__processed_bytes = 0
         self.__percent = 0
@@ -35,7 +36,7 @@ class Merge:
         return self.__eta
 
     async def __progress(self):
-        while self.__proc.returncode != 0:
+        while self.__listener.suproc != 0:
             await sleep(1)
             async with aiopen('progress.txt', 'r+') as f:
                 text = await f.read()
@@ -54,7 +55,7 @@ class Merge:
             self.__eta = floor((self.__duration - elapsed_time) / float(speed))
             self.__percent = floor(elapsed_time * 100 / self.__duration)
 
-    async def merge_vids(self, path, gid, listener):
+    async def merge_vids(self, path, gid):
         list_files, remove_files = [], []
         for dirpath, _, files in await sync_to_async(walk, path):
             for file in natsorted(files):
@@ -67,7 +68,7 @@ class Merge:
             name = ospath.basename(path)
             size = await get_path_size(path)
             async with download_dict_lock:
-                download_dict[listener.uid] = FFMpegStatus(name, size, gid, self, listener)
+                download_dict[self.__listener.uid] = FFMpegStatus(name, size, gid, self, self.__listener)
             await update_all_messages()
             input_file, progress = ospath.join(path, 'input.txt'), ospath.join(path, 'progress.txt')
             async with aiopen(input_file, 'w') as f:
@@ -75,13 +76,13 @@ class Merge:
             LOGGER.info(f'Merging: {name}')
             cmd = ['ffmpeg', '-ignore_unknown', '-loglevel', 'error', '-progress', progress, '-f', 'concat',
                    '-safe', '0', '-i', input_file, '-map', '0', '-c', 'copy', f'{ospath.join(path, name)}.mkv']
-            listener.suproc = await create_subprocess_exec(*cmd)
-            _, code = await gather(self.__progress(), listener.suproc.wait())
-            if listener.suproc == 'cancelled' or code == -9:
+            self.__listener.suproc = await create_subprocess_exec(*cmd)
+            _, code = await gather(self.__progress(), self.__listener.suproc.wait())
+            if self.__listener.suproc == 'cancelled' or code == -9:
                 return
             elif code == 0:
                 await gather(clean_target(input_file), clean_target(progress))
-                if not listener.seed:
+                if not self.__listener.seed:
                     await gather(clean_target(file) for file in remove_files)
                 LOGGER.info(f'Merge successfully with name: {name}.mkv')
             else:
