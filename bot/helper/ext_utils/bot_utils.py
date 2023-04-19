@@ -197,7 +197,7 @@ def get_readable_message():
         if isSuperGoup:
             extend_info += f'\n<b>├ By:</b> <a href="https://t.me/{message.from_user.username}">{message.from_user.first_name}</a>'
         extend_info += f'\n<b>├ Action:</b> {action(message)}'
-        if download.status() not in [MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_MERGING]:
+        if download.status() != MirrorStatus.STATUS_SEEDING:
             msg += f'\n<b>├ </b>{get_progress_bar_string(download.progress())}'
             msg += f'\n<b>├ Progress:</b> {download.progress()}'
             if download.status() == MirrorStatus.STATUS_SPLITTING and download.listener().isLeech:

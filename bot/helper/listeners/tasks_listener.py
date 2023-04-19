@@ -1,4 +1,3 @@
-from aiofiles import open as aiopen
 from aiofiles.os import listdir, path as aiopath, makedirs
 from aioshutil import move
 from asyncio import create_subprocess_exec, sleep, Event
@@ -14,17 +13,17 @@ from time import time
 
 from bot import bot_loop, bot_dict, bot_name, download_dict, download_dict_lock, Interval, aria2, user_data, config_dict, status_reply_dict_lock, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, \
                 DOWNLOAD_DIR, LOGGER, DATABASE_URL, DEFAULT_SPLIT_SIZE
-from bot.helper.ext_utils.bot_utils import get_readable_time, is_magnet, is_url, presuf_remname_name, is_premium_user, action, get_link, is_media, get_date_time, UserDaily, default_button, sync_to_async, get_readable_file_size, cmd_exec
+from bot.helper.ext_utils.bot_utils import get_readable_time, is_magnet, is_url, presuf_remname_name, is_premium_user, action, get_link, is_media, get_date_time, UserDaily, default_button, sync_to_async, get_readable_file_size
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, presuf_remname_file, is_first_archive_split, is_archive, is_archive_split
-from bot.helper.ext_utils.leech_utils import split_file, get_document_type
+from bot.helper.ext_utils.leech_utils import split_file
 from bot.helper.ext_utils.shortenurl import short_url
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.ext_utils.telegraph_helper import TelePost
+from bot.helper.ext_utils.merge_videos import Merge
 from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.mirror_utils.status_utils.extract_status import ExtractStatus
-from bot.helper.mirror_utils.status_utils.ffmpeg_status import FFMpegStatus
 from bot.helper.mirror_utils.status_utils.gdrive_status import GdriveStatus
 from bot.helper.mirror_utils.status_utils.gofile_upload_status import GofileUploadStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
@@ -105,40 +104,6 @@ class MirrorLeechListener:
             await clean_target(m_path)
         return True
 
-    async def __merge(self, path, gid):
-        list_files, remove_files = [], []
-        for dirpath, _, files in await sync_to_async(walk, path):
-            for file in natsorted(files):
-                fvid = ospath.join(dirpath, file)
-                if (await get_document_type(fvid))[0]:
-                    list_files.append(f"file '{fvid}'")
-                    remove_files.append(fvid)
-        if len(list_files) > 1:
-            name = ospath.basename(path)
-            size = await get_path_size(path)
-            async with download_dict_lock:
-                download_dict[self.uid] = FFMpegStatus(name, size, gid, self)
-            await update_all_messages()
-            input_file = ospath.join(path, 'input.txt')
-            async with aiopen(input_file, 'w') as f:
-                await f.write('\n'.join(list_files))
-            LOGGER.info(f'Merging: {name}')
-            cmd = ['ffmpeg', '-ignore_unknown', '-loglevel', 'error', '-f', 'concat', '-safe', '0',
-                   '-i', input_file, '-map', '0', '-c', 'copy', f'{ospath.join(path, name)}.mkv']
-            self.suproc = await create_subprocess_exec(*cmd)
-            code = await self.suproc.wait()
-            if self.suproc == 'cancelled' or code == -9:
-                return
-            elif code == 0:
-                await clean_target(input_file)
-                if not self.seed:
-                    for file in remove_files:
-                        await clean_target(file)
-                LOGGER.info(f'Merge successfully with name: {name}.mkv')
-            else:
-                LOGGER.error(f'Failed to merge: {name}.mkv')
-        return True
-
     async def onDownloadStart(self):
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
@@ -186,7 +151,7 @@ class MirrorLeechListener:
         await start_from_queued()
         if self.isZip:
             if self.user_dict.get('merge_vid'):
-                if not await self.__merge(m_path, gid):
+                if not await Merge().merge_vids(m_path, gid, self):
                     return
             zipmode = self.user_dict.get('zipmode', 'zfolder')
             if zipmode in ['zfolder', 'zfpart']:
@@ -297,7 +262,7 @@ class MirrorLeechListener:
         else:
             path = m_path
         if not self.isZip and self.user_dict.get('merge_vid'):
-            if not await self.__merge(path, gid):
+            if not await Merge().merge_vids(path, gid, self):
                 return
         up_dir, up_name = path.rsplit('/', 1)
         size = await get_path_size(up_dir)
