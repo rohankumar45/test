@@ -1,4 +1,5 @@
 from aiofiles import open as aiopen
+from aiofiles.os import path as aiopath
 from asyncio import create_subprocess_exec, sleep, gather
 from asyncio.subprocess import PIPE
 from math import floor
@@ -37,7 +38,7 @@ class Merge:
     async def __progress(self, progress):
         while self.__listener.suproc != 0:
             await sleep(1)
-            if await ospath.exists(progress):
+            if await aiopath.exists(progress):
                 async with aiopen(progress, 'r+') as f:
                     text = await f.read()
                     await f.truncate(0)
