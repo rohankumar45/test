@@ -165,6 +165,10 @@ class YoutubeDLHelper:
                 self.name = f"{name}{ext}" if name else realName
                 if not self.__ext:
                     self.__ext = ext
+                if result.get('filesize'):
+                    self.__size = result['filesize']
+                elif result.get('filesize_approx'):
+                    self.__size = result['filesize_approx']
 
     def __download(self, link, path):
         try:
