@@ -1,5 +1,5 @@
 from aiofiles import open as aiopen
-from aiofiles.os import remove as aioremove, path as aiopath, listdir, rmdir, makedirs, rename as aiorename
+from aiofiles.os import remove as aioremove, path as aiopath, listdir, makedirs, rename as aiorename
 from aiohttp import ClientSession
 from aioshutil import rmtree as aiormtree, disk_usage
 from asyncio import create_subprocess_exec
