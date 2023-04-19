@@ -239,9 +239,6 @@ class YoutubeDLHelper:
         msgerr = None
         arch = any([self.__listener.isZip, self.__listener.isLeech])
         ytdl, zuzdl, leechdl, storage, max_pyt = config_dict['YTDL_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD'], config_dict['MAX_YTPLAYLIST']
-        LOGGER.info('=====================================')
-        LOGGER.info(self.__size)
-        LOGGER.info('=====================================')
         if config_dict['PREMIUM_MODE'] and not is_premium_user(self.__listener.user_id):
             ytdl = zuzdl = leechdl = config_dict['NONPREMIUM_LIMIT']
             max_pyt = 10
