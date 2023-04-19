@@ -34,10 +34,10 @@ class Merge:
     def eta(self):
         return self.__eta
 
-    async def __progress(self):
+    async def __progress(self, progress):
         while self.__listener.suproc != 0:
             await sleep(1)
-            async with aiopen('progress.txt', 'r+') as f:
+            async with aiopen(progress, 'r+') as f:
                 text = await f.read()
                 await f.truncate(0)
             time_used = re_findall('out_time_ms=(\d+)', text)
@@ -76,7 +76,7 @@ class Merge:
             cmd = ['ffmpeg', '-ignore_unknown', '-loglevel', 'error', '-progress', progress, '-f', 'concat',
                    '-safe', '0', '-i', input_file, '-map', '0', '-c', 'copy', f'{ospath.join(path, name)}.mkv']
             self.__listener.suproc = await create_subprocess_exec(*cmd)
-            _, code = await gather(self.__progress(), self.__listener.suproc.wait())
+            _, code = await gather(self.__progress(progress), self.__listener.suproc.wait())
             if self.__listener.suproc == 'cancelled' or code == -9:
                 return
             elif code == 0:
