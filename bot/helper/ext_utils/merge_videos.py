@@ -67,7 +67,7 @@ class Merge:
             name = ospath.basename(path)
             size = await get_path_size(path)
             async with download_dict_lock:
-                download_dict[self.uid] = FFMpegStatus(name, size, gid, self, listener)
+                download_dict[listener.uid] = FFMpegStatus(name, size, gid, self, listener)
             await update_all_messages()
             input_file, progress = ospath.join(path, 'input.txt'), ospath.join(path, 'progress.txt')
             async with aiopen(input_file, 'w') as f:
