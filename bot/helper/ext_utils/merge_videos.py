@@ -82,7 +82,7 @@ class Merge:
             elif code == 0:
                 await gather(clean_target(input_file), clean_target(progress))
                 if not self.__listener.seed:
-                    await gather(clean_target(file) for file in remove_files)
+                    await gather(*[clean_target(file) for file in remove_files])
                 LOGGER.info(f'Merge successfully with name: {name}.mkv')
             else:
                 LOGGER.error(f'Failed to merge: {name}.mkv')
