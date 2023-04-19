@@ -10,6 +10,7 @@ class FFMpegStatus:
         self.__gid = gid
         self.__size = size
         self.__obj = obj
+        self.__start_time = time()
         self.__listener = listener
         self.message = listener.message
 
