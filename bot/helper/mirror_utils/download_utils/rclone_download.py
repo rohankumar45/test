@@ -14,8 +14,8 @@ from bot.helper.telegram_helper.message_utils import sendStatusMessage
 
 
 async def add_rclone_download(rc_path, config_path, path, name, listener):
-    cmd1 = ['rclone', 'lsjson', '--fast-list', '--stat', '--no-mimetype', '--no-modtime', '--config', config_path, rc_path]
-    cmd2 = ['rclone', 'size', '--fast-list', '--json', '--config', config_path, rc_path]
+    cmd1 = ['./gclone', 'lsjson', '--fast-list', '--stat', '--no-mimetype', '--no-modtime', '--config', config_path, rc_path]
+    cmd2 = ['./gclone', 'size', '--fast-list', '--json', '--config', config_path, rc_path]
     res1, res2 = await gather(cmd_exec(cmd1), cmd_exec(cmd2))
     if res1[2] or res2[2]:
         if res1[2] != -9:

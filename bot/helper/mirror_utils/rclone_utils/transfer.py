@@ -140,7 +140,7 @@ class RcloneTransferHelper:
         else:
             epath = f"{remote}:{rc_path}{self.name}"
             destination = epath
-        cmd = ['rclone', 'lsjson', '--fast-list', '--no-mimetype', '--no-modtime', '--config', config_path, epath]
+        cmd = ['./gclone', 'lsjson', '--fast-list', '--no-mimetype', '--no-modtime', '--config', config_path, epath]
         res, err, code = await cmd_exec(cmd)
         if code == 0:
             result = loads(res)
@@ -220,7 +220,7 @@ class RcloneTransferHelper:
                 destination = f'{oremote}:{rc_path}/{self.name}'
             else:
                 destination = f'{oremote}:{self.name}'
-            cmd = ['rclone', 'link', '--config', oconfig_path, destination]
+            cmd = ['./gclone', 'link', '--config', oconfig_path, destination]
             res, err, code = await cmd_exec(cmd)
             if code == 0:
                 link = res
@@ -261,7 +261,7 @@ class RcloneTransferHelper:
             else:
                 if mime_type != 'Folder':
                     destination += f'/{self.name}' if destination.split(':', 1)[1] else self.name
-                cmd = ['rclone', 'link', '--config', config_path, destination]
+                cmd = ['./gclone', 'link', '--config', config_path, destination]
                 res, err, code = await cmd_exec(cmd)
                 if self.__is_cancelled:
                     return None, None
@@ -301,7 +301,7 @@ class RcloneTransferHelper:
     @staticmethod
     async def __getUpdatedCommand(config_path, source, destination, rcflags, method):
         ext = '*.{' + ','.join(GLOBAL_EXTENSION_FILTER) + '}'
-        cmd = ['rclone', method, '--fast-list', '--config', config_path, '-P', source, destination, '--exclude', ext, '--ignore-case', '--low-level-retries', '1', '-M']
+        cmd = ['./gclone', method, '--fast-list', '--config', config_path, '-P', source, destination, '--exclude', ext, '--ignore-case', '--low-level-retries', '1', '-M']
         if rcflags:
             rcflags = rcflags.split('|')
             for flag in rcflags:
