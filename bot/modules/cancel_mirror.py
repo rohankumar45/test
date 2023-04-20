@@ -83,6 +83,7 @@ async def cancell_all_buttons(client: Client, message: Message):
     buttons.button_data('Cloning', f'canall {MirrorStatus.STATUS_CLONING}')
     buttons.button_data('Extracting', f'canall {MirrorStatus.STATUS_EXTRACTING}')
     buttons.button_data('Archiving', f'canall {MirrorStatus.STATUS_ARCHIVING}')
+    buttons.button_data('Merging', f'canall {MirrorStatus.STATUS_MERGING}')
     buttons.button_data('DL Queued', f'canall {MirrorStatus.STATUS_QUEUEDL}')
     buttons.button_data('UL Queued', f'canall {MirrorStatus.STATUS_QUEUEUP}')
     buttons.button_data('Paused', f'canall {MirrorStatus.STATUS_PAUSED}')
