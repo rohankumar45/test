@@ -103,7 +103,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         link, destination = await RCTransfer.clone(config_path, remote, src_path, dst_path, rcf, mime_type)
     if not link:
         return
-    LOGGER.info(f'Cloning Done: {name}')
+    LOGGER.info(f'Cloning Done: {name} | {destination}')
     cmd1 = ['rclone', 'lsf', '--fast-list', '-R', '--files-only', '--config', config_path, destination]
     cmd2 = ['rclone', 'lsf', '--fast-list', '-R', '--dirs-only', '--config', config_path, destination]
     cmd3 = ['rclone', 'size', '--fast-list', '--json', '--config', config_path, destination]
