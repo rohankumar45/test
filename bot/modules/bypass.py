@@ -64,7 +64,7 @@ async def bypass(client: Client, message: Message):
         if mmsg[1].isdigit():
             multi = int(mmsg[1])
 
-    buttons.button_link('Source Link', f'{url}')
+    buttons.button_link('Source Link', url)
     host = urlparse(url).netloc
     bpmsg = await sendMessage(f'<i>Bypassing {host} link, please wait...</i>', message)
     LOGGER.info(f'Bypassing: {url}')
