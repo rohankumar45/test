@@ -41,14 +41,6 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         config_path = ospath.join('rclone', f'{user_id}.conf')
     else:
         config_path = 'rclone.conf'
-    if is_sharar(link):
-        host = urlparse(link).netloc
-        await editMessage(f'<i>Checking {host} link...</i>\n<code>{link}</code>', editable)
-        try:
-            link = await sync_to_async(direct_link_generator, link)
-        except DirectDownloadLinkException as e:
-            await editMessage(f'{tag}, {e}', editable)
-            return
     if not await aiopath.exists(config_path):
         await editMessage(f'Rclone Config: {config_path} not Exists!', editable)
         return
@@ -129,18 +121,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
     await listener.onUploadComplete(link, size, files, folders, mime_type, name, destination, True)
 
 
-async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSuperGroup):
-    host = urlparse(link).netloc
-    sharer_link = None
-    if 'drive.google.com' not in host:
-        await editMessage(f'<i>Checking {host} link...</i>\n<code>{link}</code>', editable)
-    if is_sharar(link):
-        try:
-            link = await sync_to_async(direct_link_generator, link)
-            sharer_link = link
-        except DirectDownloadLinkException as e:
-            await editMessage(f'{tag}, {e}', editable)
-            return
+async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSuperGroup, sharer_link):
     user_dict = user_data.get(message.from_user.id, {})
     multiid = get_multiid(message.from_user.id)
     if config_dict['MULTI_GDID'] and multi == 0 and not user_dict.get('cus_gdrive'):
@@ -148,7 +129,6 @@ async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSu
     if not multiid:
         await editMessage('Task has been cancelled!', editable)
         return
-
     if is_gdrive_link(link):
         gd = GoogleDriveHelper()
         name, mime_type, size, files, _ = await sync_to_async(gd.count, link)
@@ -249,12 +229,21 @@ async def cloneNode(client: Client, message: Message):
     run_multi(mlist, cloneNode)
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
+    sharer_link = None
+    if is_sharar(link):
+        await editMessage(f'<i>Checking {urlparse(link).netloc} link...</i>\n<code>{link}</code>', check_)
+        try:
+            link = await sync_to_async(direct_link_generator, link)
+            sharer_link = link
+        except DirectDownloadLinkException as e:
+            await editMessage(f'{tag}, {e}', check_)
+            return
     if not link:
         if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(HelpString.CLONE)):
             await auto_delete_message(message, fmsg, reply_to)
             return
         await editMessage(HelpString.CLONE, check_)
-    elif (is_rclone_path(link) and not newname) or (dst_path and is_url(link) and await aiopath.exists('gclone')):
+    elif (is_rclone_path(link) and not newname) or (dst_path and is_gdrive_link(link) and await aiopath.exists('gclone')):
         if not await aiopath.exists('rclone.conf') and not await aiopath.exists(ospath.join('rclone', f'{user_id}.conf')):
             await editMessage('RClone config not exists!', check_)
             return
@@ -266,7 +255,7 @@ async def cloneNode(client: Client, message: Message):
         if not config_dict['GDRIVE_ID'] and not user_dict.get('cus_gdrive'):
             await editMessage('GDRIVE_ID not Provided!', check_)
         else:
-            await gdcloneNode(client, message, check_, newname, multi, link, tag, isSuperGroup)
+            await gdcloneNode(client, message, check_, newname, multi, link, tag, isSuperGroup, sharer_link)
 
 
 bot.add_handler(MessageHandler(cloneNode, filters=command(BotCommands.CloneCommand) & CustomFilters.authorized))
