@@ -1,11 +1,11 @@
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from asyncio import create_subprocess_exec, sleep, gather
-from asyncio.subprocess import PIPE
 from math import floor
 from natsort import natsorted
 from os import path as ospath, walk
 from re import findall as re_findall
+from time import time
 
 from bot import download_dict, download_dict_lock, LOGGER
 from bot.helper.ext_utils.fs_utils import get_path_size, clean_target
@@ -19,23 +19,34 @@ class Merge:
     def __init__(self, listener):
         self.__listener = listener
         self.__processed_bytes = 0
-        self.__percent = 0
-        self.__eta = 0
+        # self.__percent = 0
+        # self.__eta = 0
         self.__duration = 0
+        self.__start_time = time()
 
     @property
     def processed_bytes(self):
         return self.__processed_bytes
 
     @property
-    def percent(self):
-        return self.__percent
+    def speed(self):
+        return self.__processed_bytes / (time() - self.__start_time)
 
-    @property
-    def eta(self):
-        return self.__eta
+    # @property
+    # def percent(self):
+    #     return self.__percent
 
-    async def __progress(self, progress):
+    # @property
+    # def eta(self):
+    #     return self.__eta
+
+    async def __progress(self, outfile):
+        while self.__listener.suproc != 0:
+            await sleep(1)
+            if await aiopath.exists(outfile):
+                self.__processed_bytes = await get_path_size(outfile)
+
+    async def __progress_old(self, progress):
         while self.__listener.suproc != 0:
             await sleep(1)
             if await aiopath.exists(progress):
@@ -75,10 +86,11 @@ class Merge:
             async with aiopen(input_file, 'w') as f:
                 await f.write('\n'.join(list_files))
             LOGGER.info(f'Merging: {name}')
+            outfile = f'{ospath.join(path, name)}.mkv'
             cmd = ['ffmpeg', '-ignore_unknown', '-loglevel', 'error', '-progress', progress, '-f', 'concat',
-                   '-safe', '0', '-i', input_file, '-map', '0', '-c', 'copy', f'{ospath.join(path, name)}.mkv']
+                   '-safe', '0', '-i', input_file, '-map', '0', '-c', 'copy', outfile]
             self.__listener.suproc = await create_subprocess_exec(*cmd)
-            _, code = await gather(self.__progress(progress), self.__listener.suproc.wait())
+            _, code = await gather(self.__progress(outfile), self.__listener.suproc.wait())
             if self.__listener.suproc == 'cancelled' or code == -9:
                 return
             elif code == 0:
