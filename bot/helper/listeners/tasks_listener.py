@@ -84,7 +84,7 @@ class MirrorLeechListener:
 
     async def __archive(self, m_path, path, size, mpart=False):
         LEECH_SPLIT_SIZE = config_dict['LEECH_SPLIT_SIZE']
-        cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a", "-mx=0", f"-p{self.pswd}", path, m_path, "-aoa"]
+        cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a", "-mx=0", f"-p{self.pswd}", path, m_path]
         if self.isLeech and int(size) > LEECH_SPLIT_SIZE or mpart and int(size) > LEECH_SPLIT_SIZE:
             if self.pswd is None:
                 del cmd[4]
