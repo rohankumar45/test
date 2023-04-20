@@ -57,17 +57,17 @@ class Merge:
                 self.__percent = floor(elapsed_time * 100 / self.__duration)
 
     async def merge_vids(self, path, gid):
-        list_files, remove_files = [], []
+        list_files, remove_files, size = [], [], 0
         for dirpath, _, files in await sync_to_async(walk, path):
             for file in natsorted(files):
                 video_file = ospath.join(dirpath, file)
                 if (await get_document_type(video_file))[0]:
                     self.__duration += (await get_media_info(video_file))[0]
+                    size += await get_path_size(video_file)
                     list_files.append(f"file '{video_file}'")
                     remove_files.append(video_file)
         if len(list_files) > 1:
             name = ospath.basename(path)
-            size = await get_path_size(path)
             async with download_dict_lock:
                 download_dict[self.__listener.uid] = FFMpegStatus(name, size, gid, self, self.__listener)
             await update_all_messages()
