@@ -51,7 +51,7 @@ class EngineStatus:
     STATUS_QB = 'qBittorrent'
     STATUS_TG = 'Pyrogram'
     STATUS_YT = 'YT-DLP'
-    STATUS_EXT = 'pExtract'
+    STATUS_EXT = 'p7zip'
     STATUS_SPLIT = 'FFmpeg'
     STATUS_CONVERT = 'FFmpeg'
     STATUS_ZIP = 'p7zip'
