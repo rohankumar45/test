@@ -74,7 +74,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
     else:
         remote, src_path = link.split(':', 1)
         src_path = src_path .strip('/')
-        cmd = ['rclone', 'lsjson', '--fast-list', '--stat', '--no-modtime', '--config', config_path, f'{remote}:{src_path}']
+        cmd = ['./gclone', 'lsjson', '--fast-list', '--stat', '--no-modtime', '--config', config_path, f'{remote}:{src_path}']
         res = await cmd_exec(cmd)
         if res[2] != 0:
             if res[2] != -9:
