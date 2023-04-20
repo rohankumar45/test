@@ -71,10 +71,9 @@ async def cancel_all(message: Message, status: str):
 @new_task
 async def cancell_all_buttons(client: Client, message: Message):
     async with download_dict_lock:
-        count = len(download_dict)
-    if count == 0:
-        await sendMessage('No active tasks!', message)
-        return
+        if len(download_dict) == 0:
+            await sendMessage('No active tasks!', message)
+            return
     buttons = ButtonMaker()
     buttons.button_data('Downloading', f'canall {MirrorStatus.STATUS_DOWNLOADING}')
     buttons.button_data('Uploading', f'canall {MirrorStatus.STATUS_UPLOADING}')
