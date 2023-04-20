@@ -104,9 +104,9 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
     if not link:
         return
     LOGGER.info(f'Cloning Done: {name} | {destination}')
-    cmd1 = ['rclone', 'lsf', '--fast-list', '-R', '--files-only', '--config', config_path, destination]
-    cmd2 = ['rclone', 'lsf', '--fast-list', '-R', '--dirs-only', '--config', config_path, destination]
-    cmd3 = ['rclone', 'size', '--fast-list', '--json', '--config', config_path, destination]
+    cmd1 = ['./gclone', 'lsf', '--fast-list', '-R', '--files-only', '--config', config_path, destination]
+    cmd2 = ['./gclone', 'lsf', '--fast-list', '-R', '--dirs-only', '--config', config_path, destination]
+    cmd3 = ['./gclone', 'size', '--fast-list', '--json', '--config', config_path, destination]
     res1, res2, res3 = await gather(cmd_exec(cmd1), cmd_exec(cmd2), cmd_exec(cmd3))
     if res1[2] != res2[2] != res3[2] != 0:
         if res1[2] == -9:
