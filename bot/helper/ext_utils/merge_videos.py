@@ -7,7 +7,7 @@ from os import path as ospath, walk
 from re import findall as re_findall
 from time import time
 
-from bot import download_dict, download_dict_lock, LOGGER
+from bot import bot_loop, download_dict, download_dict_lock, LOGGER
 from bot.helper.ext_utils.fs_utils import get_path_size, clean_target
 from bot.helper.ext_utils.leech_utils import get_media_info, get_document_type
 from bot.helper.ext_utils.bot_utils import sync_to_async
@@ -21,7 +21,7 @@ class Merge:
         self.__processed_bytes = 0
         # self.__percent = 0
         # self.__eta = 0
-        self.__duration = 0
+        # self.__duration = 0
         self.__start_time = time()
 
     @property
@@ -41,7 +41,7 @@ class Merge:
     #     return self.__eta
 
     async def __progress(self, outfile):
-        while self.__listener.suproc != 0:
+        while True:
             await sleep(1)
             if await aiopath.exists(outfile):
                 self.__processed_bytes = await get_path_size(outfile)
@@ -90,7 +90,9 @@ class Merge:
             cmd = ['ffmpeg', '-ignore_unknown', '-loglevel', 'error', '-progress', progress, '-f', 'concat',
                    '-safe', '0', '-i', input_file, '-map', '0', '-c', 'copy', outfile]
             self.__listener.suproc = await create_subprocess_exec(*cmd)
-            _, code = await gather(self.__progress(outfile), self.__listener.suproc.wait())
+            task = bot_loop.create_task(self.__progress(outfile))
+            code = await self.__listener.suproc.wait()
+            task.cancel()
             if self.__listener.suproc == 'cancelled' or code == -9:
                 return
             elif code == 0:
