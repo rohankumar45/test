@@ -1,16 +1,13 @@
-from time import time
-
 from bot import LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, MirrorStatus, EngineStatus, get_readable_time
 
 
-class FFMpegStatus:
+class MergeStatus:
     def __init__(self, name, size, gid, obj, listener):
         self.__name = name
         self.__gid = gid
         self.__size = size
         self.__obj = obj
-        self.__start_time = time()
         self.__listener = listener
         self.message = listener.message
 
@@ -21,10 +18,14 @@ class FFMpegStatus:
         return self.__gid
 
     def progress(self):
-        return f'{round(self.__obj.percent, 2)}%'
+        try:
+            progress_raw = self.__obj.processed_bytes / self.__size * 100
+        except:
+            progress_raw = 0
+        return f'{round(progress_raw, 2)}%'
 
     def speed(self):
-        return f'{get_readable_file_size(round(self.__obj.processed_bytes / (time() - self.__start_time), 2))}/s'
+        return f'{get_readable_file_size(self.__obj.speed)}/s'
 
     def name(self):
         return self.__name
@@ -33,7 +34,10 @@ class FFMpegStatus:
         return get_readable_file_size(self.__size)
 
     def eta(self):
-        return get_readable_time(self.__obj.eta) if self.__obj.eta else '~'
+        try:
+            return f'{get_readable_time((self.__size - self.__obj.processed_bytes) / self.__obj.speed)}'
+        except:
+            return '~'
 
     def status(self):
         return MirrorStatus.STATUS_MERGING
