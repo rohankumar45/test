@@ -73,7 +73,7 @@ class Merge:
             for file in natsorted(files):
                 video_file = ospath.join(dirpath, file)
                 if (await get_document_type(video_file))[0]:
-                    self.__duration += (await get_media_info(video_file))[0]
+                    # self.__duration += (await get_media_info(video_file))[0]
                     size += await get_path_size(video_file)
                     list_files.append(f"file '{video_file}'")
                     remove_files.append(video_file)
