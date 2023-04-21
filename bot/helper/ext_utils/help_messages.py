@@ -165,6 +165,7 @@ Number and m:folder_name (folder_name without space) should be always before n: 
 2. Options (<b>s, m: go and multi</b>) should be added randomly before link and before any other option.
 3. Options (<b>n:, pswd: and opt:</b>) should be added randomly after the link if link along with the cmd or after cmd if by reply.
 4. You can always add video quality from yt-dlp api options.
+5. Don't add file extension while rename using `n:`
 
 <b>Options Note:</b> Add `^` before integer, some values must be integer and some string.
 Like playlist_items:10 works with string, so no need to add `^` before the number but playlistend works only with integer so you must add `^` before the number like example above.

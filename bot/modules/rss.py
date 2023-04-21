@@ -1,3 +1,4 @@
+from aiofiles import open as aiopen
 from aiohttp import ClientSession
 from apscheduler.triggers.interval import IntervalTrigger
 from asyncio import Lock, sleep
@@ -19,7 +20,7 @@ from bot.helper.ext_utils.exceptions import RssShutdownException
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import deleteMessage, editMessage, sendMessage, sendRss, auto_delete_message
+from bot.helper.telegram_helper.message_utils import deleteMessage, editMessage, sendMessage, sendRss, auto_delete_message, sendFile
 
 
 rss_dict_lock = Lock()
@@ -275,7 +276,15 @@ async def rssGet(client: Client, message: Message, query: CallbackQuery):
                         link = rss_d.entries[item_num]['link']
                     item_info += f"<b>Name: </b><code>{rss_d.entries[item_num]['title'].replace('>', '').replace('<', '')}</code>\n"
                     item_info += f"<b>Link: </b><code>{link}</code>\n\n"
-                await editMessage(item_info, msg)
+                item_info_ecd = item_info.encode()
+                if len(item_info_ecd) > 4000:
+                    filename = f'RSSGet {title} items_no. {count}.txt'
+                    async with aiopen(filename, 'w', encoding='utf-8') as f:
+                        await f.write(f'{item_info_ecd}')
+                    await sendFile(message, filename, f'RSSGet {title} items_no. {count}')
+                    await deleteMessage(msg)
+                else:
+                    await editMessage(item_info, msg)
             except IndexError as e:
                 LOGGER.error(str(e))
                 await editMessage('Parse depth exceeded. Try again with a lower value.', msg)
@@ -284,7 +293,7 @@ async def rssGet(client: Client, message: Message, query: CallbackQuery):
                 await editMessage(str(e), msg)
     except Exception as e:
         LOGGER.error(str(e))
-        msg = await sendMessage(f'Enter a vaild value!. {e}', message)
+        msg = await sendMessage(f'Enter a valid value!. {e}', message)
     await updateRssMenu(query)
     _auto_delete(message, msg, stime=10)
 
@@ -301,7 +310,7 @@ async def rssEdit(client: Client, message: Message, query: CallbackQuery):
             _auto_delete(message, msg)
             continue
         elif not rss_dict[user_id].get(title, False):
-            msg = await sendMessage('Enter a vaild title. Title not found!', message)
+            msg = await sendMessage('Enter a valid title. Title not found!', message)
             _auto_delete(message, msg)
             continue
         inf_lists, exf_lists = [], []
@@ -411,7 +420,7 @@ async def rssListener(client: Client, query: CallbackQuery):
             buttons = ButtonMaker()
             buttons.button_data('<<', f'rss back {user_id}')
             buttons.button_data('Close', f'rss close {user_id}')
-            await editMessage('Send one title with vlaue seperated by space get last X items.\nTitle Value\n\n<i>Timeout: 60s.</i>', message, buttons.build_menu(2))
+            await editMessage('Send one title with vlaue separated by space get last X items.\nTitle Value\n\n<i>Timeout: 60s.</i>', message, buttons.build_menu(2))
             pfunc = partial(rssGet, query=query)
             await event_handler(client, query, pfunc)
     elif data[1] in ['unsubscribe', 'pause', 'resume']:
@@ -429,7 +438,7 @@ async def rssListener(client: Client, query: CallbackQuery):
             elif data[1] == 'unsubscribe':
                 buttons.button_data('Unsub AllMyFeeds', f'rss uallunsub {user_id}')
             buttons.button_data('Close', f'rss close {user_id}')
-            await editMessage( f'Send one or more rss titles seperated by space to {data[1]}.\n\n<i>Timeout: 60s.</i>', message, buttons.build_menu(2))
+            await editMessage( f'Send one or more rss titles separated by space to {data[1]}.\n\n<i>Timeout: 60s.</i>', message, buttons.build_menu(2))
             pfunc = partial(rssUpdate, query=query, state=data[1])
             await event_handler(client, query, pfunc)
     elif data[1] == 'edit':
@@ -441,7 +450,7 @@ async def rssListener(client: Client, query: CallbackQuery):
             buttons = ButtonMaker()
             buttons.button_data('<<', f'rss back {user_id}')
             buttons.button_data('Close', f'rss close {user_id}')
-            msg = '''Send one or more rss titles with new filters or command seperated by new line.
+            msg = '''Send one or more rss titles with new filters or command separated by new line.
 Examples:
 Title1 c: mirror exf: none inf: 1080 or 720 opt: up: remote:path/subdir
 Title2 c: none inf: none opt: none
@@ -519,7 +528,7 @@ Note: Only what you provide will be edited, the rest will be the same like examp
             buttons = ButtonMaker()
             buttons.button_data('<<', f'rss back {user_id}')
             buttons.button_data('Close', f'rss close {user_id}')
-            msg = 'Send one or more user_id seperated by space to delete their resources.\n\n<i>Timeout: 60s.</i>'
+            msg = 'Send one or more user_id separated by space to delete their resources.\n\n<i>Timeout: 60s.</i>'
             await editMessage(msg, message, buttons.build_menu(2))
             pfunc = partial(rssDelete, query=query)
             await event_handler(client, query, pfunc)

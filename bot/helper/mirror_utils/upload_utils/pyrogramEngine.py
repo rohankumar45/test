@@ -133,10 +133,11 @@ class TgUploader:
         try:
             self.__client = bot_dict['USERBOT'] if bot_dict['IS_PREMIUM'] and await get_path_size(self.__up_path) > DEFAULT_SPLIT_SIZE else bot
             is_video, is_audio, is_image = await get_document_type(self.__up_path)
-            if not is_image and not thumb:
+            if not is_image and thumb is None:
                 file_name = ospath.splitext(file)[0]
-                if await aiopath.isfile(ythumb:= f'{self.__path}/yt-dlp-thumb/{file_name}.jpg'):
-                    thumb = ythumb
+                thumb_path = f'{self.__path}/yt-dlp-thumb/{file_name}.jpg'
+                if await aiopath.isfile(thumb_path):
+                    thumb = thumb_path
             ss_image = None
             if is_video:
                 duration = (await get_media_info(self.__up_path))[0]

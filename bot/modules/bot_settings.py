@@ -564,7 +564,7 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         await event_handler(client, query, pfunc, rfunc)
     elif data[1] == 'editaria' and STATE == 'view':
         value = aria2_options[data[2]]
-        if len(value) > 200:
+        if len(str(value)) > 200:
             await query.answer()
             filename = f'{data[2]}.txt'
             async with aiopen(filename, 'w', encoding='utf-8') as f:

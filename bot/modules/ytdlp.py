@@ -1,16 +1,18 @@
 from aiofiles.os import path as aiopath
 from aiohttp import ClientSession
-from asyncio import sleep
+from asyncio import wait_for, Event, wrap_future
+from functools import partial
 from os import path as ospath
 from pyrogram import Client
-from pyrogram.filters import command, regex
+from pyrogram.filters import command, regex, user
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
 from re import split as re_split
+from time import time
 from yt_dlp import YoutubeDL
 
 from bot import bot, config_dict, user_data, DOWNLOAD_DIR, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_url, is_premium_user, is_media, UserDaily, sync_to_async, new_task, is_rclone_path, get_multiid
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_url, is_premium_user, is_media, UserDaily, sync_to_async, new_task, is_rclone_path, get_multiid, get_readable_time, new_thread
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.multi import run_multi, MultiSelect
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
@@ -22,7 +24,193 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, sendMessage, editMessage, auto_delete_message, deleteMessage, sendingMessage
 
 
-listener_dict = {}
+class YtSelection:
+    def __init__(self, client: Client, message: Message, user_id: int):
+        self.__message = message
+        self.__user_id = user_id
+        self.__client = client
+        self.__is_m4a = False
+        self.__time = time()
+        self.__timeout = 120
+        self.__is_playlist = False
+        self.__main_buttons = None
+        self.is_cancelled = False
+        self.event = Event()
+        self.formats = {}
+        self.qual = None
+
+    @new_thread
+    async def __event_handler(self):
+        pfunc = partial(select_format, obj=self)
+        handler = self.__client.add_handler(CallbackQueryHandler(pfunc, filters=regex('^ytq') & user(self.__user_id)), group=-1)
+        try:
+            await wait_for(self.event.wait(), timeout=self.__timeout)
+        except:
+            await editMessage('Timed Out. Task has been cancelled!', self.__message)
+            self.qual = None
+            self.is_cancelled = True
+            self.event.set()
+        finally:
+            self.__client.remove_handler(*handler)
+
+    async def get_quality(self, result):
+        future = self.__event_handler()
+        buttons = ButtonMaker()
+        if 'entries' in result:
+            self.__is_playlist = True
+            for i in ['144', '240', '360', '480', '720', '1080', '1440', '2160']:
+                video_format = f'bv*[height<=?{i}][ext=mp4]+ba[ext=m4a]/b[height<=?{i}]'
+                b_data = f'{i}|mp4'
+                self.formats[b_data] = video_format
+                buttons.button_data(f'{i}-mp4', f'ytq {b_data}')
+                video_format = f'bv*[height<=?{i}][ext=webm]+ba/b[height<=?{i}]'
+                b_data = f'{i}|webm'
+                self.formats[b_data] = video_format
+                buttons.button_data(f'{i}-webm', f'ytq {b_data}')
+            buttons.button_data('MP3', 'ytq mp3')
+            buttons.button_data('Audio Formats', 'ytq audio')
+            buttons.button_data('Best Videos', 'ytq bv*+ba/b')
+            buttons.button_data('Best Audios', 'ytq ba/b')
+            buttons.button_data('Cancel', 'ytq cancel', 'footer')
+            self.__main_buttons = buttons.build_menu(3)
+            msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout - (time()-self.__time))}'
+        else:
+            format_dict = result.get('formats')
+            if format_dict is not None:
+                for item in format_dict:
+                    if item.get('tbr'):
+                        format_id = item['format_id']
+
+                        if item.get('filesize'):
+                            size = item['filesize']
+                        elif item.get('filesize_approx'):
+                            size = item['filesize_approx']
+                        else:
+                            size = 0
+
+                        if item.get('video_ext') == 'none' and item.get('acodec') != 'none':
+                            if item.get('audio_ext') == 'm4a':
+                                self.__is_m4a = True
+                            b_name = f"{item['acodec']}-{item['ext']}"
+                            v_format = f'ba[format_id={format_id}]'
+                        elif item.get('height'):
+                            height = item['height']
+                            ext = item['ext']
+                            fps = item['fps'] if item.get('fps') else ''
+                            b_name = f'{height}p{fps}-{ext}'
+                            ba_ext = '[ext=m4a]' if self.__is_m4a and ext == 'mp4' else ''
+                            v_format = f'bv*[format_id={format_id}]+ba{ba_ext}/b[height=?{height}]'
+                        else:
+                            continue
+
+                        self.formats.setdefault(b_name, {})[f"{item['tbr']}"] = [
+                            size, v_format]
+
+                for b_name, tbr_dict in self.formats.items():
+                    if len(tbr_dict) == 1:
+                        tbr, v_list = next(iter(tbr_dict.items()))
+                        buttonName = f'{b_name} ({get_readable_file_size(v_list[0])})'
+                        buttons.button_data(buttonName, f'ytq sub {b_name} {tbr}')
+                    else:
+                        buttons.button_data(b_name, f'ytq dict {b_name}')
+            buttons.button_data('MP3', 'ytq mp3')
+            buttons.button_data('Audio Formats', 'ytq audio')
+            buttons.button_data('Best Video', 'ytq bv*+ba/b')
+            buttons.button_data('Best Audio', 'ytq ba/b')
+            buttons.button_data('Cancel', 'ytq cancel', 'footer')
+            self.__main_buttons = buttons.build_menu(2)
+            msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        await editMessage(msg, self.__message, self.__main_buttons)
+        await wrap_future(future)
+        return self.qual
+
+    async def back_to_main(self):
+        if self.__is_playlist:
+            msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout - (time()-  self.__time))}'
+        else:
+            msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        await editMessage(msg, self.__message, self.__main_buttons)
+
+    async def qual_subbuttons(self, b_name):
+        buttons = ButtonMaker()
+        tbr_dict = self.formats[b_name]
+        for tbr, d_data in tbr_dict.items():
+            button_name = f'{tbr}K ({get_readable_file_size(d_data[0])})'
+            buttons.button_data(button_name, f'ytq sub {b_name} {tbr}')
+        buttons.button_data('Back', 'ytq back', 'footer')
+        buttons.button_data('Cancel', 'ytq cancel', 'footer')
+        msg = f'Choose Bit rate for <b>{b_name}</b>:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        await editMessage(msg, self.__message, buttons.build_menu(2))
+
+    async def mp3_subbuttons(self):
+        i = 's' if self.__is_playlist else ''
+        buttons = ButtonMaker()
+        audio_qualities = [64, 128, 320]
+        for q in audio_qualities:
+            audio_format = f'ba/b-mp3-{q}'
+            buttons.button_data(f'{q}K-mp3', f'ytq {audio_format}')
+        buttons.button_data('Back', 'ytq back')
+        buttons.button_data('Cancel', 'ytq cancel')
+        msg = f'Choose mp3 Audio{i} Bitrate:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        await editMessage(msg, self.__message, buttons.build_menu(3))
+
+    async def audio_format(self):
+        i = 's' if self.__is_playlist else ''
+        buttons = ButtonMaker()
+        for frmt in ['aac', 'alac', 'flac', 'm4a', 'opus', 'vorbis', 'wav']:
+            audio_format = f'ba/b-{frmt}-'
+            buttons.button_data(frmt, f'ytq aq {audio_format}')
+        buttons.button_data('Back', 'ytq back', 'footer')
+        buttons.button_data('Cancel', 'ytq cancel', 'footer')
+        msg = f'Choose Audio{i} Format:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        await editMessage(msg, self.__message, buttons.build_menu(3))
+
+    async def audio_quality(self, format):
+        i = 's' if self.__is_playlist else ''
+        buttons = ButtonMaker()
+        for qual in range(11):
+            audio_format = f'{format}{qual}'
+            buttons.button_data(qual, f'ytq {audio_format}')
+        buttons.button_data('Back', 'ytq aq back')
+        buttons.button_data('Cancel', 'ytq aq cancel')
+        subbuttons = buttons.build_menu(5)
+        msg = f'Choose Audio{i} Qaulity:\n0 is best and 10 is worst\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        await editMessage(msg, self.__message, subbuttons)
+
+
+@new_task
+async def select_format(client: Client, query: CallbackQuery, obj: YtSelection):
+    data = query.data.split()
+    message = query.message
+    await query.answer()
+
+    if data[1] == 'dict':
+        b_name = data[2]
+        await obj.qual_subbuttons(b_name)
+    elif data[1] == 'mp3':
+        await obj.mp3_subbuttons()
+    elif data[1] == 'audio':
+        await obj.audio_format()
+    elif data[1] == 'aq':
+        if data[2] == 'back':
+            await obj.audio_format()
+        else:
+            await obj.audio_quality(data[2])
+    elif data[1] == 'back':
+        await obj.back_to_main()
+    elif data[1] == 'cancel':
+        await editMessage('Task has been cancelled.', message)
+        obj.qual = None
+        obj.is_cancelled = True
+        obj.event.set()
+    else:
+        if data[1] == 'sub':
+            obj.qual = obj.formats[data[2]][data[3]][1]
+        elif '|' in data[1]:
+            obj.qual = obj.formats[data[1]]
+        else:
+            obj.qual = data[1]
+        obj.event.set()
 
 
 def extract_info(link):
@@ -120,7 +308,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             elif x.startswith('m:'):
                 marg = x.split('m:', 1)
                 if len(marg) > 1:
-                    folder_name = f"/{marg[1]}"
+                    folder_name = f'/{marg[1]}'
                     if not sameDir:
                         sameDir = set()
                     sameDir.add(message.id)
@@ -229,177 +417,16 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             qual = user_dict['yt_ql']
         else:
             qual = config_dict.get('YT_DLP_QUALITY')
-    if qual:
-        await deleteMessage(check_)
-        playlist = 'entries' in result
-        LOGGER.info(f'Downloading with YT-DLP: {link}')
-        ydl = YoutubeDLHelper(listener)
-        await ydl.add_download(link, path, name, qual, playlist, opt)
-    else:
-        buttons = ButtonMaker()
-        best_video = 'bv*+ba/b'
-        best_audio = 'ba/b'
-        formats_dict = {}
-        if 'entries' in result:
-            for i in ['144', '240', '360', '480', '720', '1080', '1440', '2160']:
-                video_format = f'bv*[height<=?{i}][ext=mp4]+ba[ext=m4a]/b[height<=?{i}]'
-                b_data = f'{i}|mp4'
-                formats_dict[b_data] = video_format
-                buttons.button_data(f'{i}-mp4', f'qu {msg_id} {b_data} t')
-                video_format = f'bv*[height<=?{i}][ext=webm]+ba/b[height<=?{i}]'
-                b_data = f'{i}|webm'
-                formats_dict[b_data] = video_format
-                buttons.button_data(f'{i}-webm', f'qu {msg_id} {b_data} t')
-            buttons.button_data('MP3', f'qu {msg_id} mp3 t')
-            buttons.button_data('Best Videos', f'qu {msg_id} {best_video} t')
-            buttons.button_data('Best Audios', f'qu {msg_id} {best_audio} t')
-            buttons.button_data('Cancel', f'qu {msg_id} cancel')
-            mbuttons = buttons.build_menu(3)
-            await editMessage(f'{tag}, Choose Playlist Videos Quality:', check_, mbuttons)
-        else:
-            formats = result.get('formats')
-            is_m4a = False
-            if formats is not None:
-                for frmt in formats:
-                    if frmt.get('tbr'):
 
-                        format_id = frmt['format_id']
-
-                        if frmt.get('filesize'):
-                            size = frmt['filesize']
-                        elif frmt.get('filesize_approx'):
-                            size = frmt['filesize_approx']
-                        else:
-                            size = 0
-
-                        if frmt.get('video_ext') == 'none' and frmt.get('acodec') != 'none':
-                            if frmt.get('audio_ext') == 'm4a':
-                                is_m4a = True
-                            b_name = f"{frmt['acodec']}-{frmt['ext']}"
-                            v_format = f'ba[format_id={format_id}]'
-                        elif frmt.get('height'):
-                            height = frmt['height']
-                            ext = frmt['ext']
-                            fps = frmt['fps'] if frmt.get('fps') else ''
-                            b_name = f'{height}p{fps}-{ext}'
-                            ba_ext = '[ext=m4a]' if is_m4a and ext == 'mp4' else ''
-                            v_format = f"bv*[format_id={format_id}]+ba{ba_ext}/b[height=?{height}]"
-                        else:
-                            continue
-
-                        formats_dict.setdefault(b_name, {})[str(frmt['tbr'])] = [
-                            size, v_format]
-
-                for b_name, tbr_dict in formats_dict.items():
-                    if len(tbr_dict) == 1:
-                        tbr, v_list = next(iter(tbr_dict.items()))
-                        buttonName = f'{b_name} ({get_readable_file_size(v_list[0])})'
-                        buttons.button_data(buttonName, f'qu {msg_id} {b_name}|{tbr}')
-                    else:
-                        buttons.button_data(b_name, f'qu {msg_id} dict {b_name}')
-            buttons.button_data('MP3', f'qu {msg_id} mp3')
-            buttons.button_data('Best Video', f'qu {msg_id} {best_video}')
-            buttons.button_data('Best Audio', f'qu {msg_id} {best_audio}')
-            buttons.button_data('Cancel', f'qu {msg_id} cancel')
-            mbuttons = buttons.build_menu(2)
-            await editMessage(f'{tag}, Choose Video Quality:', check_, mbuttons)
-
-        listener_dict[msg_id] = [listener, user_id, link, name, mbuttons, opt, formats_dict, path]
-        _auto_cancel(check_, msg_id)
-
-
-async def _qual_subbuttons(task_id: int, b_name: str, msg: Message):
-    buttons = ButtonMaker()
-    tbr_dict = listener_dict[task_id][6][b_name]
-    for tbr, d_data in tbr_dict.items():
-        button_name = f"{tbr}K ({get_readable_file_size(d_data[0])})"
-        buttons.button_data(button_name, f"qu {task_id} {b_name}|{tbr}")
-    buttons.button_data("Back", f"qu {task_id} back")
-    buttons.button_data("Cancel", f"qu {task_id} cancel")
-    await editMessage(f'Choose Bit rate for <b>{b_name}</b>:', msg, buttons.build_menu(2))
-
-
-async def _mp3_subbuttons(task_id: str, msg: Message, playlist: bool=False):
-    buttons = ButtonMaker()
-    audio_qualities = [64, 128, 320]
-    for q in audio_qualities:
-        if playlist:
-            i = 's'
-            audio_format = f'ba/b-{q} t'
-        else:
-            i = ''
-            audio_format = f'ba/b-{q}'
-        buttons.button_data(f'{q}K-mp3', f'qu {task_id} {audio_format}')
-    buttons.button_data('Back', f'qu {task_id} back')
-    buttons.button_data('Cancel', f'qu {task_id} cancel')
-    await editMessage(f'Choose Audio{i} Bitrate:', msg, buttons.build_menu(2))
-
-
-@new_task
-async def select_format(client: Client, query: CallbackQuery):
-    user_id = query.from_user.id
-    message = query.message
-    data = query.data.split()
-    task_id = int(data[1])
-    try:
-        task_info = listener_dict[task_id]
-    except:
-        await editMessage('This is an old task!', message)
-        return
-    uid = task_info[1]
-    if user_id != uid and not await CustomFilters.sudo(client, query):
-        await query.answer('This task is not for you!', show_alert=True)
-        return
-    elif data[2] == 'dict':
-        await query.answer()
-        b_name = data[3]
-        await _qual_subbuttons(task_id, b_name, message)
-        return
-    elif data[2] == 'back':
-        await query.answer()
-        await editMessage('Choose Video Quality:', message, task_info[4])
-        return
-    elif data[2] == 'mp3':
-        await query.answer()
-        playlist = len(data) == 4
-        await _mp3_subbuttons(task_id, message, playlist)
-        return
-    elif data[2] == 'cancel':
-        await query.answer()
-        await editMessage('Task has been cancelled!', message)
-        del listener_dict[task_id]
-    else:
-        await query.answer()
-        listener = task_info[0]
-        link = task_info[2]
-        name = task_info[3]
-        opt = task_info[5]
-        qual = data[2]
-        path = task_info[7]
-        if len(data) == 4:
-            playlist = True
-            if '|' in qual:
-                qual = task_info[6][qual]
-        else:
-            playlist = False
-            if '|' in qual:
-                b_name, tbr = qual.split('|')
-                qual = task_info[6][b_name][tbr][1]
-        LOGGER.info(f'Downloading with YT-DLP: {link}')
-        await deleteMessage(message)
-        del listener_dict[task_id]
-        ydl = YoutubeDLHelper(listener)
-        await ydl.add_download(link, path, name, qual, playlist, opt)
-
-
-@new_task
-async def _auto_cancel(msg, task_id):
-    await sleep(120)
-    try:
-        del listener_dict[task_id]
-        await editMessage('Timed out! Task has been cancelled!', msg)
-    except:
-        pass
+    if not qual:
+        qual = await YtSelection(client, check_, user_id).get_quality(result)
+        if qual is None:
+            return
+    await deleteMessage(check_)
+    LOGGER.info(f'Downloading with YT-DLP: {link}')
+    playlist = 'entries' in result
+    ydl = YoutubeDLHelper(listener)
+    await ydl.add_download(link, path, name, qual, playlist, opt)
 
 
 async def ytdl(client, message):
@@ -422,4 +449,3 @@ bot.add_handler(MessageHandler(ytdl, filters=command(BotCommands.YtdlCommand) & 
 bot.add_handler(MessageHandler(ytdlZip, filters=command(BotCommands.YtdlZipCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(ytdlleech, filters=command(BotCommands.YtdlLeechCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(ytdlZipleech, filters=command(BotCommands.YtdlZipLeechCommand) & CustomFilters.authorized))
-bot.add_handler(CallbackQueryHandler(select_format, filters=regex('^qu')))

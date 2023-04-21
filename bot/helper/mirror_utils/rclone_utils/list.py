@@ -17,7 +17,6 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import editMessage
 
 LIST_LIMIT = 6
-TIMEOUT = 240
 
 
 class RcloneList:
@@ -29,6 +28,7 @@ class RcloneList:
         self.__rc_owner = False
         self.__sections = []
         self.__time = time()
+        self.__timeout = 240
         self.remote = ''
         self.is_cancelled = False
         self.query_proc = False
@@ -47,7 +47,7 @@ class RcloneList:
         pfunc = partial(path_updates, obj=self)
         handler = self.__client.add_handler(CallbackQueryHandler(pfunc, filters=regex('^rcq') & user(self.__user_id)), group=-1)
         try:
-            await wait_for(self.event.wait(), timeout=240)
+            await wait_for(self.event.wait(), timeout=self.__timeout)
         except:
             self.path = ''
             self.remote = 'Timed Out. Task has been cancelled!'
@@ -99,7 +99,7 @@ class RcloneList:
         msg += f"Transfer Type: <b>{'Download' if self.list_status == 'rcd' else 'Upload' }</b>\n"
         msg += f'Config Path: <b>{self.config_path}</b>\n'
         msg += f'Current Path: <code>{self.remote}{self.path}</code>\n\n'
-        msg += f'<i>Timeout: {get_readable_time(TIMEOUT-(time()-self.__time))}</i>'
+        msg += f'<i>Timeout: {get_readable_time(self.__timeout-(time()-self.__time))}</i>'
         if not self.is_cancelled:
             await editMessage(msg, self.__message, buttons.build_menu(f_cols=2))
 
@@ -142,7 +142,7 @@ class RcloneList:
         else:
             msg = 'Choose Rclone remote:\n' + f"Transfer Type: <b>{'Download' if self.list_status == 'rcd' else 'Upload'}</b>\n"
             msg += f'Config Path: <b>{self.config_path}</b>\n\n'
-            msg += f'<i>Timeout: {get_readable_time(TIMEOUT-(time()-self.__time))}.</i>'
+            msg += f'<i>Timeout: {get_readable_time(self.__timeout-(time()-self.__time))}.</i>'
             buttons = ButtonMaker()
             for remote in self.__sections:
                 buttons.button_data(remote, f'rcq re {remote}:')
@@ -155,7 +155,7 @@ class RcloneList:
     async def list_config(self):
         if self.__rc_user and self.__rc_owner:
             msg = 'Choose Rclone remote:\n' + f"Transfer Type: <b>{'Download' if self.list_status == 'rcd' else 'Upload'}</b>\n\n"
-            msg += f'<i>Timeout: {get_readable_time(TIMEOUT-(time()-self.__time))}.</i>'
+            msg += f'<i>Timeout: {get_readable_time(self.__timeout-(time()-self.__time))}.</i>'
             buttons = ButtonMaker()
             buttons.button_data('Owner Config', 'rcq owner')
             buttons.button_data('My Config', 'rcq user')
