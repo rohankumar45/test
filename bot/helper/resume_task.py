@@ -79,7 +79,7 @@ async def start_resume_task(client: Client, tasks: list):
             _ytdl(client, message, isZip, isLeech)
         else:
             _mirror_leech(client, message, isZip, extract, isQbit, isLeech)
-        await sleep(3)
+        await sleep(6)
     del incompte_dict[msg.from_user.id]
 
 async def resume_task(client: Client, query: CallbackQuery):
