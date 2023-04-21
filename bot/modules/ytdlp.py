@@ -73,7 +73,7 @@ class YtSelection:
             buttons.button_data('Best Audios', 'ytq ba/b')
             buttons.button_data('Cancel', 'ytq cancel', 'footer')
             self.__main_buttons = buttons.build_menu(3)
-            msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout - (time()-self.__time))}'
+            msg = f'Choose Available Playlist Videos Quality:\n\n<i>Timeout: {get_readable_time(self.__timeout - (time()-self.__time))}</i>'
         else:
             format_dict = result.get('formats')
             if format_dict is not None:
@@ -119,16 +119,17 @@ class YtSelection:
             buttons.button_data('Best Audio', 'ytq ba/b')
             buttons.button_data('Cancel', 'ytq cancel', 'footer')
             self.__main_buttons = buttons.build_menu(2)
-            msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+            msg = f'Choose Available Video Quality:\n\n<i>Timeout: {get_readable_time(self.__timeout - (time() - self.__time))}</i>'
         await editMessage(msg, self.__message, self.__main_buttons)
         await wrap_future(future)
         return self.qual
 
     async def back_to_main(self):
+        time_out = f'<i>Timeout: {get_readable_time(self.__timeout - (time()-  self.__time))}</i>'
         if self.__is_playlist:
-            msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout - (time()-  self.__time))}'
+            msg = f'Choose Available Playlist Videos Quality:\n\n{time_out}'
         else:
-            msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+            msg = f'Choose Available Video Quality:\n\n{time_out}'
         await editMessage(msg, self.__message, self.__main_buttons)
 
     async def qual_subbuttons(self, b_name):
@@ -139,7 +140,7 @@ class YtSelection:
             buttons.button_data(button_name, f'ytq sub {b_name} {tbr}')
         buttons.button_data('Back', 'ytq back', 'footer')
         buttons.button_data('Cancel', 'ytq cancel', 'footer')
-        msg = f'Choose Bit rate for <b>{b_name}</b>:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        msg = f'Choose available Bit rate for <b>{b_name}</b>:\n\n<i>Timeout: {get_readable_time(self.__timeout - (time() - self.__time))}</i>'
         await editMessage(msg, self.__message, buttons.build_menu(2))
 
     async def mp3_subbuttons(self):
@@ -151,7 +152,7 @@ class YtSelection:
             buttons.button_data(f'{q}K-mp3', f'ytq {audio_format}')
         buttons.button_data('Back', 'ytq back')
         buttons.button_data('Cancel', 'ytq cancel')
-        msg = f'Choose mp3 Audio{i} Bitrate:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        msg = f'Choose mp3 Audio{i} Bitrate:\n\n<i>Timeout: {get_readable_time(self.__timeout - (time() - self.__time))}</i>'
         await editMessage(msg, self.__message, buttons.build_menu(3))
 
     async def audio_format(self):
@@ -162,7 +163,7 @@ class YtSelection:
             buttons.button_data(frmt, f'ytq aq {audio_format}')
         buttons.button_data('Back', 'ytq back', 'footer')
         buttons.button_data('Cancel', 'ytq cancel', 'footer')
-        msg = f'Choose Audio{i} Format:\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        msg = f'Choose Audio{i} Format:\n\n<b>Timeout: {get_readable_time(self.__timeout - (time() - self.__time))}</b>'
         await editMessage(msg, self.__message, buttons.build_menu(3))
 
     async def audio_quality(self, format):
@@ -174,7 +175,7 @@ class YtSelection:
         buttons.button_data('Back', 'ytq aq back')
         buttons.button_data('Cancel', 'ytq aq cancel')
         subbuttons = buttons.build_menu(5)
-        msg = f'Choose Audio{i} Qaulity:\n0 is best and 10 is worst\nTimeout: {get_readable_time(self.__timeout - (time() - self.__time))}'
+        msg = f'Choose Audio{i} Qaulity:\n0 is best and 10 is worst\n\n<b>Timeout: {get_readable_time(self.__timeout - (time() - self.__time))}</b>'
         await editMessage(msg, self.__message, subbuttons)
 
 
