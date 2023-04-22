@@ -10,7 +10,7 @@ from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
 from time import time
 
-from bot import bot, user_data, config_dict, DATABASE_URL, LOGGER
+from bot import bot, user_data, config_dict, DATABASE_URL
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.force_mode import ForceMode
@@ -136,12 +136,12 @@ async def get_user_settings(from_user, data: str, uset_data: str):
         rccmsg, buttonkey = ('EXISTS ✅', '✅ RClone') if await aiopath.exists(rclone_path) else ('NOT SET', 'RClone')
         buttons.button_data(buttonkey, f'userset {user_id} setdata rcc')
 
-        YQ = config_dict['YT_DLP_OPTIONS']
+        YOPT = config_dict['YT_DLP_OPTIONS']
         buttonkey = '✅ YT-DLP'
         if user_dict.get('yt_opt'):
             yto = f"\n<b><code>{escape(user_dict['yt_opt'])}</code></b>"
-        elif 'yt_opt' not in user_dict and YQ:
-            yto = f"\n<b><code>{escape(YQ)}</code></b>"
+        elif 'yt_opt' not in user_dict and YOPT:
+            yto = f"\n<b><code>{escape(YOPT)}</code></b>"
         else:
             buttonkey = 'YT-DLP'
             yto = '<b>NONE</b>'
@@ -310,7 +310,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                 buttons.button_data('Set Remname', f'userset {user_id} prepare remname')
         elif uset_data == 'yto':
             text, image = MSG.YT.replace('Timeout: 60s.', ''), config_dict['IMAGE_YT']
-            if user_dict.get('yt_opt') or config_dict['YT_DLP_QUALITY']:
+            if user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']:
                 buttons.button_data('Change YT-DLP', f'userset {user_id} prepare yto')
                 buttons.button_data('Remove YT-DLP', f'userset {user_id} ryto')
             else:
@@ -440,7 +440,6 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
-    LOGGER.info(data)
     user_dict = user_data.get(user_id, {})
     premi_features = {'capmode': 'user_caption',
                       'dumpid': 'dump_id',
