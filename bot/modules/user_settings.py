@@ -79,11 +79,11 @@ Example: <code>[</code><b>|</b><code>]</code><b>|</b> <code>-</code>\n
 Timeout: 60s.</i>
 '''
         YT = f'''
-<b>YT-DLP QUALITY SETTING</b>\n
+<b>YT-DLP OPTIONS SETTING</b>\n
 Examples:
 1. <code>{escape('bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080]')}</code> this will give 1080p-mp4.
 2. <code>{escape('bv*[height<=720][ext=webm]+ba/b[height<=720]')}</code> this will give 720p-webm.
-Check all available qualities options <a href="https://github.com/yt-dlp/yt-dlp#filtering-formats">HERE</a>.\n
+Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a> or use this <a href='https://t.me/mltb_official/177'>script</a> to convert cli arguments to api options.\n
 <i>Timeout: 60s.</i>
 '''
 
