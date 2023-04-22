@@ -214,8 +214,8 @@ async def select_format(client: Client, query: CallbackQuery, obj: YtSelection):
         obj.event.set()
 
 
-def extract_info(link):
-    with YoutubeDL({'usenetrc': True, 'cookiefile': 'cookies.txt', 'playlist_items': '0'}) as ydl:
+def extract_info(link, options):
+    with YoutubeDL(options) as ydl:
         result = ydl.extract_info(link, download=False)
         if result is None:
             raise ValueError('Info result is None')
@@ -398,8 +398,24 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     listener = MirrorLeechListener(message, isZip, isLeech=isLeech, isGofile=isGofile, pswd=pswd, tag=tag, newname=name, multiId=multiid, sameDir=sameDir, rcFlags=rcf, upPath=up)
     if 'mdisk.me' in link:
         name, link = await _mdisk(link, name)
+    options = {'usenetrc': True, 'cookiefile': 'cookies.txt', 'playlist_items': '0'}
+    if opt:
+        yt_opt = opt.split('|')
+        for ytopt in yt_opt:
+            kv = ytopt.split(':', 1)
+            key = kv[0].strip()
+            value = kv[1].strip()
+            if value.startswith('^'):
+                value = float(value.split('^')[1])
+            elif value.lower() == 'true':
+                value = True
+            elif value.lower() == 'false':
+                value = False
+            elif value.startswith(('{', '[', '(')) and value.endswith(('}', ']', ')')):
+                value = eval(value)
+            options[key] = value
     try:
-        result = await sync_to_async(extract_info, link)
+        result = await sync_to_async(extract_info, link, options)
     except Exception as e:
         e = str(e).replace('<', ' ').replace('>', ' ')
         await editMessage(f'{tag} {e}', check_)
@@ -408,12 +424,8 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     run_multi(mlist, _ytdl, isZip, isLeech, sameDir)
     if not select:
         user_dict = user_data.get(user_id, {})
-        if 'format:' in opt:
-            opts = opt.split('|')
-            for f in opts:
-                if f.startswith('format:'):
-                    qual = f.split('format:', 1)[1]
-                    break
+        if 'format:' in options:
+            qual = options['format']
         elif user_dict.get('yt_ql'):
             qual = user_dict['yt_ql']
         else:
@@ -421,7 +433,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
 
     if not qual:
         qual = await YtSelection(client, check_, user_id).get_quality(result)
-        if qual is None:
+        if not qual:
             return
     await deleteMessage(check_)
     LOGGER.info(f'Downloading with YT-DLP: {link}')
