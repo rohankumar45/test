@@ -190,7 +190,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
     if isGofile:
         await editMessage('<i>GoFile upload has been enabled!</i>', check_)
-        await sleep(2)
+        await sleep(1)
 
     if not is_mega_link(link) and not isQbit and not is_magnet(link) and not is_rclone_path(link) \
         and not is_gdrive_link(link) and not link.endswith('.torrent') and not file_:
