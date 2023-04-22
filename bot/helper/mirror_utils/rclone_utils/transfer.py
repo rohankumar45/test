@@ -26,7 +26,7 @@ class RcloneTransferHelper:
         self.__is_upload = False
         self.__sa_count = 1
         self.__sa_index = 0
-        self.__sa_number = 100
+        self.__sa_number = 0
         self.name = name
 
     @property
@@ -100,7 +100,7 @@ class RcloneTransferHelper:
             error = (await self.__proc.stderr.read()).decode().strip()
             LOGGER.error(error)
             if 'RATE_LIMIT_EXCEEDED' in error and config_dict['USE_SERVICE_ACCOUNTS']:
-                if self.__sa_count < self.__sa_number:
+                if self.__sa_number != 0 and self.__sa_count < self.__sa_number:
                     remote = self.__switchServiceAccount()
                     cmd[7] = f"{remote}:{cmd[7].split(':', 1)[1]}"
                     if self.__is_cancelled:
@@ -126,6 +126,8 @@ class RcloneTransferHelper:
         cmd = await self.__getUpdatedCommand(config_path, f'{remote}:{rc_path}', path, rcflags, 'copy')
         if remote_type == 'drive' and not config_dict['RCLONE_FLAGS'] and not self.__listener.rcFlags:
             cmd.append('--drive-acknowledge-abuse')
+        elif remote_type != 'drive':
+            cmd.extend(('--retries-sleep', '3s'))
         await self.__start_download(cmd)
 
     async def __get_gdrive_link(self, config_path, remote, rc_path, mime_type):
@@ -163,7 +165,7 @@ class RcloneTransferHelper:
             error = (await self.__proc.stderr.read()).decode().strip()
             LOGGER.error(error)
             if 'RATE_LIMIT_EXCEEDED' in error and config_dict['USE_SERVICE_ACCOUNTS']:
-                if self.__sa_count < self.__sa_number:
+                if self.__sa_number != 0 and self.__sa_count < self.__sa_number:
                     remote = self.__switchServiceAccount()
                     cmd[6] = f"{remote}:{cmd[6].split(':', 1)[1]}"
                     return False if self.__is_cancelled else self.__start_upload(cmd)
@@ -208,6 +210,8 @@ class RcloneTransferHelper:
         cmd = await self.__getUpdatedCommand(fconfig_path, path, f'{fremote}:{rc_path}', rcflags, method)
         if remote_type == 'drive' and not config_dict['RCLONE_FLAGS'] and not self.__listener.rcFlags:
             cmd.extend(('--drive-chunk-size', '64M', '--drive-upload-cutoff', '32M'))
+        elif remote_type != 'drive':
+            cmd.extend(('--retries-sleep', '3s'))
         result = await self.__start_upload(cmd)
         if not result:
             return
@@ -238,6 +242,8 @@ class RcloneTransferHelper:
         cmd = await self.__getUpdatedCommand(config_path, f'{remote}:{source}', destination, rcflags, 'copy')
         if remote_type == 'drive' and not rcflags:
             cmd.extend(('--drive-chunk-size', '64M', '--tpslimit', '3', '--transfers', '3', '--drive-upload-cutoff', '32M', '--drive-acknowledge-abuse'))
+        elif remote_type != 'drive':
+            cmd.extend(('--retries-sleep', '3s'))
         cmd.append('--server-side-across-configs')
         self.__proc = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
         _, return_code = await gather(self.__progress(), self.__proc.wait())
@@ -306,10 +312,10 @@ class RcloneTransferHelper:
             rcflags = rcflags.split('|')
             for flag in rcflags:
                 if ":" in flag:
-                    key, value = flag.split(":", 1)
+                    key, value = map(str.strip, flag.split(':', 1))
                     cmd.extend((key, value))
                 elif len(flag) > 0:
-                    cmd.append(flag)
+                    cmd.append(flag.strip())
         return cmd
 
     @staticmethod

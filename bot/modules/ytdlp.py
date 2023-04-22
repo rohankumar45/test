@@ -349,6 +349,8 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     up = mssg.split(' up: ', 1)
     up = re_split(' n: | pswd: | rcf: | opt: ', up[1])[0].strip() if len(up) > 1 else None
 
+    opt = opt or config_dict['YT_DLP_OPTIONS']
+
     if reply_to and not is_media(reply_to) and len(link) == 0:
         link = reply_to.text.split('\n', 1)[0].strip()
 
@@ -402,9 +404,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     if opt:
         yt_opt = opt.split('|')
         for ytopt in yt_opt:
-            kv = ytopt.split(':', 1)
-            key = kv[0].strip()
-            value = kv[1].strip()
+            key, value = map(str.strip, ytopt.split(':', 1))
             if value.startswith('^'):
                 value = float(value.split('^')[1])
             elif value.lower() == 'true':
@@ -428,8 +428,6 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             qual = options['format']
         elif user_dict.get('yt_ql'):
             qual = user_dict['yt_ql']
-        else:
-            qual = config_dict.get('YT_DLP_QUALITY')
 
     if not qual:
         qual = await YtSelection(client, check_, user_id).get_quality(result)

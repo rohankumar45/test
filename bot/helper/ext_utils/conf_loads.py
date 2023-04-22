@@ -195,7 +195,7 @@ async def load_config():
     SAVE_SESSION_STRING = environ.get('SAVE_SESSION_STRING', '')
     AUTO_DELETE_MESSAGE_DURATION = int(environ.get('AUTO_DELETE_MESSAGE_DURATION', 30))
     AUTO_DELETE_UPLOAD_MESSAGE_DURATION = int(environ.get('AUTO_DELETE_UPLOAD_MESSAGE_DURATION', 0))
-    YT_DLP_QUALITY = environ.get('YT_DLP_QUALITY', '')
+    YT_DLP_OPTIONS = environ.get('YT_DLP_OPTIONS', '')
     DAILY_LIMIT_SIZE = int(environ.get('DAILY_LIMIT_SIZE', 2))
     STATUS_UPDATE_INTERVAL = int(environ.get('STATUS_UPDATE_INTERVAL', 5))
     if len(download_dict) != 0:
@@ -523,7 +523,7 @@ async def load_config():
                         'AUTO_DELETE_MESSAGE_DURATION': AUTO_DELETE_MESSAGE_DURATION,
                         'AUTO_DELETE_UPLOAD_MESSAGE_DURATION': AUTO_DELETE_UPLOAD_MESSAGE_DURATION,
                         'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
-                        'YT_DLP_QUALITY': YT_DLP_QUALITY,
+                        'YT_DLP_OPTIONS': YT_DLP_OPTIONS,
                         'AUTO_THUMBNAIL': AUTO_THUMBNAIL,
                         'PREMIUM_MODE': PREMIUM_MODE,
                         'DAILY_MODE': DAILY_MODE,

@@ -136,16 +136,16 @@ async def get_user_settings(from_user, data: str, uset_data: str):
         rccmsg, buttonkey = ('EXISTS ✅', '✅ RClone') if await aiopath.exists(rclone_path) else ('NOT SET', 'RClone')
         buttons.button_data(buttonkey, f'userset {user_id} setdata rcc')
 
-        YQ = config_dict['YT_DLP_QUALITY']
+        YQ = config_dict['YT_DLP_OPTIONS']
         buttonkey = '✅ YT-DLP'
-        if user_dict.get('yt_ql'):
-            ytq = f"\n<b><code>{escape(user_dict['yt_ql'])}</code></b>"
-        elif 'yt_ql' not in user_dict and YQ:
-            ytq = f"\n<b><code>{escape(YQ)}</code></b>"
+        if user_dict.get('yt_opt'):
+            yto = f"\n<b><code>{escape(user_dict['yt_opt'])}</code></b>"
+        elif 'yt_opt' not in user_dict and YQ:
+            yto = f"\n<b><code>{escape(YQ)}</code></b>"
         else:
             buttonkey = 'YT-DLP'
-            ytq = '<b>NONE</b>'
-        buttons.button_data(buttonkey, f'userset {user_id} setdata ytq')
+            yto = '<b>NONE</b>'
+        buttons.button_data(buttonkey, f'userset {user_id} setdata yto')
 
         buttons.button_data('Caption', f'userset {user_id} capmode')
         buttons.button_data('Zip Mode', f'userset {user_id} zipmode')
@@ -184,7 +184,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
             f"<b>├ </b>Sufname: <b>{sufname}</b>\n"\
             f"<b>├ </b>Merge Videos: <b>{mergevid}</b>\n"\
             f"<b>├ </b>Custom Caption: <b>{custom_cap}</b>\n"\
-            f"<b>└ </b>YT-DLP Quality: {ytq}\n\n"
+            f"<b>└ </b>YT-DLP Options: {yto}\n\n"
         if remname:
             text += f"<b>Remname:</b> <code>{remname[0:600]}</code>\n\n"
         text += f"<i>Leech Split Size ~ {get_readable_file_size(config_dict['LEECH_SPLIT_SIZE'])}</i>"
@@ -308,13 +308,13 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                 buttons.button_data('Remove Remname', f'userset {user_id} rremname')
             else:
                 buttons.button_data('Set Remname', f'userset {user_id} prepare remname')
-        elif uset_data == 'ytq':
+        elif uset_data == 'yto':
             text, image = MSG.YT.replace('Timeout: 60s.', ''), config_dict['IMAGE_YT']
-            if user_dict.get('yt_ql') or config_dict['YT_DLP_QUALITY']:
-                buttons.button_data('Change YT-DLP', f'userset {user_id} prepare ytq')
-                buttons.button_data('Remove YT-DLP', f'userset {user_id} rytq')
+            if user_dict.get('yt_opt') or config_dict['YT_DLP_QUALITY']:
+                buttons.button_data('Change YT-DLP', f'userset {user_id} prepare yto')
+                buttons.button_data('Remove YT-DLP', f'userset {user_id} ryto')
             else:
-                buttons.button_data('Set YT-DLP', f'userset {user_id} prepare ytq')
+                buttons.button_data('Set YT-DLP', f'userset {user_id} prepare yto')
         if uset_data != 'setcap':
             buttons.button_data('<<', f'userset {user_id} back')
 
@@ -331,7 +331,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                         'prename': (MSG.PRE, config_dict['IMAGE_PRENAME']),
                         'sufname': (MSG.SUF, config_dict['IMAGE_SUFNAME']),
                         'remname': (MSG.REM, config_dict['IMAGE_REMNAME']),
-                        'ytq': (MSG.YT, config_dict['IMAGE_YT'])}
+                        'yto': (MSG.YT, config_dict['IMAGE_YT'])}
         text, image = prepare_dict[uset_data]
         buttons.button_data('<<', f'userset {user_id} setdata {uset_data}')
 
@@ -478,9 +478,9 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
         await update_user_ldata(user_id, 'media_group', not user_dict.get('media_group', False))
         await query.answer("Leech File(s) Will Send As Media Group!", show_alert=True) if user_dict.get('media_group') else await query.answer()
         await update_user_settings(query)
-    elif data[2] == 'rytq':
+    elif data[2] == 'ryto':
         await query.answer("YT-DLP Quality Removed!", show_alert=True)
-        await update_user_ldata(user_id, 'yt_ql', '')
+        await update_user_ldata(user_id, 'yt_opt', '')
         await update_user_settings(query)
     elif data[2] == 'back':
         handler_dict[user_id] = False
@@ -601,7 +601,7 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
                             'prename': 'user_prename',
                             'sufname': 'user_sufname',
                             'remname': 'user_remname',
-                            'ytq': 'yt_ql'}
+                            'yto': 'yt_opt'}
             key = prepare_dict[data[3]]
             if key == 'dump_id':
                 await query.answer('Don\'t forget add me to your chat!', show_alert=True)

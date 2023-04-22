@@ -28,7 +28,7 @@ getLogger('pyrogram').setLevel(ERROR)
 class TgUploader:
     def __init__(self, name=None, path=None, size=0, listener=None):
         self.name = name
-        self._last_uploaded = 0
+        self.__last_uploaded = 0
         self.__processed_bytes = 0
         self.__listener = listener
         self.__path = path
@@ -47,8 +47,8 @@ class TgUploader:
     async def __upload_progress(self, current, total):
         if self.__is_cancelled:
             self.__client.stop_transmission()
-        chunk_size = current - self._last_uploaded
-        self._last_uploaded = current
+        chunk_size = current - self.__last_uploaded
+        self.__last_uploaded = current
         self.__processed_bytes += chunk_size
 
     async def upload(self, o_files, m_size):
@@ -83,7 +83,7 @@ class TgUploader:
                                     if len(msgs) > 1:
                                         await self.__send_media_group(msgs, subkey, key)
                     self.__last_msg_in_group = False
-                    self._last_uploaded = 0
+                    self.__last_uploaded = 0
                     await self.__upload_file(caption, file_)
                     total_files += 1
                     if self.__is_cancelled:

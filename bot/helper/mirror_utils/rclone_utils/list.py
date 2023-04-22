@@ -220,6 +220,8 @@ async def path_updates(client: Client, query: CallbackQuery, obj: RcloneList):
         else:
             await obj.back_from_path()
     elif data[1] == 're':
+        # Some remotes has space
+        data = query.data.split(maxsplit=2)
         obj.remote = data[2]
         await obj.get_path()
     elif data[1] == 'pa':

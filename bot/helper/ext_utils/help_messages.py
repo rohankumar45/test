@@ -167,7 +167,7 @@ Number and m:folder_name (folder_name without space) should be always before n: 
 4. You can always add video quality from yt-dlp api options.
 5. Don't add file extension while rename using `n:`
 
-<b>Options Note:</b> Add `^` before integer, some values must be integer and some string.
+<b>Options Note:</b> Add `^` before integer or float, some values must be numeric and some string.
 Like playlist_items:10 works with string, so no need to add `^` before the number but playlistend works only with integer so you must add `^` before the number like example above.
 You can add tuple and dict also. Use double quotes inside dict.
 
