@@ -170,7 +170,7 @@ class GoogleDriveHelper:
                     LOGGER.error('File not found. Trying with token.pickle...')
                     self.__service = token_service
                     return self.deletefile(link)
-                err = "File not found or insufficientFilePermissions!"
+                err = "File not found or insufficient file permissions!"
             LOGGER.error(f"Delete Result: {err}")
             msg = str(err)
         return msg
