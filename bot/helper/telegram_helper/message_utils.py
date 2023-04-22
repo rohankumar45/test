@@ -3,7 +3,7 @@ from aiofiles.os import path as aiopath
 from aiohttp import ClientSession
 from asyncio import sleep, gather
 from datetime import datetime, timedelta
-from pyrogram.errors import FloodWait
+from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram.types import Message, InlineKeyboardMarkup, InputMediaPhoto, ChatPermissions
 from time import time
 
@@ -85,6 +85,8 @@ async def editMessage(text: str, message: Message, reply_markup=None):
         LOGGER.warning(f)
         await sleep(f.value * 1.2)
         return await editMessage(text, message, reply_markup)
+    except MessageNotModified:
+        pass
     except Exception as e:
         LOGGER.error(e)
         return str(e)
