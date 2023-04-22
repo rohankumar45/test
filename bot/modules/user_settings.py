@@ -10,7 +10,7 @@ from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
 from time import time
 
-from bot import bot, user_data, config_dict, DATABASE_URL
+from bot import bot, user_data, config_dict, DATABASE_URL, LOGGER
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.force_mode import ForceMode
@@ -440,6 +440,7 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
+    LOGGER.info(data)
     user_dict = user_data.get(user_id, {})
     premi_features = {'capmode': 'user_caption',
                       'dumpid': 'dump_id',
