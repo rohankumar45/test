@@ -251,7 +251,7 @@ async def path_updates(client: Client, query: CallbackQuery, obj: RcloneList):
         await obj.list_remotes()
     elif data[1] == 'user':
         obj.config_path = obj.user_rcc_path
-        obj.path = 'mrcc:'
+        obj.path = ''
         obj.remote = ''
         await obj.list_remotes()
     obj.query_proc = False
