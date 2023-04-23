@@ -39,6 +39,7 @@ def is_archive_split(file):
 
 @new_task
 async def download_gclone():
+    await clean_target('gclone')
     if GCLONE_URL:= config_dict['GCLONE_URL']:
         try:
             async with ClientSession() as session:
