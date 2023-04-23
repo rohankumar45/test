@@ -368,7 +368,7 @@ class MirrorLeechListener:
         images = choice(config_dict['IMAGE_COMPLETE'].split())
         TIME_ZONE_TITLE = config_dict['TIME_ZONE_TITLE']
         drive_mode = None
-        if config_dict['MULTI_GDID'] and not self.isLeech:
+        if config_dict['MULTI_GDID'] and not self.isLeech and self.upPath == 'gd':
             drive_mode = self.multiId[0]
         if self.isLeech and not self.newname and await aiopath.isfile(f'{self.dir}/{name}'):
             name = presuf_remname_name(self.user_dict, name)
@@ -585,7 +585,7 @@ class MirrorLeechListener:
         dt_date, dt_time = get_date_time(self.message)
         TIME_ZONE_TITLE = config_dict['TIME_ZONE_TITLE']
         drive_mode = None
-        if config_dict['MULTI_GDID'] and not self.isLeech:
+        if config_dict['MULTI_GDID'] and not self.isLeech and self.upPath == 'gd':
             drive_mode = self.multiId[0]
         if (chat_id := config_dict['LINK_LOG']) and self.isSuperGroup:
             msg_log = '<b>LINK LOGS</b>\n'
@@ -670,7 +670,7 @@ class MirrorLeechListener:
         reply_to = self.message.reply_to_message
         TIME_ZONE_TITLE = config_dict['TIME_ZONE_TITLE']
         drive_mode = None
-        if config_dict['MULTI_GDID'] and not self.isLeech:
+        if config_dict['MULTI_GDID'] and not self.isLeech and self.upPath == 'gd':
             drive_mode = self.multiId[0]
         if (chat_id := config_dict['LINK_LOG']) and self.isSuperGroup:
             msg_log = '<b>LINK LOGS</b>\n'
