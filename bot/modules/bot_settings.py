@@ -199,7 +199,7 @@ async def edit_variable(client: Client, message: Message, omsg: Message, key: st
     elif key == 'EXTENSION_FILTER':
         fx = value.split()
         GLOBAL_EXTENSION_FILTER.clear()
-        GLOBAL_EXTENSION_FILTER.append('.aria2')
+        GLOBAL_EXTENSION_FILTER.append('aria2')
         for x in fx:
             GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
     elif key == 'GDRIVE_ID':

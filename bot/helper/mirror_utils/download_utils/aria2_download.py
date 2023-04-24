@@ -1,7 +1,8 @@
 from aiofiles.os import remove as aioremove, path as aiopath
 
-from bot import aria2, aria2_options, aria2c_global, download_dict_lock, download_dict, config_dict, LOGGER
+from bot import aria2, aria2_options, aria2c_global, download_dict_lock, download_dict, config_dict, non_queued_dl, queue_dict_lock, LOGGER
 from bot.helper.ext_utils.bot_utils import getDownloadByGid, bt_selection_buttons, sync_to_async
+from bot.helper.ext_utils.task_manager import is_queued
 from bot.helper.mirror_utils.status_utils.aria_status import Aria2Status
 from bot.helper.telegram_helper.message_utils import sendStatusMessage, sendMessage, sendingMessage
 
@@ -22,6 +23,12 @@ async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_
         a2c_opt['bt-stop-timeout'] = f'{TORRENT_TIMEOUT}'
     if headers:
         a2c_opt['header'] = headers
+    added_to_queue, event = await is_queued(listener.uid)
+    if added_to_queue:
+        if link.startswith('magnet:'):
+            a2c_opt['pause-metadata'] = 'true'
+        else:
+            a2c_opt['pause'] = 'true'
     try:
         download = (await sync_to_async(aria2.add, link, a2c_opt))[0]
     except Exception as e:
@@ -35,18 +42,35 @@ async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_
         LOGGER.info(f'Aria2c Download Error: {error}')
         await sendMessage(error, listener.message)
         return
-    gid = download.gid
+    name, gid =     name = download.name, download.gid
     async with download_dict_lock:
-        download_dict[listener.uid] = Aria2Status(gid, listener)
-        LOGGER.info(f'Aria2Download started: {gid}')
+        download_dict[listener.uid] = Aria2Status(gid, listener, queue=added_to_queue)
+    if added_to_queue:
+        LOGGER.info(f'Added to Queue/Download: {name}. Gid: {gid}')
+        if not listener.select or not download.is_torrent:
+            await sendStatusMessage(listener.message)
+    else:
+        async with queue_dict_lock:
+            non_queued_dl.add(listener.uid)
+        LOGGER.info(f'Aria2Download started: {name}. Gid: {gid}')
     await listener.onDownloadStart()
-    if not listener.select or not config_dict['BASE_URL']:
+    if not added_to_queue and (not listener.select or not config_dict['BASE_URL']):
         await sendStatusMessage(listener.message)
-    elif download.is_torrent and not download.is_metadata:
-        await sync_to_async(aria2.client.force_pause, gid)
-        name = ''
-        if dl:= await getDownloadByGid(gid):
-            name = f'<code>{dl.name()}</code>\n\n'
+    elif listener.select and download.is_torrent and not download.is_metadata:
+        if not added_to_queue:
+            await sync_to_async(aria2.client.force_pause, gid)
         SBUTTONS = bt_selection_buttons(gid)
-        msg = f'{name}{listener.tag}, your download paused. Choose files then press <b>Done Selecting</b> button to start downloading.'
+        msg = f'<code>{name}</code>\n\n{listener.tag}, your download paused. Choose files then press <b>Done Selecting</b> button to start downloading.'
         await sendingMessage(msg, listener.message, config_dict['IMAGE_PAUSE'], SBUTTONS)
+    if added_to_queue:
+        await event.wait()
+        async with download_dict_lock:
+            if listener.uid not in download_dict:
+                return
+            download = download_dict[listener.uid]
+            download.queued = False
+            new_gid = download.gid()
+        await sync_to_async(aria2.client.unpause, new_gid)
+        LOGGER.info(f'Start Queued Download from Aria2c: {name}. Gid: {gid}')
+        async with queue_dict_lock:
+            non_queued_dl.add(listener.uid)

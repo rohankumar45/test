@@ -58,13 +58,15 @@ async def select(client: Client, message: Message):
         if listener.isQbit:
             id_ = dl.hash()
             client = dl.client()
-            await sync_to_async(client.torrents_pause, torrent_hashes=id_)
+            if not dl.queued:
+                await sync_to_async(client.torrents_pause, torrent_hashes=id_)
         else:
             id_ = dl.gid()
-            try:
-                await sync_to_async(aria2.client.force_pause, id_)
-            except Exception as e:
-                LOGGER.error(f'{e} Error in pause, this mostly happens after abuse aria2')
+            if not dl.queued:
+                try:
+                    await sync_to_async(aria2.client.force_pause, id_)
+                except Exception as e:
+                    LOGGER.error(f"{e} Error in pause, this mostly happens after abuse aria2")
         listener.select = True
     except:
         qbselmsg = await sendMessage('This is not a bittorrent task!', message)
@@ -110,16 +112,18 @@ async def get_confirm(client: Client, query: CallbackQuery):
             for f in res:
                 if f.priority == 0:
                     await gather(*[clean_target(f_path) for f_path in [f'{path}/{f.name}', f'{path}/{f.name}.!qB']])
-            await sync_to_async(client.torrents_resume, torrent_hashes=id_)
+            if not dl.queued:
+                await sync_to_async(client.torrents_resume, torrent_hashes=id_)
         else:
             res = await sync_to_async(aria2.client.get_files, id_)
             for f in res:
                 if f['selected'] == 'false':
                     await clean_target(f['path'])
-            try:
-                await sync_to_async(aria2.client.unpause, id_)
-            except Exception as e:
-                LOGGER.error(f'{e} Error in resume, this mostly happens after abuse aria2. Try to use select cmd again!')
+            if not dl.queued:
+                try:
+                    await sync_to_async(aria2.client.unpause, id_)
+                except Exception as e:
+                    LOGGER.error(f"{e} Error in resume, this mostly happens after abuse aria2. Try to use select cmd again!")
         await sendStatusMessage(listener.message)
         await deleteMessage(message)
         if BotCommands.BtSelectCommand in message.reply_to_message.text:

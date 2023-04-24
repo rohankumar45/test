@@ -14,10 +14,11 @@ def get_download(gid):
 
 class Aria2Status:
 
-    def __init__(self, gid, listener, seeding=False):
+    def __init__(self, gid, listener, seeding=False, queued=False):
         self.__gid = gid
         self.__download = get_download(gid)
         self.__listener = listener
+        self.queued = queued
         self.start_time = 0
         self.seeding = seeding
         self.message = listener.message
@@ -51,7 +52,7 @@ class Aria2Status:
 
     def status(self):
         self.__update()
-        if self.__download.is_waiting:
+        if self.__download.is_waiting or self.queued:
             if self.seeding:
                 return MirrorStatus.STATUS_QUEUEUP
             else:
@@ -104,8 +105,13 @@ class Aria2Status:
             downloads.append(self.__download)
             await sync_to_async(aria2.remove, downloads, force=True, files=True)
         else:
-            LOGGER.info(f'Cancelling Download: {self.name()}')
-            await self.__listener.onDownloadError('Download stopped by user!', ename=self.name())
+            if self.queued:
+                LOGGER.info(f'Cancelling QueueDl: {self.name()}')
+                msg = 'Task have been removed from queue/download'
+            else:
+                LOGGER.info(f"Cancelling Download: {self.name()}")
+                msg = 'Download stopped by user!'
+            await self.__listener.onDownloadError(msg, ename=self.name())
             await sync_to_async(aria2.remove, [self.__download], force=True, files=True)
 
     def eng(self):

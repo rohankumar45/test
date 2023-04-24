@@ -96,7 +96,7 @@ async def __onDownloadComplete(tor):
             async with download_dict_lock:
                 if listener.uid in download_dict:
                     removed = False
-                    download_dict[listener.uid] = QbittorrentStatus(listener, ext_hash, True)
+                    download_dict[listener.uid] = QbittorrentStatus(listener, True)
                 else:
                     removed = True
             if removed:

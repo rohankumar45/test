@@ -87,7 +87,8 @@ async def __onDownloadComplete(api, gid):
         if dl:= await getDownloadByGid(new_gid):
             listener = dl.listener()
             if config_dict['BASE_URL'] and listener.select:
-                await sync_to_async(api.client.force_pause, new_gid)
+                if not dl.queued:
+                    await sync_to_async(api.client.force_pause, new_gid)
                 SBUTTONS = bt_selection_buttons(new_gid)
                 msg = f'<code>{dl.name()}</code>\n\n{listener.tag}, your download paused. Choose files then press <b>Done Selecting</b> button to start downloading.'
                 await sendingMessage(msg, listener.message, config_dict['IMAGE_PAUSE'], SBUTTONS)

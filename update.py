@@ -1,12 +1,15 @@
 from dotenv import load_dotenv, dotenv_values
 from logging import FileHandler, StreamHandler, basicConfig, error as log_error, info as log_info, INFO
-from os import path as ospath, environ
+from os import path as ospath, environ, remove
 from pymongo import MongoClient
 from subprocess import run as srun
 
 if ospath.exists('log.txt'):
     with open('log.txt', 'r+') as f:
         f.truncate(0)
+
+if ospath.exists('rlog.txt'):
+    remove('rlog.txt')
 
 basicConfig(format='%(asctime)s: [%(levelname)s: %(filename)s - %(lineno)d] ~ %(message)s',
             handlers=[FileHandler('log.txt'), StreamHandler()],
