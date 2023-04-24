@@ -156,8 +156,7 @@ class GoogleDriveHelper:
         try:
             file_id = self.__getIdFromUrl(link)
         except (KeyError, IndexError):
-            msg = "Google Drive ID could not be found in the provided link"
-            return msg
+            return "Google Drive ID could not be found in the provided link"
         msg = ''
         try:
             self.__service.files().delete(fileId=file_id, supportsAllDrives=True).execute()
@@ -320,7 +319,7 @@ class GoogleDriveHelper:
             return self.__G_DRIVE_BASE_DOWNLOAD_URL.format(drive_file.get('id'))
         return
 
-    def clone(self, link: str, name: str, sharer_link=None):
+    def clone(self, link: str, name: str, gdrive_sharer=False):
         self.__is_cloning = True
         self.__start_time = time()
         self.__total_files = 0
@@ -366,12 +365,16 @@ class GoogleDriveHelper:
                     if token_service is not None:
                         LOGGER.error('File not found. Trying with token.pickle...')
                         self.__service = token_service
-                        return self.clone(link, name, sharer_link)
+                        return self.clone(link, name, gdrive_sharer)
                 msg = 'File not found!'
             else:
                 msg = err
             async_to_sync(self.__listener.onUploadError, msg, name, True)
             return None, None, None, None, None
+        finally:
+            if gdrive_sharer:
+                msg = self.deletefile(link)
+                LOGGER.info(f'{msg} (Sharer Link): {link}')
 
     def __cloneFolder(self, name, local_path, folder_id, dest_id):
         LOGGER.info(f"Syncing: {local_path}")

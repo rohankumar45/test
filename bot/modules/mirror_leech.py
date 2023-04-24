@@ -195,10 +195,9 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     if not is_mega_link(link) and not isQbit and not is_magnet(link) and not is_rclone_path(link) \
         and not is_gdrive_link(link) and not link.endswith('.torrent') and not file_:
         content_type = await sync_to_async(get_content_type, link)
-        content_type = get_content_type(link)
         host = urlparse(link).netloc
         gdrive_sharer = is_sharar(link)
-        if content_type is None or re_match(r'text/html|text/plain', content_type):
+        if not content_type or re_match(r'text/html|text/plain', content_type):
             try:
                 await editMessage(f'<i>Generating direct link from {host}, please wait...</i>', check_)
                 if 'gofile.io' in host:
@@ -206,8 +205,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                 else:
                     link = await sync_to_async(direct_link_generator, link)
                 LOGGER.info(f'Generated link: {link}')
-                gd_link = urlparse(link).netloc
-                await editMessage(f"<i>Found {'drive' if 'drive.google.com' in gd_link else 'direct'} link:</i>\n<code>{link}</code>", check_)
+                await editMessage(f"<i>Found {'drive' if 'drive.google.com' in link else 'direct'} link:</i>\n<code>{link}</code>", check_)
                 await sleep(1)
             except DirectDownloadLinkException as e:
                 if str(e).startswith('ERROR:'):
