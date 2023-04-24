@@ -433,7 +433,7 @@ class MirrorLeechListener:
                         await sendMedia(msg, self.user_id, reply_to, buttons_scr.build_menu(2))
                     else:
                         await copyMessage(self.user_id, uploadmsg, buttons_scr.build_menu(2))
-                if (chat_id := config_dict['LEECH_LOG']) and ONCOMPLETE_LEECH_LOG:
+                if (chat_id:= config_dict['LEECH_LOG']) and ONCOMPLETE_LEECH_LOG:
                     await copyMessage(chat_id, uploadmsg, buttons_scr.build_menu(2))
             else:
                 result_msg = 0
