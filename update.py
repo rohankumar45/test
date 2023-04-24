@@ -18,16 +18,13 @@ basicConfig(format='%(asctime)s: [%(levelname)s: %(filename)s - %(lineno)d] ~ %(
 
 load_dotenv('config.env', override=True)
 
-BOT_TOKEN = environ.get('BOT_TOKEN', '')
-if not BOT_TOKEN:
+if BOT_TOKEN:= environ.get('BOT_TOKEN', ''):
+    bot_id = BOT_TOKEN.split(':', 1)[0]
+else:
     log_error('BOT_TOKEN variable is missing! Exiting now')
     exit(1)
 
-bot_id = BOT_TOKEN.split(':', 1)[0]
-
-DATABASE_URL = environ.get('DATABASE_URL', '')
-
-if DATABASE_URL:
+if DATABASE_URL:= environ.get('DATABASE_URL', ''):
     conn = MongoClient(DATABASE_URL)
     db = conn.mltb
     old_config = db.settings.deployConfig.find_one({'_id': bot_id})
@@ -43,10 +40,7 @@ if DATABASE_URL:
 if environ.get('UPDATE_EVERYTHING', 'False').lower() == 'true':
     srun(['pip3', 'install', '-U', '--no-cache-dir', '-r', 'requirements.txt'])
 
-UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
-UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
-
-if UPSTREAM_REPO:
+if (UPSTREAM_REPO:= environ.get('UPSTREAM_REPO')) and (UPSTREAM_BRANCH:= environ.get('UPSTREAM_BRANCH')):
     if ospath.exists('.git'):
         srun(['rm', '-rf', '.git'])
     update = srun([f'git init -q \
@@ -57,7 +51,6 @@ if UPSTREAM_REPO:
                      && git remote add origin {UPSTREAM_REPO} \
                      && git fetch origin -q \
                      && git reset --hard origin/{UPSTREAM_BRANCH} -q'], shell=True)
-
     if update.returncode == 0:
         log_info(f'Successfully updated with latest commit from UPSTREAM_REPO ~ {UPSTREAM_BRANCH.upper()} Branch.')
     else:
