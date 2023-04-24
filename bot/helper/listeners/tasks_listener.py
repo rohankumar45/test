@@ -373,7 +373,7 @@ class MirrorLeechListener:
         if self.isLeech and not self.newname and await aiopath.isfile(f'{self.dir}/{name}'):
             name = presuf_remname_name(self.user_dict, name)
         scr_link = await get_link(self.message)
-        if (chat_id := config_dict['LINK_LOG']) and self.isSuperGroup:
+        if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
             msg_log = '<b>LINK LOGS</b>\n'
             msg_log += f'<code>{escape(name)}</code>\n'
             msg_log += f'<b>┌ Cc: </b>{self.tag}\n'
@@ -587,7 +587,7 @@ class MirrorLeechListener:
         drive_mode = None
         if config_dict['MULTI_GDID'] and not self.isLeech and self.upPath == 'gd':
             drive_mode = self.multiId[0]
-        if (chat_id := config_dict['LINK_LOG']) and self.isSuperGroup:
+        if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
             msg_log = '<b>LINK LOGS</b>\n'
             if ename:
                 msg_log += f'<code>{ename}</code>\n'
@@ -672,7 +672,10 @@ class MirrorLeechListener:
         drive_mode = None
         if config_dict['MULTI_GDID'] and not self.isLeech and self.upPath == 'gd':
             drive_mode = self.multiId[0]
-        if (chat_id := config_dict['LINK_LOG']) and self.isSuperGroup:
+        if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
+            LOGGER.info('=========================')
+            LOGGER.info(chat_id)
+            LOGGER.info('=========================')
             msg_log = '<b>LINK LOGS</b>\n'
             if ename:
                 msg_log += f'<code>{ename}</code>\n'
