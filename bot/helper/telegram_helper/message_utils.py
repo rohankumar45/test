@@ -57,6 +57,10 @@ async def sendSticker(fileid: str, message: Message, is_misc=False):
 
 
 async def sendCustom(text: str, chat_id: int, reply_markup: InlineKeyboardMarkup = None):
+    LOGGER.info('===============================')
+    LOGGER.info(chat_id)
+    LOGGER.info(text)
+    LOGGER.info('===============================')
     try:
         return await bot.send_message(chat_id, text, reply_markup=reply_markup, disable_notification=True)
     except FloodWait as f:

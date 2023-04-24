@@ -673,9 +673,6 @@ class MirrorLeechListener:
         if config_dict['MULTI_GDID'] and not self.isLeech and self.upPath == 'gd':
             drive_mode = self.multiId[0]
         if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
-            LOGGER.info('=========================')
-            LOGGER.info(chat_id)
-            LOGGER.info('=========================')
             msg_log = '<b>LINK LOGS</b>\n'
             if ename:
                 msg_log += f'<code>{ename}</code>\n'
