@@ -172,10 +172,11 @@ async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSu
             await sendMessage(link, message)
     else:
         if config_dict['AUTO_MUTE'] and isSuperGroup:
-            msg = await ForceMode(message).auto_muted(HelpString.CLONE)
+            await deleteMessage(editable)
+            editable = await ForceMode(message).auto_muted(HelpString.CLONE)
         else:
-            msg = await editMessage(HelpString.CLONE, editable)
-        await auto_delete_message(message, msg, message.reply_to_message)
+            await editMessage(HelpString.CLONE, editable)
+        await auto_delete_message(message, editable, message.reply_to_message)
 
 
 @new_task
@@ -240,9 +241,11 @@ async def cloneNode(client: Client, message: Message):
             return
     if not link:
         if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(HelpString.CLONE)):
-            await auto_delete_message(message, fmsg, reply_to)
-            return
-        await editMessage(HelpString.CLONE, check_)
+            await deleteMessage(check_)
+            check_ = fmsg
+        else:
+            await editMessage(HelpString.CLONE, check_)
+        await auto_delete_message(message, check_, reply_to)
     elif (is_rclone_path(link) and not newname) or (dst_path and is_gdrive_link(link) and await aiopath.exists('gclone')):
         if not await aiopath.exists('rclone.conf') and not await aiopath.exists(ospath.join('rclone', f'{user_id}.conf')):
             await editMessage('RClone config not exists!', check_)
