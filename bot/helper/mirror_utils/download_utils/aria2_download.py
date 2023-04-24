@@ -42,7 +42,7 @@ async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_
         LOGGER.info(f'Aria2c Download Error: {error}')
         await sendMessage(error, listener.message)
         return
-    name, gid =     name = download.name, download.gid
+    name, gid = download.name, download.gid
     async with download_dict_lock:
         download_dict[listener.uid] = Aria2Status(gid, listener, queued=added_to_queue)
     if added_to_queue:
