@@ -10,7 +10,8 @@ RcloneServe = []
 
 
 async def rclone_serve_booter():
-    await download_gclone()
+    if not await aiopath.exists('gclone'):
+        await download_gclone()
     if not config_dict['RCLONE_SERVE_URL'] or not await aiopath.exists('rclone.conf'):
         if RcloneServe:
             try:
