@@ -94,9 +94,11 @@ async def multi_select_handler(client: Client, query: CallbackQuery, obj: MultiS
     data = query.data.split()
     print(data)
     if data[1] == 'cancel':
+        await query.answer()
         obj.drive_key = ''
         obj.event.set()
     elif data[1] == 'start':
+        await query.answer()
         obj.event.set()
     elif data[1] == 'gofile':
         await query.answer()
