@@ -51,7 +51,7 @@ async def __stop_duplicate(tor):
         file, sname = await stop_duplicate_check(name, listener)
         if file:
             LOGGER.info('File/folder already in Drive!')
-            __onDownloadError(f'{sname} already available in Drive.', tor, file, sname)
+            __onDownloadError('File/folder already available in Drive.', tor, file, sname)
 
 
 @new_task
@@ -74,7 +74,7 @@ async def __download_limits(tor, limits):
             msgerr = f'You must leave {storage}GB free storage'
         if msgerr:
             LOGGER.info('File/folder size over the limit size!')
-            __onDownloadError(f'{msgerr}. {tor.name} size is {get_readable_file_size(tor.size)}.', tor, None, tor.name)
+            __onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(tor.size)}.', tor, None, tor.name)
 
 
 @new_task
@@ -132,7 +132,7 @@ async def __qb_listener():
                     if state == 'metaDL':
                         QbTorrents[tag]['stalled_time'] = time()
                         if TORRENT_TIMEOUT and time() - tor_info.added_on >= TORRENT_TIMEOUT:
-                            __onDownloadError(f'{tor_info.name} is dead torrent!', tor_info, ename=tor_info.name)
+                            __onDownloadError('Dead torrent!', tor_info, ename=tor_info.name)
                         else:
                             await sync_to_async(client.torrents_reannounce, torrent_hashes=tor_info.hash)
                     elif state == 'downloading':
@@ -152,7 +152,7 @@ async def __qb_listener():
                             await sync_to_async(client.torrents_recheck, torrent_hashes=tor_info.hash)
                             QbTorrents[tag]['rechecked'] = True
                         elif TORRENT_TIMEOUT and time() - QbTorrents[tag]['stalled_time'] >= TORRENT_TIMEOUT:
-                            __onDownloadError(f'{tor_info.name} is dead torrent!', tor_info, ename=tor_info.name)
+                            __onDownloadError('Dead torrent!', tor_info, ename=tor_info.name)
                         else:
                             await sync_to_async(client.torrents_reannounce, torrent_hashes=tor_info.hash)
                     elif state == 'missingFiles':

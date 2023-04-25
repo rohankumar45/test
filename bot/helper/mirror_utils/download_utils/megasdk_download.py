@@ -143,7 +143,7 @@ async def add_mega_download(mega_link, path, listener, name):
     file, sname = await stop_duplicate_check(name, listener)
     if file:
         LOGGER.info("File/folder already in Drive!")
-        await listener.onDownloadError(f'{sname} already in Drive!', file, sname)
+        await listener.onDownloadError('File/folder already in Drive!', file, sname)
         await executor.do(api.logout, ())
         if folder_api:
             await executor.do(folder_api.logout, ())
@@ -167,7 +167,7 @@ async def add_mega_download(mega_link, path, listener, name):
         msgerr = f'Need {storage}GB free storage'
     if msgerr:
         LOGGER.info('File/folder size over the limit size!')
-        await listener.onDownloadError(f'{msgerr}. {name} size is {get_readable_file_size(size)}.', ename=name)
+        await listener.onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(size)}.', ename=name)
         if folder_api:
             await sync_to_async(folder_api.removeListener, mega_listener)
         return

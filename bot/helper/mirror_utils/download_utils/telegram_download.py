@@ -112,12 +112,12 @@ class TelegramDownloadHelper:
                 gid = media.file_unique_id
                 if (storage := config_dict['STORAGE_THRESHOLD']) and not \
                     await check_storage_threshold(size, any([self.__listener.isZip, self.__listener.isLeech, self.__listener.extract])):
-                    await self.__onDownloadError(f'Need {storage}GB free storage. {name} size is {get_readable_file_size(size)}', ename=name)
+                    await self.__onDownloadError(f'Need {storage}GB free storage. File size is {get_readable_file_size(size)}', ename=name)
                     return
                 file, sname = await stop_duplicate_check(name, self.__listener)
                 if file:
                     LOGGER.info('File/folder already in Drive!')
-                    await self.__onDownloadError(f'{sname} already in Drive!', file, sname)
+                    await self.__onDownloadError('File already in Drive!', file, sname)
                     return
                 added_to_queue, event = await is_queued(self.__listener.uid)
                 if added_to_queue:
@@ -137,7 +137,7 @@ class TelegramDownloadHelper:
                 LOGGER.info(f'Downloading Telegram file with id: {media.file_unique_id}')
                 await self.__download(_dmsg, path)
             else:
-                await self.__onDownloadError('Already being downloaded!')
+                await self.__onDownloadError('File already being downloaded!')
         else:
             await self.__onDownloadError('No document from given link!' if data else 'No document in the replied message')
 

@@ -126,9 +126,9 @@ class YoutubeDLHelper:
             await self.__listener.onDownloadStart()
             await sendStatusMessage(self.__listener.message)
 
-    def __onDownloadError(self, error, listfile=None, ename=None):
+    def __onDownloadError(self, error, listfile=None):
         self.__is_cancelled = True
-        async_to_sync(self.__listener.onDownloadError, error, listfile, ename)
+        async_to_sync(self.__listener.onDownloadError, error, listfile, self.name)
 
     def extractMetaData(self, link, name):
         if link.startswith(('rtmp', 'mms', 'rstp', 'rtmps')):
@@ -190,7 +190,7 @@ class YoutubeDLHelper:
                 self.__onDownloadError(str(e))
                 return
         except ValueError:
-            self.__onDownloadError('Stopped by user!', ename=self.name)
+            self.__onDownloadError('Stopped by user!')
 
     async def add_download(self, link, path, name, qual, playlist, options):
         if playlist:
@@ -240,7 +240,7 @@ class YoutubeDLHelper:
         if file:
             LOGGER.info('File/folder already in Drive!')
             self.__is_cancelled = True
-            await self.__listener.onDownloadError(f'{sname} already in Drive!', file, sname)
+            await self.__listener.onDownloadError('File/folder already in Drive!', file, sname)
             return
         msgerr = None
         arch = any([self.__listener.isZip, self.__listener.isLeech])
@@ -261,7 +261,7 @@ class YoutubeDLHelper:
         if msgerr:
             if 'Only' not in msgerr:
                 LOGGER.info('File/folder size over the limit size!')
-                msgerr += f'. {self.name} size is {get_readable_file_size(self.__size)}.'
+                msgerr += f'. File/folder size is {get_readable_file_size(self.__size)}.'
             self.__is_cancelled = True
             await self.__listener.onDownloadError(msgerr, ename=self.name)
             return

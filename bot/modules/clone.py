@@ -69,7 +69,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         await deleteMessage(editable)
         if CLONE_LIMIT := config_dict['CLONE_LIMIT']:
             if size > CLONE_LIMIT * 1024**3:
-                await listener.onDownloadError(f'Clone limit is {CLONE_LIMIT}GB. {name} size is {get_readable_file_size(size)}.', ename=name, isClone=True)
+                await listener.onDownloadError(f'Clone limit is {CLONE_LIMIT}GB. File/folder size is {get_readable_file_size(size)}.', ename=name, isClone=True)
                 return
     else:
         remote, src_path = link.split(':', 1)
@@ -142,12 +142,12 @@ async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSu
         if file:
             await deleteMessage(editable)
             LOGGER.info('File/folder already in Drive!')
-            await listener.onDownloadError(f'{name} already in Drive!', file, name, True)
+            await listener.onDownloadError('File/folder already in Drive!', file, name, True)
             return
         if CLONE_LIMIT := config_dict['CLONE_LIMIT']:
             if size > CLONE_LIMIT * 1024**3:
                 await deleteMessage(editable)
-                await listener.onDownloadError(f'Clone limit is {CLONE_LIMIT}GB. {name} size is {get_readable_file_size(size)}.', ename=name, isClone=True)
+                await listener.onDownloadError(f'Clone limit is {CLONE_LIMIT}GB. File/folder size is {get_readable_file_size(size)}.', ename=name, isClone=True)
                 return
         await listener.onDownloadStart()
         LOGGER.info(f'Clone Started: Name: {name} - Source: {link}')

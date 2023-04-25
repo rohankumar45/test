@@ -44,7 +44,7 @@ async def __onDownloadStarted(api, gid):
                 file, sname = await stop_duplicate_check(download.name, listener)
                 if file:
                     LOGGER.info('File/folder already in Drive!')
-                    await listener.onDownloadError(f'{sname} already in Drive!', file, sname)
+                    await listener.onDownloadError('File/folder already in Drive!', file, sname)
                     await sync_to_async(api.remove, [download], force=True, files=True)
                     return
     torddl, zuzdl, leechdl, storage = config_dict['TORRENT_DIRECT_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
@@ -70,7 +70,7 @@ async def __onDownloadStarted(api, gid):
                 msgerr = f'Need {storage}GB free storage'
             if msgerr:
                 LOGGER.info('File/folder size over the limit size!')
-                await listener.onDownloadError(f'{msgerr}. {download.name} size is {get_readable_file_size(size)}.', ename=download.name)
+                await listener.onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(size)}.', ename=download.name)
                 await sync_to_async(api.remove, [download], force=True, files=True)
 
 
@@ -155,9 +155,9 @@ async def __onDownloadStopped(api, gid):
     await sleep(6)
     if dl := await getDownloadByGid(gid):
         download = await sync_to_async(api.get_download, gid)
-        ername = download.name.replace('[METADATA]','')
+        ername = download.name.replace('[METADATA]', '')
         listener = dl.listener()
-        await listener.onDownloadError(f'{ername} is dead torrent!', ename=ername)
+        await listener.onDownloadError('Dead torrent!', ename=ername)
 
 
 @new_thread
@@ -172,7 +172,8 @@ async def __onDownloadError(api, gid):
         pass
     if dl := await getDownloadByGid(gid):
         listener = dl.listener()
-        await listener.onDownloadError(error)
+        ername = dl.name.replace('[METADATA]', '')
+        await listener.onDownloadError(error, ename=ername)
 
 
 def start_aria2_listener():

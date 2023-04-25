@@ -36,7 +36,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
     file, sname = await stop_duplicate_check(name, listener)
     if file:
         LOGGER.info('File/folder already in Drive!')
-        await listener.onDownloadError(f'{sname} already in Drive!', file, sname)
+        await listener.onDownloadError('File/folder already in Drive!', file, sname)
         return
     torddl, zuzdl, leechdl, storage = config_dict['TORRENT_DIRECT_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
     if any([torddl, zuzdl, leechdl, storage]):
@@ -54,7 +54,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
             msgerr = f'Need {storage}GB free storage'
         if msgerr:
             LOGGER.info('File/folder size over the limit size!')
-            await listener.onDownloadError(f'{msgerr}. {name} size is {get_readable_file_size(size)}.', ename=name)
+            await listener.onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(size)}.', ename=name)
             return
     added_to_queue, event = await is_queued(listener.uid)
     if added_to_queue:

@@ -67,7 +67,7 @@ class MegaDownloader:
         if state == constants.State.TYPE_STATE_COMPLETED:
             await self.__listener.onDownloadComplete()
         elif state == constants.State.TYPE_STATE_CANCELED:
-            await self.__onDownloadError(f'Download stopped by user!', ename=self.__name)
+            await self.__onDownloadError('Download stopped by user!', ename=self.__name)
         elif state == constants.State.TYPE_STATE_FAILED:
             await self.__onDownloadError(dlInfo['error_string'], ename=self.__name)
         else:
@@ -97,7 +97,7 @@ class MegaDownloader:
         file, sname = await stop_duplicate_check(file_name, self.__listener)
         if file:
             LOGGER.info('File/folder already in Drive!')
-            await self.__onDownloadError(f'{sname} already in Drive!', file, sname)
+            await self.__onDownloadError('File/folder already in Drive!', file, sname)
             return
         msgerr = None
         megadl, zuzdl, leechdl, storage = config_dict['MEGA_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
@@ -116,7 +116,7 @@ class MegaDownloader:
             msgerr = f'Need {storage}GB free storage'
         if msgerr:
             LOGGER.info('File/folder size over the limit size!')
-            await self.__onDownloadError(f'{msgerr}. {file_name} size is {get_readable_file_size(file_size)}.', ename=file_name)
+            await self.__onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(file_size)}.', ename=file_name)
             return
 
         added_to_queue, event = await is_queued(self.__listener.uid)
