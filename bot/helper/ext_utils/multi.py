@@ -92,7 +92,6 @@ class MultiSelect:
 @new_task
 async def multi_select_handler(client: Client, query: CallbackQuery, obj: MultiSelect):
     data = query.data.split()
-    print(data)
     if data[1] == 'cancel':
         await query.answer()
         obj.drive_key = ''
