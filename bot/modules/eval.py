@@ -43,6 +43,9 @@ async def send(msg, message):
 
 @new_task
 async def evaluate(client: Client, message: Message):
+    if len(message.text.split()) == 1:
+        await sendMessage('No command given to execute!', message)
+        return
     await send(await sync_to_async(do, eval, message), message)
 
 
