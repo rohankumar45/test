@@ -3,12 +3,14 @@ from aiofiles.os import path as aiopath
 from asyncio import create_subprocess_exec
 from configparser import ConfigParser
 
-from bot import config_dict, bot_loop
+from bot import config_dict, bot_loop, LOGGER
+from bot.helper.ext_utils.fs_utils import download_gclone
 
 RcloneServe = []
 
 
 async def rclone_serve_booter():
+    await download_gclone()
     if not config_dict['RCLONE_SERVE_URL'] or not await aiopath.exists('rclone.conf'):
         if RcloneServe:
             try:
@@ -38,7 +40,10 @@ async def rclone_serve_booter():
            '--vfs-cache-mode', 'full', '--vfs-cache-max-age', '1m0s', '--buffer-size', '64M']
     if (user := config_dict['RCLONE_SERVE_USER']) and (pswd := config_dict['RCLONE_SERVE_PASS']):
         cmd.extend(('--user', user, '--pass', pswd))
-    rcs = await create_subprocess_exec(*cmd)
-    RcloneServe.append(rcs)
+    try:
+        rcs = await create_subprocess_exec(*cmd)
+        RcloneServe.append(rcs)
+    except Exception as e:
+        LOGGER.error(e)
 
 bot_loop.run_until_complete(rclone_serve_booter())

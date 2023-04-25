@@ -11,7 +11,7 @@ from pyrogram.types import Message, CallbackQuery
 from time import time
 
 
-from bot import bot, bot_dict, aria2, config_dict, drive_dict, status_reply_dict_lock, Interval, aria2_options, aria2c_global, download_dict, qbit_options, get_client, \
+from bot import bot, bot_loop, bot_dict, aria2, config_dict, drive_dict, status_reply_dict_lock, Interval, aria2_options, aria2c_global, download_dict, qbit_options, get_client, \
                 LOGGER, DATABASE_URL, DRIVES_IDS, DRIVES_NAMES, INDEX_URLS, GLOBAL_EXTENSION_FILTER, SHORTENERES, SHORTENER_APIS
 from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_thread
 from bot.helper.ext_utils.conf_loads import default_values, load_config, megarest_client, intialize_userbot, intialize_savebot
@@ -214,7 +214,7 @@ async def edit_variable(client: Client, message: Message, omsg: Message, key: st
         else:
             INDEX_URLS.insert(0, value)
     elif key == 'GCLONE_URL':
-        download_gclone()
+        bot_loop.create_task(download_gclone())
     elif value.isdigit() or value.startswith('-1'):
         value = int(value)
     config_dict[key] = value

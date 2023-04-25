@@ -21,7 +21,7 @@ from bot.helper import save_message
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time, cmd_exec, sync_to_async, new_task, get_progress_bar_string
 from bot.helper.ext_utils.conf_loads import megarest_client, intialize_userbot, intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up, clean_target, download_gclone
+from bot.helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up, clean_target
 from bot.helper.ext_utils.help_messages import HelpString, get_help_button
 from bot.helper.ext_utils.heroku_status import getHerokuDetails
 from bot.helper.listeners.aria2_listener import start_aria2_listener
@@ -276,7 +276,6 @@ async def restart_notification():
 
 
 async def main():
-    download_gclone()
     await gather(intialize_userbot(False), set_command(), start_cleanup(), torrent_search.initiate_search_tools())
     await gather(intialize_savebot(False), restart_notification())
     if config_dict['ENABLE_MEGAREST']:
