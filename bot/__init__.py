@@ -210,7 +210,7 @@ DAILY_LIMIT_SIZE = int(environ.get('DAILY_LIMIT_SIZE', 50))
 
 #============================= RCLONE =================================
 RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
-RCLONE_SERVE_PORT = environ.get('PORT', '')
+RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
 RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
 RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
 #======================================================================
@@ -495,6 +495,7 @@ config_dict = {'BOT_TOKEN': BOT_TOKEN,
                'RCLONE_FLAGS': RCLONE_FLAGS,
                'RCLONE_PATH': RCLONE_PATH,
                'RCLONE_SERVE_URL': RCLONE_SERVE_URL,
+               'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
                'RCLONE_SERVE_USER': RCLONE_SERVE_USER,
                'RCLONE_SERVE_PASS': RCLONE_SERVE_PASS,
                # LOGS

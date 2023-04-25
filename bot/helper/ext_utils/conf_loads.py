@@ -537,6 +537,7 @@ async def load_config():
                         'RCLONE_FLAGS': RCLONE_FLAGS,
                         'RCLONE_PATH': RCLONE_PATH,
                         'RCLONE_SERVE_URL': RCLONE_SERVE_URL,
+                        'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
                         'RCLONE_SERVE_USER': RCLONE_SERVE_USER,
                         'RCLONE_SERVE_PASS': RCLONE_SERVE_PASS,
                         # LOGS
