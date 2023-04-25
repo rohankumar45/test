@@ -23,7 +23,7 @@ class GofileUploadStatus:
     def progress_raw(self):
         try:
             return self.__obj.uploaded_bytes / self.__size * 100
-        except ZeroDivisionError:
+        except:
             return 0
 
     def progress(self):
@@ -34,8 +34,8 @@ class GofileUploadStatus:
 
     def eta(self):
         try:
-            return f'{get_readable_time((self.__size - self.__obj.uploaded_bytes) / self.__obj.speed)}'
-        except ZeroDivisionError:
+            return get_readable_time((self.__size - self.__obj.uploaded_bytes) / self.__obj.speed)
+        except:
             return '~'
 
     def gid(self) -> str:

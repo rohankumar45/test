@@ -36,7 +36,7 @@ class TelegramStatus:
 
     def eta(self):
         try:
-            return f'{get_readable_time((self.__size - self.__obj.processed_bytes) / self.__obj.speed)}'
+            return get_readable_time((self.__size - self.__obj.processed_bytes) / self.__obj.speed)
         except:
             return '~'
 

@@ -37,7 +37,7 @@ class MegaDownloadStatus:
 
     def eta(self):
         try:
-            return f'{get_readable_time((self.__size - self.__obj.downloaded_bytes) / self.__obj.speed)}'
+            return get_readable_time((self.__size - self.__obj.downloaded_bytes) / self.__obj.speed)
         except:
             return '~'
 

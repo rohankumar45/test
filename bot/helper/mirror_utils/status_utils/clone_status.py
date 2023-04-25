@@ -37,7 +37,7 @@ class CloneStatus:
 
     def eta(self):
         try:
-            return f'{get_readable_time((self.__size - self.__obj.transferred_size) / self.__obj.cspeed())}'
+            return get_readable_time((self.__size - self.__obj.transferred_size) / self.__obj.cspeed())
         except:
             return '~'
 
