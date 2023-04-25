@@ -90,13 +90,13 @@ class UserDaily:
         await update_user_ldata(self.__user_id, 'daily_limit', data)
 
     async def __check_status(self):
-        user_dict = user_data.get(self.__user_id, False)
-        if not user_dict or user_dict and not user_dict.get('daily_limit'):
-            await self.__re_set_limit()
+        user_dict = user_data.get(self.__user_id, {})
+        if not user_dict.get('daily_limit'):
+            await self.__reset()
         if user_data[self.__user_id]['reset_limit'] - time() <= 0:
-            await self.__re_set_limit()
+            await self.__reset()
 
-    async def __re_set_limit(self):
+    async def __reset(self):
         await update_user_ldata(self.__user_id, 'daily_limit', 1)
         await update_user_ldata(self.__user_id, 'reset_limit', time() + 86400)
 
