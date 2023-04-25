@@ -216,9 +216,11 @@ async def cloneNode(client: Client, message: Message):
 
     mlist = [client, message, multi, 1, '']
 
-    if reply_to and not is_media(reply_to):
-        link = reply_to.text.split('\n', 1)[0].strip()
-        tag = reply_to.from_user.mention
+    if reply_to:
+        if not reply_to.from_user.is_bot:
+            tag = reply_to.from_user.mention
+        if not is_media(reply_to):
+            link = reply_to.text.split('\n', 1)[0].strip()
 
     newname = text.split(' n: ', 1)
     newname = re_split(' rcf: | up: ', newname[1])[0].strip() if len(newname) > 1 else ''

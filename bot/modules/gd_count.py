@@ -35,8 +35,11 @@ async def countNode(client: Client, message: Message):
         return
     if len(args) > 1:
         link = args[1]
-    if reply_to and not is_media(reply_to) and len(link) == 0:
-        link = reply_to.text.split(maxsplit=1)[0].strip()
+    if reply_to:
+        if not reply_to.from_user.is_bot:
+            tag = reply_to.from_user.mention
+        if not is_media(reply_to) and len(link) == 0:
+            link = reply_to.text.split(maxsplit=1)[0].strip()
 
     if is_gdrive_link(link):
         TIME_ZONE_TITLE = config_dict['TIME_ZONE_TITLE']
