@@ -158,7 +158,8 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
     file_ = None
     if reply_to:
-        # tag = reply_to.from_user.mention
+        if not reply_to.from_user.is_bot:
+            tag = reply_to.from_user.mention
         file_ = is_media(reply_to)
         if len(link) == 0 or not is_url(link) and not is_magnet(link):
             if not file_:
