@@ -98,7 +98,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
     image = None
 
     if not data:
-        mergevid, buttonkey, buttondata = ('ENABLE ✅', '✅ Merge Videos', 'mergevid') if user_dict.get('merge_vid') else ('DISABLE', 'Merge Vids', 'mergevid')
+        mergevid, buttonkey, buttondata = ('ENABLE ✅', '✅ Merge Videos', 'mergevid') if user_dict.get('merge_vid') else ('DISABLE', 'Merge Videos', 'mergevid')
         buttons.button_data(buttonkey, f'userset {user_id} {buttondata}', 'header')
 
         sendpm, buttonkey, buttondata = ('ENABLE ✅', '✅ Send PM', 'sendpm') if user_dict.get('enable_pm') else ('DISABLE', 'Send PM', 'sendpm')
