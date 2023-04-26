@@ -427,7 +427,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     run_multi(mlist, _ytdl, isZip, isLeech, sameDir)
     if not select:
         user_dict = user_data.get(user_id, {})
-        if 'format:' in options:
+        if 'format' in options:
             qual = options['format']
         elif user_dict.get('yt_opt'):
             qual = user_dict['yt_opt']
