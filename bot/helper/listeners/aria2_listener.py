@@ -170,9 +170,9 @@ async def __onDownloadError(api, gid):
         LOGGER.info(f'Download Error: {error}')
     except:
         pass
-    if dl := await getDownloadByGid(gid):
+    if dl:= await getDownloadByGid(gid):
         listener = dl.listener()
-        ername = dl.name.replace('[METADATA]', '')
+        ername = dl.name().replace('[METADATA]', '')
         await listener.onDownloadError(error, ename=ername)
 
 
