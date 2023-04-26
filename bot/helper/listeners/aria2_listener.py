@@ -172,8 +172,7 @@ async def __onDownloadError(api, gid):
         pass
     if dl:= await getDownloadByGid(gid):
         listener = dl.listener()
-        ername = dl.name().replace('[METADATA]', '')
-        await listener.onDownloadError(error, ename=ername)
+        await listener.onDownloadError(error, ename=dl.name().replace('[METADATA]', ''))
 
 
 def start_aria2_listener():
