@@ -1,4 +1,5 @@
-from aiohttp import request as aiorequest
+from aiofiles import open as aiopen
+from aiohttp import ClientSession
 from base64 import decodebytes
 from gtts import gTTS
 from io import BytesIO
@@ -28,17 +29,14 @@ class miscTool:
         self.__error = ''
         self.lang = 'en'
 
-    async def __get_content(self, url):
+    async def __get_content(self, url, webss=False):
         self.__error = ''
-        try:
-            async with aiorequest('GET', url) as res:
-                if res.status == 200:
-                    return await res.json()
+        async with ClientSession() as session:
+            async with session.get(url) as r:
+                if r.status == 200:
+                    return await r.json()
                 else:
-                    self.__error = f'Got respons {res.status_code}'
-        except Exception as err:
-            LOGGER.error(err)
-            self.__error = 'ERROR: Something error occurred, please try again!'
+                    self.__error = f'Got respons {r.status}'
 
     async def translator(self, text):
         url = f'https://script.google.com/macros/s/AKfycbyhNk6uVgrtJLEFRUT6y5B2pxETQugCZ9pKvu01-bE1gKkDRsw/exec?q={text}&target={self.lang}'
@@ -46,16 +44,16 @@ class miscTool:
 
     async def webss(self, url):
         LOGGER.info(f'Generated Screemshot: {url}')
-        comurl = f'https://yasirapi.eu.org/webss?url={url}'
-        photo = (await self.__get_content(comurl))['result']
-        if self.__error:
-            return
         self.__file = f'Webss_{self.__message.id}.png'
-        try:
-            img = Image.open(BytesIO(decodebytes(bytes(photo, 'utf-8'))))
-            await sync_to_async(img.save, self.__file)
-        except Exception as err:
-            self.__error = err
+        async with ClientSession() as session:
+            async with session.get(f'https://webss.yasirapi.eu.org/api?url={url}&width=1920&height=1080') as r:
+                if r.status == 200:
+                    async for data in r.content.iter_chunked(1024):
+                        async with aiopen(self.__file, 'ba') as f:
+                            await f.write(data)
+                else:
+                    self.__error = f'Got respons {r.status}'
+                    return
         return self.__file
 
     async def vidss(self, url):

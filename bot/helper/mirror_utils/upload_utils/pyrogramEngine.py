@@ -6,7 +6,7 @@ from natsort import natsorted
 from os import path as ospath, walk
 from PIL import Image
 from pyrogram.errors import FloodWait, RPCError
-from pyrogram.types import InputMediaVideo, InputMediaDocument
+from pyrogram.types import InputMediaVideo, InputMediaDocument, Message
 from re import match as re_match
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type, RetryError
 from time import time
@@ -344,16 +344,21 @@ class TgUploader:
     #================================================= MESSAGE =================================================
     async def __msg_to_reply(self):
         self.__leech_log = config_dict['LEECH_LOG']
-        if self.__leech_log:
-            caption = f'<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n{self.name}\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>'
-            if self.__thumb and await aiopath.exists(self.__thumb):
-                self.__send_msg = await bot.send_photo(self.__leech_log, photo=self.__thumb, caption=caption)
+        try:
+            if self.__leech_log:
+                caption = f'<b>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n{self.name}\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</b>'
+                if self.__thumb and await aiopath.exists(self.__thumb):
+                    self.__send_msg = await bot.send_photo(self.__leech_log, photo=self.__thumb, caption=caption)
+                else:
+                    self.__send_msg = await bot.send_message(self.__leech_log, caption, disable_web_page_preview=True)
             else:
-                self.__send_msg = await bot.send_message(self.__leech_log, caption, disable_web_page_preview=True)
-        else:
-            self.__send_msg = await bot.get_messages(self.__listener.message.chat.id, self.__listener.uid)
-        if user_data.get(self.__user_id, {}).get('log_title') and self.__user_dump:
-            await self.__copy_Leech('Log title', self.__user_dump, self.__send_msg)
+                self.__send_msg = await bot.get_messages(self.__listener.message.chat.id, self.__listener.uid)
+            if user_data.get(self.__user_id, {}).get('log_title') and self.__user_dump:
+                await self.__copy_Leech('Log title', self.__user_dump, self.__send_msg)
+        except FloodWait as f:
+            LOGGER.warning(f)
+            await sleep(f.value * 1.2)
+            await self.__msg_to_reply()
 
     async def __premium_check(self, text, client, message, buttons):
         if client == bot:
@@ -367,10 +372,15 @@ class TgUploader:
                 await deleteMessage(message)
 
     async def __send_media_group(self, msgs, subkey, key):
-        msgs_list = await bot.send_media_group(chat_id=self.__send_msg.chat.id,
-                                               media=self.__get_input_media(subkey, key),
-                                               disable_notification=True,
-                                               reply_to_message_id=msgs[0].reply_to_message.id)
+        try:
+            msgs_list = await bot.send_media_group(chat_id=self.__send_msg.chat.id,
+                                                   media=self.__get_input_media(subkey, key),
+                                                   disable_notification=True,
+                                                   reply_to_message_id=msgs[0].reply_to_message.id)
+        except FloodWait as f:
+            LOGGER.warning(f)
+            await sleep(f.value * 1.2)
+            await self.__send_media_group(msgs, subkey, key)
         if self.__enable_pm:
             await self.__copy_media_group(self.__user_id, msgs_list)
         if self.__user_dump:
@@ -389,6 +399,10 @@ class TgUploader:
         try:
             captions = [self.__caption_mode(msg.caption.split('\n')[0]) for msg in msgs]
             await bot.copy_media_group(chat_id=chat_id, from_chat_id=msgs[0].chat.id, message_id=msgs[0].id, captions=captions)
+        except FloodWait as f:
+            LOGGER.warning(f)
+            await sleep(f.value * 1.2)
+            await self.__copy_media_group(chat_id, msgs)
         except Exception as e:
             LOGGER.error(e)
 
@@ -404,10 +418,14 @@ class TgUploader:
                 await self.__copy_Leech('SS', self.__user_id, ssmsg)
             if self.__user_dump:
                 await self.__copy_Leech('SS', self.__user_dump, ssmsg)
+        except FloodWait as f:
+            LOGGER.warning(f)
+            await sleep(f.value * 1.2)
+            await self.__send_ss(ss_image, button)
         except Exception as e:
             LOGGER.error(e)
 
-    async def __copy_Leech(self, text: str, chat_id: int, from_mg, buttons=None):
+    async def __copy_Leech(self, text: str, chat_id: int, from_mg: Message, buttons=None):
         try:
             if buttons:
                 reply_markup = buttons
@@ -420,6 +438,10 @@ class TgUploader:
                                           from_chat_id=from_mg.chat.id,
                                           reply_to_message_id=from_mg.reply_to_message.id if chat_id == from_mg.chat.id else None,
                                           reply_markup=reply_markup)
+        except FloodWait as f:
+            LOGGER.warning(f)
+            await sleep(f.value * 1.2)
+            await self.__copy_Leech(text, chat_id, from_mg, buttons)
         except Exception as e:
             LOGGER.error(f'Failed copy {text} to {chat_id}: {e}')
 
