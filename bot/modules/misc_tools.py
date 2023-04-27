@@ -46,7 +46,7 @@ class miscTool:
         LOGGER.info(f'Generated Screemshot: {url}')
         self.__file = f'Webss_{self.__message.id}.png'
         async with ClientSession() as session:
-            async with session.get(f'https://webss.yasirapi.eu.org/api?url={url}&width=1080&height=720') as r:
+            async with session.get(f'https://webss.yasirapi.eu.org/api?url={url}&width=720&height=1080') as r:
                 if r.status == 200:
                     async for data in r.content.iter_chunked(1024):
                         async with aiopen(self.__file, 'ba') as f:
