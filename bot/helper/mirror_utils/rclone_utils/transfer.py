@@ -285,8 +285,10 @@ class RcloneTransferHelper:
             cmd = ['./gclone', '-P', 'copy', f'{def_remote}:{{{drive_id}}}', destination]
         else:
             cmd = ['./gclone', '-P', 'backend', 'copyid', f'{def_remote}:', drive_id, f'{destination}/']
-        cmd.extend(('--config', config_path, '--drive-server-side-across-configs', '--ignore-existing', '--check-first', '--drive-chunk-size', '64M', '--tpslimit', '3', '--transfers', '3', '--drive-upload-cutoff', '32M', '--drive-acknowledge-abuse'))
+        cmd.extend(('--config', config_path, '--drive-server-side-across-configs', '--ignore-existing', '--check-first', '--checkers=256',
+                    '--transfers=256', '--drive-pacer-min-sleep=1ms', '--drive-pacer-burst=5000', '--drive-acknowledge-abuse'))
         if config_path == 'rclone.conf' and config_dict['USE_SERVICE_ACCOUNTS']:
+            LOGGER.info('Gclone with service accounts.')
             cmd.extend(('--drive-random-pick-sa', '--drive-rolling-sa', '--drive-rolling-count=1'))
         self.__proc = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
         _, return_code = await gather(self.__progress(), self.__proc.wait())
