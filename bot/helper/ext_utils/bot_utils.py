@@ -188,7 +188,7 @@ def get_readable_message():
         msg += f'<code>{escape(str(download.sname))}</code>'
         if isSuperGoup:
             reply_to = message.reply_to_message
-            link = message.link if not reply_to or reply_to.from_user.is_bot else reply_to.link
+            link = message.link if not reply_to or getattr(reply_to.from_user, 'is_bot', None) else reply_to.link
             msg += f'\n<b>┌ <a href="{link}"><i>{download.status()}...</i></a></b>'
         else:
             msg += f'\n<b>┌ <i>{download.status()}...</i></b>'

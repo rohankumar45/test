@@ -352,7 +352,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     opt = opt or config_dict['YT_DLP_OPTIONS']
 
     if reply_to:
-        if not reply_to.sender_chat and not reply_to.from_user.is_bot:
+        if not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
         if not is_media(reply_to) and len(link) == 0:
             link = reply_to.text.split('\n', 1)[0].strip()
