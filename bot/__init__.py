@@ -369,7 +369,7 @@ IMAGE_ZIP = environ.get('IMAGE_ZIP', 'https://telegra.ph/file/4a1a17589798bc405b
 # Mega
 MEGA_KEY = environ.get('MEGA_KEY', '')
 if not MEGA_KEY:
-    LOGGER.warning('MEGA API KEY not provided!')
+    LOGGER.warning('MEGA KEY not provided!')
 ENABLE_MEGAREST = environ.get('ENABLE_MEGAREST', 'False').lower() == 'true'
 MEGA_USERNAME = environ.get('MEGA_USERNAME', '')
 MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
