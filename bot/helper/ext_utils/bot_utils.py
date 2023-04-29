@@ -184,7 +184,6 @@ def get_readable_message():
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
         message: Message = download.message
-        extend_info = ''
         isSuperGoup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
         msg += f'<code>{escape(str(download.sname))}</code>'
         if isSuperGoup:
@@ -193,7 +192,7 @@ def get_readable_message():
             msg += f'\n<b>┌ <a href="{link}"><i>{download.status()}...</i></a></b>'
         else:
             msg += f'\n<b>┌ <i>{download.status()}...</i></b>'
-        extend_info += f'\n<b>├ Engine:<i> {download.eng()}</i></b>'
+        extend_info = f'\n<b>├ Engine:<i> {download.eng()}</i></b>'
         if isSuperGoup:
             extend_info += f'\n<b>├ By:</b> <a href="https://t.me/{message.from_user.username}">{message.from_user.first_name}</a>'
         extend_info += f'\n<b>├ Action:</b> {action(message)}'
