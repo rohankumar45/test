@@ -374,8 +374,8 @@ class MirrorLeechListener:
             name = presuf_remname_name(self.user_dict, name)
         scr_link = await get_link(self.message)
         if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
-            msg_log = '<b>LINK LOGS</b>\n\n'
-            msg_log += f'<code>{escape(name)}</code>\n\n'
+            msg_log = '<b>LINK LOGS</b>\n'
+            msg_log += f'<code>{escape(name)}</code>\n'
             msg_log += f'<b>┌ Cc: </b>{self.tag}\n'
             msg_log += f'<b>├ ID: </b><code>{self.user_id}</code>\n'
             msg_log += f'<b>├ Size: </b>{size}\n'
@@ -403,7 +403,7 @@ class MirrorLeechListener:
                 await sendCustom(msg_log, chat_id)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().rm_complete_task(self.message.link)
-        msg = f'<code>{escape(name)}</code>\n\n'
+        msg = f'<code>{escape(name)}</code>\n'
         msg += f'<b>┌ Size: </b>{size}\n'
         if self.isLeech:
             if config_dict['SOURCE_LINK']:
@@ -590,7 +590,7 @@ class MirrorLeechListener:
         if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
             msg_log = '<b>LINK LOGS</b>\n'
             if ename:
-                msg_log += f'\n<code>{ename}</code>\n\n'
+                msg_log += f'<code>{ename}</code>\n'
             msg_log += f'<b>┌ Cc: </b>{self.tag}\n'
             msg_log += f'<b>├ ID: </b><code>{self.user_id}</code>\n'
             msg_log += f'<b>├ Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
@@ -675,7 +675,7 @@ class MirrorLeechListener:
         if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
             msg_log = '<b>LINK LOGS</b>\n'
             if ename:
-                msg_log += f'\n<code>{ename}</code>\n\n'
+                msg_log += f'<code>{ename}</code>\n'
             msg_log += f'<b>┌ Cc: </b>{self.tag}\n'
             msg_log += f'<b>├ ID: </b><code>{self.user_id}</code>\n'
             msg_log += f'<b>├ Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
