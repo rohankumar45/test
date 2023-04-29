@@ -184,11 +184,11 @@ def get_readable_message():
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
         message: Message = download.message
-        reply_to = message.reply_to_message
         extend_info = ''
         isSuperGoup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
         msg += f'<code>{escape(str(download.sname))}</code>'
         if isSuperGoup:
+            reply_to = message.reply_to_message
             link = message.link if not reply_to or reply_to.from_user.is_bot else reply_to.link
             msg += f'\n<b>┌ <a href="{link}"><i>{download.status()}...</i></a></b>'
         else:
