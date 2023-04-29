@@ -341,7 +341,7 @@ class RcloneTransferHelper:
             await self.__listener.onDownloadError('Download stopped by user!', ename=self.name)
         elif self.__is_upload:
             LOGGER.info(f'Cancelling Upload: {self.name}')
-            await self.__listener.onUploadError('Your upload has been stopped!', self.name)
+            await self.__listener.onUploadError('Upload stopped by user!', self.name)
         else:
             LOGGER.info(f'Cancelling Clone: {self.name}')
-            await self.__listener.onUploadError('Your clone has been stopped!', self.name, True)
+            await self.__listener.onUploadError('Clone stopped by user!', self.name, True)
