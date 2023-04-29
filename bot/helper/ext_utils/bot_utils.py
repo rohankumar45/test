@@ -189,7 +189,7 @@ def get_readable_message():
         isSuperGoup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
         msg += f'<code>{escape(str(download.sname))}</code>'
         if isSuperGoup:
-            link = f'https://t.me/c/{str(message.chat.id)[4:]}/{message.id if not reply_to or reply_to.from_user.is_bot else reply_to.id}'
+            link = message.link if not reply_to or reply_to.from_user.is_bot else reply_to.link
             msg += f'\n<b>┌ <a href="{link}"><i>{download.status()}...</i></a></b>'
         else:
             msg += f'\n<b>┌ <i>{download.status()}...</i></b>'
