@@ -225,7 +225,7 @@ def get_readable_message():
             msg += f'\n<b>├ Elapsed:</b> {get_readable_time(time() - message.date.timestamp())}'
             msg += extend_info
         msg += f'\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n'
-    if len(msg) == 0:
+    if not msg:
         return None, None
     bmsg = f'▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n'
     dl_speed = up_speed = 0
