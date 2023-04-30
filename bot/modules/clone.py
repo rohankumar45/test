@@ -217,7 +217,7 @@ async def cloneNode(client: Client, message: Message):
     mlist = [client, message, multi, 1, '']
 
     if reply_to:
-        if not getattr(reply_to.from_user, 'is_bot', None):
+        if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
         if not is_media(reply_to):
             link = reply_to.text.split('\n', 1)[0].strip()
