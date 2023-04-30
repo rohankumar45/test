@@ -17,15 +17,7 @@ from bot.helper.telegram_helper.message_utils import deleteMessage, auto_delete_
 async def mirror_status(client: Client, message: Message):
     async with download_dict_lock:
         count = len(download_dict)
-    if count == 0:
-        currentTime = get_readable_time(time() - botStartTime)
-        free = get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)
-        msg = 'No Active Downloads!\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n'
-        msg += f'<b>CPU:</b> {cpu_percent()}% | <b>RAM:</b> {virtual_memory().percent}% | <b>FREE:</b> {free}\n'
-        msg += f'<b>IN:</b> {get_readable_file_size(net_io_counters().bytes_recv)}/s<b> | OUT:</b> {get_readable_file_size(net_io_counters().bytes_sent)}/s | {get_readable_time(time() - botStartTime)}'
-        statusmsg = await sendingMessage(msg, message, config_dict['IMAGE_STATUS'])
-        await auto_delete_message(message, statusmsg)
-    else:
+    if count:
         await sendStatusMessage(message)
         await deleteMessage(message)
         async with status_reply_dict_lock:
@@ -33,6 +25,12 @@ async def mirror_status(client: Client, message: Message):
                 Interval[0].cancel()
                 Interval.clear()
                 Interval.append(setInterval(config_dict['STATUS_UPDATE_INTERVAL'], update_all_messages))
+    else:
+        msg = 'No Active Downloads!\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n'
+        msg += f'<b>CPU:</b> {cpu_percent()}% | <b>RAM:</b> {virtual_memory().percent}% | <b>FREE:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}\n'
+        msg += f'<b>IN:</b> {get_readable_file_size(net_io_counters().bytes_recv)}/s<b> | OUT:</b> {get_readable_file_size(net_io_counters().bytes_sent)}/s | {get_readable_time(time() - botStartTime)}'
+        statusmsg = await sendingMessage(msg, message, config_dict['IMAGE_STATUS'])
+        await auto_delete_message(message, statusmsg)
 
 
 async def bot_statistics():
@@ -106,8 +104,8 @@ async def status_pages(client: Client, query: CallbackQuery):
                 await update_all_messages(True)
             else:
                 await turn_page(data)
-    except Exception as err:
-        LOGGER.error(err)
+    except Exception as e:
+        LOGGER.error(e)
 
 
 bot.add_handler(MessageHandler(mirror_status, filters=command(BotCommands.StatusCommand) & CustomFilters.authorized))
