@@ -25,14 +25,17 @@ async def add_gd_download(link, path, listener, newname, gdrive_sharer):
         await listener.onDownloadError('File/folder already in Drive!', file, sname)
         return
     msgerr = None
-    zuzdl, leechdl, storage = config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
+    torddl, zuzdl, leechdl, storage = config_dict['TORRENT_DIRECT_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
     if config_dict['PREMIUM_MODE'] and not is_premium_user(listener.user_id):
-        zuzdl = leechdl = config_dict['NONPREMIUM_LIMIT']
-    if zuzdl and any([listener.isZip, listener.extract]) and size >= zuzdl * 1024**3:
+        torddl = zuzdl = leechdl = config_dict['NONPREMIUM_LIMIT']
+    arch = any([listener.isZip, listener.isLeech, listener.extract])
+    if torddl and not arch and size >= torddl * 1024**3:
+        msgerr = f'Torrent/direct limit is {torddl}GB'
+    elif zuzdl and any([listener.isZip, listener.extract]) and size >= zuzdl * 1024**3:
         msgerr = f'Zip/Unzip limit is {zuzdl}GB'
     elif leechdl and listener.isLeech and size >= leechdl * 1024**3:
         msgerr = f'Leech limit is {leechdl}GB'
-    if storage and not await check_storage_threshold(size, any([listener.isZip, listener.isLeech, listener.extract])):
+    if storage and not await check_storage_threshold(size, arch):
         msgerr = f'Need {storage}GB free storage'
     if msgerr:
         LOGGER.info('File/folder size over the limit size!')
