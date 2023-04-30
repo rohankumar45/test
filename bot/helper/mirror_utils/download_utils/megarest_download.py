@@ -35,7 +35,10 @@ class MegaDownloader:
     @property
     def speed(self):
         if self.__gid:
-            return self.__mega_client.getDownloadInfo(self.__gid)['speed']
+            try:
+                return self.__mega_client.getDownloadInfo(self.__gid)['speed']
+            except:
+                return 0
 
     @new_task
     async def __setInterval(self, func):
