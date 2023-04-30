@@ -102,7 +102,7 @@ class UserDaily:
 
 
 def get_readable_file_size(size_in_bytes):
-    if size_in_bytes is None:
+    if not size_in_bytes:
         return '0B'
     index = 0
     while size_in_bytes >= 1024 and index < len(SIZE_UNITS) - 1:
