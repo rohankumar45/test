@@ -49,7 +49,6 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                 non_queued_dl.add(listener.uid)
             LOGGER.info(f'QbitDownload started: {tor_info.name} - Hash: {ext_hash}')
         await listener.onDownloadStart()
-        LOGGER.info(f'QbitDownload started: {tor_info.name} - Hash: {ext_hash}')
         if config_dict['BASE_URL'] and listener.select:
             if link.startswith('magnet:'):
                 metamsg = '<i>Downloading <b>Metadata</b>, please wait...</i>'
