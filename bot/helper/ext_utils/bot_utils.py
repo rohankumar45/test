@@ -250,7 +250,7 @@ def get_readable_message():
             elif 'M' in spd:
                 up_speed += float(spd.split('M')[0]) * 1048576
     bmsg += f'<b>CPU:</b> {cpu_percent()}% <b>| RAM:</b> {virtual_memory().percent}% <b>| FREE:</b> {get_readable_file_size(disk_usage(config_dict["DOWNLOAD_DIR"]).free)}\n'
-    bmsg += f'<b>IN:</b> {get_readable_file_size(net_io_counters().bytes_recv)}/s<b> | OUT:</b> {get_readable_file_size(net_io_counters().bytes_sent)}/s\n'
+    bmsg += f'<b>IN:</b> {get_readable_file_size(net_io_counters().bytes_recv)}<b> | OUT:</b> {get_readable_file_size(net_io_counters().bytes_sent)}\n'
     bmsg += f'<b>DL:</b> {get_readable_file_size(dl_speed)}/s<b> | UL:</b> {get_readable_file_size(up_speed)}/s <b>|</b> {get_readable_time(time() - botStartTime)}'
     buttons = ButtonMaker()
     if tasks > STATUS_LIMIT:

@@ -28,7 +28,7 @@ async def mirror_status(client: Client, message: Message):
     else:
         msg = 'No Active Downloads!\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n'
         msg += f'<b>CPU:</b> {cpu_percent()}% | <b>RAM:</b> {virtual_memory().percent}% | <b>FREE:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}\n'
-        msg += f'<b>IN:</b> {get_readable_file_size(net_io_counters().bytes_recv)}/s<b> | OUT:</b> {get_readable_file_size(net_io_counters().bytes_sent)}/s | {get_readable_time(time() - botStartTime)}'
+        msg += f'<b>IN:</b> {get_readable_file_size(net_io_counters().bytes_recv)}<b> | OUT:</b> {get_readable_file_size(net_io_counters().bytes_sent)} | {get_readable_time(time() - botStartTime)}'
         statusmsg = await sendingMessage(msg, message, config_dict['IMAGE_STATUS'])
         await auto_delete_message(message, statusmsg)
 
