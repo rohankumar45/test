@@ -427,7 +427,7 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         await query.answer()
         await update_buttons(message, data[1])
     elif data[1] == 'resetvar':
-        if data[2] in ['DATABASE_URL', 'UPSTREAM_REPO', 'UPSTREAM_BRANCH'] and message.forward_from.id != config_dict['OWNER_ID']:
+        if data[2] in ['DATABASE_URL', 'UPSTREAM_REPO', 'UPSTREAM_BRANCH'] and message.from_user.id != config_dict['OWNER_ID']:
             await query.answer('This setting only available for owner!', True)
             return
         handler_dict[message.chat.id] = False
@@ -540,7 +540,7 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         rfunc = partial(update_buttons, message)
         await event_handler(client, query, pfunc, rfunc, True)
     elif data[1] == 'editvar' and STATE == 'edit':
-        if data[2] in ['DATABASE_URL', 'UPSTREAM_REPO', 'UPSTREAM_BRANCH'] and message.forward_from.id != config_dict['OWNER_ID']:
+        if data[2] in ['DATABASE_URL', 'UPSTREAM_REPO', 'UPSTREAM_BRANCH'] and message.from_user.id != config_dict['OWNER_ID']:
             await query.answer('This setting only available for owner!', True)
             return
         handler_dict[message.chat.id] = False
@@ -550,7 +550,7 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         rfunc = partial(update_buttons, message, 'var')
         await event_handler(client, query, pfunc, rfunc)
     elif data[1] == 'editvar' and STATE == 'view':
-        if data[2] in ['DATABASE_URL', 'UPSTREAM_REPO', 'UPSTREAM_BRANCH'] and message.forward_from.id != config_dict['OWNER_ID']:
+        if data[2] in ['DATABASE_URL', 'UPSTREAM_REPO', 'UPSTREAM_BRANCH'] and message.from_user.id != config_dict['OWNER_ID']:
             await query.answer('This setting only available for owner!', True)
             return
         value = config_dict[data[2]]
