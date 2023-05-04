@@ -754,9 +754,9 @@ async def users_handler(client: Client, query: CallbackQuery):
         await editMessage(text, message, buttons)
 
 
-bot.add_handler(MessageHandler(set_premium_users, filters=command(BotCommands.UserSetPremiCommand) & CustomFilters.owner))
+bot.add_handler(MessageHandler(set_premium_users, filters=command(BotCommands.UserSetPremiCommand) & CustomFilters.sudo))
 bot.add_handler(MessageHandler(send_users_settings, filters=command(BotCommands.UsersCommand) & CustomFilters.sudo))
-bot.add_handler(MessageHandler(reset_daily_limit, filters=command(BotCommands.DailyResetCommand) & CustomFilters.owner))
+bot.add_handler(MessageHandler(reset_daily_limit, filters=command(BotCommands.DailyResetCommand) & CustomFilters.sudo))
 bot.add_handler(MessageHandler(user_settings, filters=command(BotCommands.UserSetCommand) & CustomFilters.authorized))
 bot.add_handler(CallbackQueryHandler(edit_user_settings, filters=regex('^userset')))
 bot.add_handler(CallbackQueryHandler(users_handler, filters=regex('^usettings')))
