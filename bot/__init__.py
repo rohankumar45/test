@@ -114,14 +114,11 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
     if DATABASE_URL:= environ.get('DATABASE_URL', ''):
         try:
             DATABASE_URL = b64decode(DATABASE_URL).decode('utf-8')
+            environ['DATABASE_URL'] = DATABASE_URL
         except:
             pass
 else:
     config_dict = {}
-
-LOGGER.info('======================================================')
-LOGGER.info(environ.get('DATABASE_URL', ''))
-LOGGER.info('======================================================')
 
 OWNER_ID = environ.get('OWNER_ID', '5119654642')
 if OWNER_ID:
