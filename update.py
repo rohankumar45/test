@@ -1,4 +1,4 @@
-from base64 import b16decode
+from base64 import b64decode
 from dotenv import load_dotenv, dotenv_values
 from logging import FileHandler, StreamHandler, basicConfig, error as log_error, info as log_info, INFO
 from os import path as ospath, environ, remove
