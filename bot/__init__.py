@@ -111,7 +111,11 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
     conn.close()
     BOT_TOKEN = environ.get('BOT_TOKEN', '')
     bot_id = BOT_TOKEN.split(':', 1)[0]
-    DATABASE_URL = environ.get('DATABASE_URL', '')
+    if DATABASE_URL:= environ.get('DATABASE_URL', ''):
+        try:
+            DATABASE_URL = b64decode(DATABASE_URL).decode('utf-8')
+        except:
+            pass
 else:
     config_dict = {}
 
