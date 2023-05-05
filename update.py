@@ -1,3 +1,4 @@
+from base64 import b16decode
 from dotenv import load_dotenv, dotenv_values
 from logging import FileHandler, StreamHandler, basicConfig, error as log_error, info as log_info, INFO
 from os import path as ospath, environ, remove
@@ -25,6 +26,10 @@ else:
     exit(1)
 
 if DATABASE_URL:= environ.get('DATABASE_URL', ''):
+    try:
+        DATABASE_URL = b64decode(DATABASE_URL).decode('utf-8')
+    except:
+        pass
     conn = MongoClient(DATABASE_URL)
     db = conn.mltb
     old_config = db.settings.deployConfig.find_one({'_id': bot_id})
