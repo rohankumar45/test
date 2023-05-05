@@ -1,6 +1,7 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aria2p import API as ariaAPI, Client as ariaClient
 from asyncio import Lock
+from base64 import b64decode
 from dotenv import load_dotenv, dotenv_values
 from faulthandler import enable as faulthandler_enable
 from logging import getLogger, FileHandler, StreamHandler, basicConfig, INFO, ERROR
@@ -72,8 +73,11 @@ if not BOT_TOKEN:
 
 bot_id = BOT_TOKEN.split(':', 1)[0]
 
-DATABASE_URL = environ.get('DATABASE_URL', '')
-if DATABASE_URL:
+if DATABASE_URL:= environ.get('DATABASE_URL', ''):
+    try:
+        DATABASE_URL = b64decode(DATABASE_URL).decode('utf-8')
+    except:
+        pass
     conn = MongoClient(DATABASE_URL)
     db = conn.mltb
     current_config = dict(dotenv_values('config.env'))
