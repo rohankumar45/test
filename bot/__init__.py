@@ -119,6 +119,10 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
 else:
     config_dict = {}
 
+LOGGER.info('======================================================')
+LOGGER.info(environ.get('DATABASE_URL', ''))
+LOGGER.info('======================================================')
+
 OWNER_ID = environ.get('OWNER_ID', '5119654642')
 if OWNER_ID:
     OWNER_ID  = int(OWNER_ID)
