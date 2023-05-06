@@ -3,7 +3,6 @@ from aria2p import API as ariaAPI, Client as ariaClient
 from asyncio import Lock
 from base64 import b64decode
 from dotenv import load_dotenv, dotenv_values
-from faulthandler import enable as faulthandler_enable
 from logging import getLogger, FileHandler, StreamHandler, basicConfig, INFO, ERROR
 from os import remove as osremove, path as ospath, environ, getcwd
 from pymongo import MongoClient
@@ -17,7 +16,6 @@ from tzlocal import get_localzone
 from uvloop import install
 
 
-faulthandler_enable()
 install()
 setdefaulttimeout(600)
 

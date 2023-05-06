@@ -4,7 +4,7 @@ from pyrogram.filters import command, regex
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
 
-from bot import bot, bot_loop, download_dict, download_dict_lock, user_data, config_dict, OWNER_ID
+from bot import bot, download_dict, download_dict_lock, user_data, config_dict, OWNER_ID
 from bot.helper.ext_utils.bot_utils import getDownloadByGid, getAllDownload, MirrorStatus, new_task
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -68,7 +68,6 @@ async def cancel_all(message: Message, status: str):
     await deleteMessage(message)
 
 
-@new_task
 async def cancell_all_buttons(client: Client, message: Message):
     async with download_dict_lock:
         if len(download_dict) == 0:
