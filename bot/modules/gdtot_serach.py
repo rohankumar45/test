@@ -1,4 +1,3 @@
-from pyrogram import Client
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
@@ -8,16 +7,14 @@ from bot import bot, config_dict
 from bot.helper.ext_utils.bot_utils import is_media, get_readable_time, get_date_time, action, new_task
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.gdtot_proxy import search_gdtot
-from bot.helper.ext_utils.telegram_helper import TeleContent
+from bot.helper.ext_utils.telegram_helper import content_dict, TeleContent
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, deleteMessage, editMessage, auto_delete_message
 
-gdtot_dict = {}
-
 
 @new_task
-async def _gdtot(client: Client, message: Message):
+async def _gdtot(_, message: Message):
     reply_to = message.reply_to_message
     mid = message.id
     args = message.text.split(maxsplit=1)
@@ -35,7 +32,7 @@ async def _gdtot(client: Client, message: Message):
     key = reply_to.text.strip() if reply_to else args[1]
     msg = await sendMessage(f'<i>Searching for <b>{key.title()}</b>, please wait...</i>', message)
     tele = TeleContent(message, key, 5)
-    gdtot_dict[mid] = tele
+    content_dict[mid] = tele
     result = await search_gdtot(key)
     if result:
         cap = f"<b>GDTot Search Result:</b>\n"
@@ -50,22 +47,22 @@ async def _gdtot(client: Client, message: Message):
         text, buttons = await tele.get_content('gdtot')
         await editMessage(text, msg, buttons)
         if len(result) < 5:
-            del gdtot_dict[mid]
+            del content_dict[mid]
     else:
         await editMessage(f'Not found search for <b>{key.title()}</b>!', msg)
 
 
 @new_task
-async def gdtot_callbak(client: Client, query: CallbackQuery):
+async def gdtot_callbak(_, query: CallbackQuery):
     message = query.message
     data = query.data.split()
     print(data)
-    tele: TeleContent = gdtot_dict.get(int(data[3]))
+    tele: TeleContent = content_dict.get(int(data[3]))
     if not tele and data[2] != 'close':
         await query.answer('Old Task!', show_alert=True)
     elif data[2] == 'close':
         if tele:
-            del gdtot_dict[int(data[3])]
+            del content_dict[int(data[3])]
         await deleteMessage(message, message.reply_to_message, tele.reply if tele else None)
     else:
         tdata = int(data[4]) if data[2] == 'foot' else int(data[3])

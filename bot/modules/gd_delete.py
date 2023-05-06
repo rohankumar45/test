@@ -1,4 +1,3 @@
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -12,7 +11,7 @@ from bot.helper.telegram_helper.message_utils import auto_delete_message, sendMe
 
 
 @new_task
-async def deletefile(client: Client, message: Message):
+async def deletefile(_, message: Message):
     link = await get_link(message)
     if is_gdrive_link(link):
         LOGGER.info(link)

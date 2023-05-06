@@ -63,12 +63,12 @@ async def updateRssMenu(query: CallbackQuery):
 
 
 @new_thread
-async def getRssMenu(client: Client, message: Message):
+async def getRssMenu(_, message: Message):
     msg, buttons = await rssMenu(message)
     await sendMessage(msg, message, buttons)
 
 
-async def rssSub(client: Client, message: Message, query: CallbackQuery):
+async def rssSub(_, message: Message, query: CallbackQuery):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     tag = message.from_user.mention
@@ -248,7 +248,7 @@ async def rssList(query: CallbackQuery, start: int, all_users: bool=False):
     await editMessage(list_feed, query.message, buttons.build_menu(2))
 
 
-async def rssGet(client: Client, message: Message, query: CallbackQuery):
+async def rssGet(_, message: Message, query: CallbackQuery):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     args = message.text.split()
@@ -298,7 +298,7 @@ async def rssGet(client: Client, message: Message, query: CallbackQuery):
     _auto_delete(message, msg, stime=10)
 
 
-async def rssEdit(client: Client, message: Message, query: CallbackQuery):
+async def rssEdit(_, message: Message, query: CallbackQuery):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     items = message.text.split('\n')
@@ -351,7 +351,7 @@ async def rssEdit(client: Client, message: Message, query: CallbackQuery):
     await updateRssMenu(query)
 
 
-async def rssDelete(client: Client, message: Message, query: CallbackQuery):
+async def rssDelete(_, message: Message, query: CallbackQuery):
     handler_dict[message.from_user.id] = False
     users = message.text.split()
     for user in users:

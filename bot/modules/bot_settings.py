@@ -147,7 +147,7 @@ async def update_buttons(message: Message, key: str=None, edit_type: str=None):
         await editMessage(msg, message, buttons)
 
 
-async def edit_variable(client: Client, message: Message, omsg: Message, key: str):
+async def edit_variable(_, message: Message, omsg: Message, key: str):
     handler_dict[message.chat.id] = False
     value = message.text
     if key == 'ENABLE_MEGAREST':
@@ -235,7 +235,7 @@ async def edit_variable(client: Client, message: Message, omsg: Message, key: st
         await rclone_serve_booter()
 
 
-async def edit_aria(client: Client, message: Message, omsg: Message, key: str):
+async def edit_aria(_, message: Message, omsg: Message, key: str):
     handler_dict[message.chat.id] = False
     value = message.text
     if key == 'newkey':
@@ -261,7 +261,7 @@ async def edit_aria(client: Client, message: Message, omsg: Message, key: str):
         await DbManger().update_aria2(key, value)
 
 
-async def edit_qbit(client: Client, message: Message, omsg: Message, key: str):
+async def edit_qbit(_, message: Message, omsg: Message, key: str):
     handler_dict[message.chat.id] = False
     value = message.text
     if value.lower() == 'true':
@@ -280,7 +280,7 @@ async def edit_qbit(client: Client, message: Message, omsg: Message, key: str):
         await DbManger().update_qbittorrent(key, value)
 
 
-async def update_private_file(client: Client, message: Message, omsg: Message):
+async def update_private_file(_, message: Message, omsg: Message):
     handler_dict[message.chat.id] = False
     if not message.media and (file_name := message.text):
         fn = file_name.rsplit('.zip', 1)[0]
@@ -631,7 +631,7 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
 
 
 @new_thread
-async def bot_settings(client: Client, message: Message):
+async def bot_settings(_, message: Message):
     msg, image, buttons = await get_buttons()
     await sendingMessage(msg, message, image, buttons)
 

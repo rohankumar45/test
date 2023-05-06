@@ -3,7 +3,7 @@ from aiohttp import ClientSession, request as aiorequests
 from asyncio import sleep
 from bs4 import BeautifulSoup
 from json import loads as jsonloads
-from pyrogram import Client, enums
+from pyrogram import enums
 from pyrogram.errors import FloodWait
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
@@ -414,7 +414,7 @@ async def update_data(query: CallbackQuery, mid: int, data=None, movid=None):
 
 
 @new_task
-async def search_info(client: Client, message: Message):
+async def search_info(_, message: Message):
     reply_to = message.reply_to_message
     args = message.text.split(maxsplit=1)
     fmode = ForceMode(message)
@@ -439,7 +439,7 @@ async def search_info(client: Client, message: Message):
 
 
 @new_task
-async def query_info(client: Client, query: CallbackQuery):
+async def query_info(_, query: CallbackQuery):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split('|')

@@ -1,6 +1,5 @@
 from asyncio import sleep
 from psutil import cpu_percent, virtual_memory, disk_usage, net_io_counters
-from pyrogram import Client
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
@@ -14,7 +13,7 @@ from bot.helper.telegram_helper.message_utils import deleteMessage, auto_delete_
 
 
 @new_task
-async def mirror_status(client: Client, message: Message):
+async def mirror_status(_, message: Message):
     async with download_dict_lock:
         count = len(download_dict)
     if count:
@@ -71,7 +70,7 @@ DL: {config_dict.get('TORRENT_DIRECT_LIMIT', '~ ')}GB | Z/U: {config_dict.get('Z
 
 
 @new_task
-async def status_pages(client: Client, query: CallbackQuery):
+async def status_pages(_, query: CallbackQuery):
     user_id = query.from_user.id
     data = query.data.split()
     message = query.message

@@ -3,7 +3,6 @@ from aiohttp import ClientSession
 from asyncio import sleep
 from bs4 import BeautifulSoup
 from functools import partial
-from pyrogram import Client
 from pyrogram.filters import command, regex, user
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
@@ -235,7 +234,7 @@ class ScrapeHelper():
 
 
 @new_task
-async def scrapper(client: Client, message: Message):
+async def scrapper(_, message: Message):
     user_id = message.from_user.id
     reply_to = message.reply_to_message
     user_dict = user_data.get(user_id, {})
@@ -274,7 +273,7 @@ async def scrapper(client: Client, message: Message):
         await scrape.OnScrapError()
 
 
-async def stop_scrapper(client: Client, query: CallbackQuery, obj: ScrapeHelper):
+async def stop_scrapper(_, query: CallbackQuery, obj: ScrapeHelper):
     await query.answer('Trying to stop...')
     obj.is_cancelled = True
 

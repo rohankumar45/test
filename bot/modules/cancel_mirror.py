@@ -1,5 +1,4 @@
 from asyncio import sleep
-from pyrogram import Client
 from pyrogram.filters import command, regex
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
@@ -14,7 +13,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, sendingMessage
 
 
 @new_task
-async def cancel_mirror(client: Client, message: Message):
+async def cancel_mirror(_, message: Message):
     user_id = message.from_user.id
     reply_to = message.reply_to_message
     msg = message.text.split()
@@ -68,7 +67,7 @@ async def cancel_all(message: Message, status: str):
     await deleteMessage(message)
 
 
-async def cancell_all_buttons(client: Client, message: Message):
+async def cancell_all_buttons(_, message: Message):
     async with download_dict_lock:
         if len(download_dict) == 0:
             await sendMessage('No active tasks!', message)
@@ -91,7 +90,7 @@ async def cancell_all_buttons(client: Client, message: Message):
 
 
 @new_task
-async def cancel_all_update(client: Client, query: CallbackQuery):
+async def cancel_all_update(_, query: CallbackQuery):
     message = query.message
     data = query.data.split()
     await query.answer()

@@ -1,4 +1,3 @@
-from pyrogram import Client
 from pyrogram.errors import UserAlreadyParticipant, InviteHashExpired
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
@@ -10,7 +9,7 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message
 
 
-async def join_chat(client: Client, message: Message):
+async def join_chat(_, message: Message):
     reply = message.reply_to_message
     if (savebot:= bot_dict['SAVEBOT']) and config_dict['SAVE_CONTENT']:
         args = message.text.split()

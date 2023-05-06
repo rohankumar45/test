@@ -1,4 +1,3 @@
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -11,7 +10,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage
 
 
 @new_task
-async def sleep(client: Client, message: Message):
+async def sleep(_, message: Message):
     if not (BASE_URL := config_dict['BASE_URL']):
         await sendMessage('BASE_URL_OF_BOT not provided!', message)
     elif alive.returncode:

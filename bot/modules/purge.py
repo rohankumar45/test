@@ -1,4 +1,3 @@
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -12,7 +11,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, d
 
 
 @new_task
-async def purge_message(client: Client, message: Message):
+async def purge_message(_, message: Message):
     reply_to = message.reply_to_message
     msg = await sendMessage('<i>Deleting message, please wait..</i>', message)
     if not reply_to:

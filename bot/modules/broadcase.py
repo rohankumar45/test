@@ -1,5 +1,4 @@
 from asyncio import sleep
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -13,7 +12,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, c
 
 
 @new_task
-async def broadcast_message(client: Client, message: Message):
+async def broadcast_message(_, message: Message):
     reply_to = message.reply_to_message
     args = message.text.split(maxsplit=1)
     if not reply_to and len(args) == 1:

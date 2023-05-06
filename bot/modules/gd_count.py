@@ -1,4 +1,3 @@
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -16,7 +15,7 @@ from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage,
 
 
 @new_task
-async def countNode(client: Client, message: Message):
+async def countNode(_, message: Message):
     buttons = ButtonMaker()
     user_id = message.from_user.id
     reply_to = message.reply_to_message

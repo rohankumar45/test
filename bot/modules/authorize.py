@@ -1,4 +1,3 @@
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -10,7 +9,7 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message
 
 @new_task
-async def authorize(client: Client, message: Message):
+async def authorize(_, message: Message):
     msg = message.text.split()
     if len(msg) > 1:
         id_ = int(msg[1].strip())
@@ -27,7 +26,7 @@ async def authorize(client: Client, message: Message):
     await auto_delete_message(message, msg)
 
 @new_task
-async def unauthorize(client: Client, message: Message):
+async def unauthorize(_, message: Message):
     msg = message.text.split()
     if len(msg) > 1:
         id_ = int(msg[1].strip())
@@ -44,7 +43,7 @@ async def unauthorize(client: Client, message: Message):
     await auto_delete_message(message, msg)
 
 @new_task
-async def addSudo(client: Client, message: Message):
+async def addSudo(_, message: Message):
     id_ = ''
     msg = message.text.split()
     if len(msg) > 1:
@@ -63,7 +62,7 @@ async def addSudo(client: Client, message: Message):
     await auto_delete_message(message, msg)
 
 @new_task
-async def removeSudo(client, message):
+async def removeSudo(_, message: Message):
     id_ = ''
     msg = message.text.split()
     if len(msg) > 1:

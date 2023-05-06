@@ -15,7 +15,7 @@ from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time,
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.fs_utils import clean_target
-from bot.helper.ext_utils.telegram_helper import TeleContent
+from bot.helper.ext_utils.telegram_helper import content_dict, TeleContent
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -349,7 +349,7 @@ async def update_user_settings(query: CallbackQuery, data: str=None, uset_data: 
     await editPhoto(text, query.message, image, button)
 
 
-async def set_user_settings(client: Client, message: Message, query: CallbackQuery, key: str):
+async def set_user_settings(_, message: Message, query: CallbackQuery, key: str):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     value = message.text
@@ -384,7 +384,7 @@ async def set_user_settings(client: Client, message: Message, query: CallbackQue
         await auto_delete_message(message, msg, stime=5)
 
 
-async def set_thumb(client: Client, message: Message, query: CallbackQuery):
+async def set_thumb(_, message: Message, query: CallbackQuery):
     user_id = query.from_user.id
     handler_dict[user_id] = False
     path = 'thumbnails'
@@ -402,7 +402,7 @@ async def set_thumb(client: Client, message: Message, query: CallbackQuery):
         await DbManger().update_user_doc(user_id, 'thumb', des_dir)
 
 
-async def add_rclone(client: Client, message: Message, query: CallbackQuery):
+async def add_rclone(_, message: Message, query: CallbackQuery):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     path = ospath.join(getcwd(), 'rclone')
@@ -634,7 +634,7 @@ async def event_handler(client: Client, query: CallbackQuery, pfunc: partial, ph
     client.remove_handler(*handler)
 
 
-async def user_settings(client: Client, message: Message):
+async def user_settings(_, message: Message):
     if config_dict['FUSERNAME'] and (fmsg:= await ForceMode(message).force_username):
         await auto_delete_message(message, fmsg)
         return
@@ -644,7 +644,7 @@ async def user_settings(client: Client, message: Message):
     await sendPhoto(msg, message, image or config_dict['IMAGE_USETIINGS'], buttons)
 
 
-async def set_premium_users(client: Client, message: Message):
+async def set_premium_users(_, message: Message):
     if not config_dict['PREMIUM_MODE']:
         await sendMessage('<b>Premium Mode</b> is disable!', message)
         return
@@ -681,7 +681,7 @@ async def set_premium_users(client: Client, message: Message):
     await auto_delete_message(message, msg)
 
 
-async def reset_daily_limit(client: Client, message: Message):
+async def reset_daily_limit(_, message: Message):
     reply_to = message.reply_to_message
     args = message.text.split()
     if not reply_to and len(args) == 1:
@@ -697,7 +697,7 @@ async def reset_daily_limit(client: Client, message: Message):
     await auto_delete_message(message, msg)
 
 
-async def send_users_settings(client: Client, message: Message):
+async def send_users_settings(_, message: Message):
     contents = []
     msg = ''
     if len(user_data) == 0:
@@ -726,23 +726,23 @@ async def send_users_settings(client: Client, message: Message):
         contents.append(str(index).zfill(3) + '. ' + msg + '\n')
         msg = ''
     tele = TeleContent(message)
-    handler_dict[message.id] = tele
+    content_dict[message.id] = tele
     await tele.set_data(contents, f'<b>FOUND {len(contents)} USERS SETTINGS DATA</b>')
     text, buttons = await tele.get_content('usettings')
     await sendMessage(text, message, buttons)
     if len(contents) < 8:
-        del handler_dict[message.id]
+        del content_dict[message.id]
 
 
-async def users_handler(client: Client, query: CallbackQuery):
+async def users_handler(_, query: CallbackQuery):
     message = query.message
     data = query.data.split()
-    tele: TeleContent = handler_dict.get(int(data[3]))
+    tele: TeleContent = content_dict.get(int(data[3]))
     if not tele and data[2] != 'close':
         await query.answer('Old Task!', show_alert=True)
     elif data[2] == 'close':
         if tele:
-            del handler_dict[int(data[3])]
+            del content_dict[int(data[3])]
         await deleteMessage(message, message.reply_to_message)
     else:
         tdata = int(data[4]) if data[2] == 'foot' else int(data[3])

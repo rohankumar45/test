@@ -4,6 +4,9 @@ from asyncio import Lock
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
+content_dict = {}
+
+
 class TeleContent:
     def __init__(self, message, key=None, max=8):
         self.key = key

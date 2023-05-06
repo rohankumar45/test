@@ -2,7 +2,6 @@ import hashlib
 
 from aiofiles.os import path as aiopath, makedirs
 from os import path as ospath
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -18,7 +17,7 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, s
 
 
 @new_task
-async def hasher(client: Client, message: Message):
+async def hasher(_, message: Message):
     user_id = message.from_user.id
     reply_to = message.reply_to_message
     tag = message.from_user.mention

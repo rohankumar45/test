@@ -1,5 +1,4 @@
 from speedtest import Speedtest
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -12,7 +11,7 @@ from bot.helper.telegram_helper.message_utils import auto_delete_message, sendMe
 
 
 @new_task
-async def speedtest(client: Client, message: Message):
+async def speedtest(_, message: Message):
     msg = await sendMessage('<i>Running speed test...</i>', message)
     try:
         test = Speedtest()
@@ -33,11 +32,11 @@ async def speedtest(client: Client, message: Message):
 <b>└ Country: </b>{result['server']['country']}, {result['server']['cc']}
 '''
         await deleteMessage(msg)
-        msg = await sendPhoto(caption, message, result['share'])
+        await sendPhoto(caption, message, result['share'])
     except Exception as err:
         LOGGER.error(str(err))
         await editMessage(f'Failed running speedtest {err}', msg)
-    await auto_delete_message(message, msg)
+        await auto_delete_message(message, msg)
 
 
 bot.add_handler(MessageHandler(speedtest, filters=command(BotCommands.SpeedCommand) & CustomFilters.sudo))

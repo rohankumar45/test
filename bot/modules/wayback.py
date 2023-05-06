@@ -16,7 +16,7 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, a
 
 
 @new_task
-async def wayback(client: Client, message: Message):
+async def wayback(_, message: Message):
     user_id = message.from_user.id
     reply_to = message.reply_to_message
     tag = message.from_user.mention

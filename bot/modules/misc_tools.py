@@ -1,10 +1,6 @@
 from aiofiles import open as aiopen
 from aiohttp import ClientSession
-from base64 import decodebytes
 from gtts import gTTS
-from io import BytesIO
-from PIL import Image
-from pyrogram import Client
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
@@ -14,6 +10,7 @@ from bot import bot, config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import ButtonMaker, is_premium_user, is_url, sync_to_async, new_task
 from bot.helper.ext_utils.fs_utils import clean_target
 from bot.helper.ext_utils.genss import GenSS
+from bot.helper.ext_utils.help_messages import HelpString
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, sendMessage, editMessage, deleteMessage, sendPhoto, sendSticker
@@ -147,21 +144,6 @@ class miscTool:
                 'vi', 'xh', 'yi', 'yo', 'zh', 'zh_CN', 'zh_TW', 'zu')
 
 
-class MSG:
-    TXT = f'''
-1. OCR: Generate text from image.
-2. TTS: Text to speech, generate sound from text or image.
-4. Webss: Generate screenshot from url.
-5. Vidss: Generate screenshot from ddl.
-6. Translate: Translate from text or image.
-7. Pahe: Find movie by title from Pahe website.
-8. Convert: Convert non animation sticker from image or from sticker to image.\n
-<b>Note</b>\nAvailable code for TTS and Translate <b><a href='https://graph.org/Support-Site-12-07-2'>Here</a></b>.
-<b>Example:</b> <code>/{BotCommands.MiscCommand} id</code>, result will in id (Indonesia) language.
-<i>*Some laguage may not work for TTS.</i>
-'''
-
-
 async def verify_message(message: Message):
     misc = miscTool(message)
     reply_to = message.reply_to_message
@@ -200,16 +182,16 @@ async def get_button(from_user, mid: int):
     head = f"Task For ~ <b><a href='tg://user?id={from_user.id}'>{from_user.first_name}</a></b>"
     for key, value in but_dict.items():
         button.button_data(key, value)
-    return head + MSG.TXT, button.build_menu(2)
+    return head + HelpString.MISC, button.build_menu(2)
 
 
-async def misc_tools(client: Client, message: Message):
+async def misc_tools(_, message: Message):
     if config_dict['PREMIUM_MODE']:
         if not is_premium_user(message.from_user.id):
             await sendMessage('This feature only for <b>Premium User</b>!', message)
             return
     if not message.reply_to_message and len(message.text.split()) == 1:
-        await sendMessage('Send command with a message or reply to a message.\n' + MSG.TXT, message)
+        await sendMessage('Send command with a message or reply to a message.\n' + HelpString.MISC, message)
         return
     message_dict[message.id] = message
     text, buttons = await get_button(message.from_user, message.id)
@@ -217,7 +199,7 @@ async def misc_tools(client: Client, message: Message):
 
 
 @new_task
-async def misc_callback(client: Client, query: CallbackQuery):
+async def misc_callback(_, query: CallbackQuery):
     buttons = ButtonMaker()
     user_id = query.from_user.id
     message = query.message

@@ -180,7 +180,7 @@ class YtSelection:
 
 
 @new_task
-async def select_format(client: Client, query: CallbackQuery, obj: YtSelection):
+async def select_format(_, query: CallbackQuery, obj: YtSelection):
     data = query.data.split()
     message = query.message
     await query.answer()

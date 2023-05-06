@@ -1,7 +1,6 @@
 from aiofiles import open as aiopen
 from aiohttp import ClientSession
 from html import escape
-from pyrogram import Client
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
@@ -12,15 +11,13 @@ from bot import bot, config_dict, get_client, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time, get_date_time, action, sync_to_async, new_task
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.html_helper import html_template
-from bot.helper.ext_utils.telegram_helper import TeleContent
+from bot.helper.ext_utils.telegram_helper import content_dict, TeleContent
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, sendMessage, deleteMessage, sendFile, auto_delete_message, sendingMessage
 
-
-search_dict = {}
 
 TELEGRAPH_LIMIT = 300
 PLUGINS = []
@@ -56,7 +53,7 @@ async def initiate_search_tools():
 
 
 @new_task
-async def torrentSearch(client: Client, message: Message):
+async def torrentSearch(_, message: Message):
     user_id = message.from_user.id
     reply_to = message.reply_to_message
     tag = message.from_user.mention
@@ -74,7 +71,7 @@ async def torrentSearch(client: Client, message: Message):
         key = args[1]
 
     tele = TeleContent(message, key)
-    search_dict[message.id] = tele
+    content_dict[message.id] = tele
 
     SEARCH_PLUGINS = config_dict['SEARCH_PLUGINS']
     if not SITES and not SEARCH_PLUGINS:
@@ -133,7 +130,7 @@ async def get_buttons(user_id: int, method=None, site=None, key=None):
 
 
 @new_task
-async def torrentSearchUpdate(client: Client, query: CallbackQuery):
+async def torrentSearchUpdate(_, query: CallbackQuery):
     user_id = query.from_user.id
     message = query.message
     data = query.data.split()
@@ -146,7 +143,7 @@ async def torrentSearchUpdate(client: Client, query: CallbackQuery):
             mid = int(data[3])
         except:
             pass
-    tele: TeleContent = search_dict.get(mid)
+    tele: TeleContent = content_dict.get(mid)
     if user_id != int(data[1]):
         await  query.answer('Not Yours!', show_alert=True)
     elif not tele and data[2] != 'close':
@@ -200,7 +197,7 @@ async def torrentSearchUpdate(client: Client, query: CallbackQuery):
     elif data[2] == 'close':
         await query.answer('Closing torrent search...')
         if tele:
-            del search_dict[mid]
+            del content_dict[mid]
         await deleteMessage(message, message.reply_to_message, tele.reply if tele else None)
     else:
         await query.answer()
@@ -290,12 +287,12 @@ async def __search(key: str, site: str, message: Message, method: str, style: st
         await sync_to_async(client.auth_log_out)
     hmsg = await __getResult(search_results, key, message, method, style)
     if style == 'tele':
-        tele: TeleContent = search_dict[omsg.id]
+        tele: TeleContent = content_dict[omsg.id]
         await tele.set_data(hmsg, cap)
         text, buttons = await tele.get_content('torser')
         await editMessage(text, message, buttons)
         if len(hmsg) < 8:
-            del search_dict[omsg.id]
+            del content_dict[omsg.id]
     elif style == 'graph':
         buttons = ButtonMaker()
         buttons.button_link("View", hmsg)
@@ -308,7 +305,7 @@ async def __search(key: str, site: str, message: Message, method: str, style: st
         await sendFile(omsg, name, cap, config_dict['IMAGE_HTML'])
         await deleteMessage(message)
     if style != 'tele':
-        del search_dict[omsg.id]
+        del content_dict[omsg.id]
     del hmsg
     if message.chat.type.name in ['SUPERGROUP', 'CHANNEL'] and (stime:= config_dict['AUTO_DELETE_UPLOAD_MESSAGE_DURATION']):
         await auto_delete_message(omsg, stime=stime)

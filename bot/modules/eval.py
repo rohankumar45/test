@@ -2,7 +2,6 @@ from aiofiles import open as aiopen
 from contextlib import redirect_stdout
 from io import StringIO
 from os import path as ospath, getcwd, chdir
-from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -42,7 +41,7 @@ async def send(msg, message):
 
 
 @new_task
-async def evaluate(client: Client, message: Message):
+async def evaluate(_, message: Message):
     if len(message.text.split()) == 1:
         await sendMessage('No command given to execute!', message)
         return
@@ -50,7 +49,7 @@ async def evaluate(client: Client, message: Message):
 
 
 @new_task
-async def execute(client: Client, message: Message):
+async def execute(_, message: Message):
     if len(message.text.split()) == 1:
         await sendMessage('No command given to execute!', message)
         return
@@ -101,7 +100,7 @@ def do(func, message: Message):
             return result
 
 
-async def clear(client: Client, message: Message):
+async def clear(_, message: Message):
     log_input(message)
     global namespaces
     if message.chat.id in namespaces:
@@ -110,7 +109,7 @@ async def clear(client: Client, message: Message):
 
 
 @new_task
-async def exechelp(client: Client, message: Message):
+async def exechelp(_, message: Message):
     text = f'''
 <b>Executor</b>
 <b>┌ </b>{BotCommands.EvalCommand} <i>Run Python Code Line | Lines</i>
