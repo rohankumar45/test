@@ -160,19 +160,19 @@ def action(message: str) -> str:
 
 
 def presuf_remname_name(user_dict: int, name: str):
-    if name:= str(name):
+    if name:
         if prename := user_dict.get('user_prename'):
             name = f'{prename} {name}'
         if sufname := user_dict.get('user_sufname'):
             try:
-                fname, ext = name.rsplit('.', maxsplit=1)
+                fname, ext = str(name).rsplit('.', maxsplit=1)
                 name = f'{fname} {sufname}.{ext}'
             except: pass
         if LEECH_FILENAME_PREFIX := config_dict['LEECH_FILENAME_PREFIX']:
             name = f'{LEECH_FILENAME_PREFIX} {name}'
         if remname := user_dict.get('user_remname'):
             for x in remname.split('|'):
-                name = name.replace(x, '')
+                name = str(name).replace(x, '')
     return name
 
 
