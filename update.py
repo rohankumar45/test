@@ -3,7 +3,9 @@ from dotenv import load_dotenv, dotenv_values
 from logging import FileHandler, StreamHandler, basicConfig, error as log_error, info as log_info, INFO
 from os import path as ospath, environ, remove
 from pymongo import MongoClient
+from re import sub as resub
 from subprocess import run as srun
+
 
 if ospath.exists('log.txt'):
     with open('log.txt', 'r+') as f:
@@ -26,10 +28,9 @@ else:
     exit(1)
 
 if DATABASE_URL:= environ.get('DATABASE_URL', ''):
-    try:
-        DATABASE_URL = b64decode(DATABASE_URL).decode('utf-8')
-    except:
-        pass
+    if not DATABASE_URL.startswith('mongodb'):
+        try: DATABASE_URL = b64decode(resub('ini|adalah|pesan|rahasia', '', DATABASE_URL)).decode('utf-8')
+        except: pass
     conn = MongoClient(DATABASE_URL)
     db = conn.mltb
     old_config = db.settings.deployConfig.find_one({'_id': bot_id})

@@ -8,6 +8,7 @@ from os import remove as osremove, path as ospath, environ, getcwd
 from pymongo import MongoClient
 from pyrogram import Client as tgClient, enums
 from qbittorrentapi import Client as qbClient
+from re import sub as resub
 from socket import setdefaulttimeout
 from subprocess import Popen, run as srun
 from threading import Thread
@@ -72,10 +73,9 @@ if not BOT_TOKEN:
 bot_id = BOT_TOKEN.split(':', 1)[0]
 
 if DATABASE_URL:= environ.get('DATABASE_URL', ''):
-    try:
-        DATABASE_URL = b64decode(DATABASE_URL).decode('utf-8')
-    except:
-        pass
+    if not DATABASE_URL.startswith('mongodb'):
+        try: DATABASE_URL = b64decode(resub('ini|adalah|pesan|rahasia', '', DATABASE_URL)).decode('utf-8')
+        except: pass
     conn = MongoClient(DATABASE_URL)
     db = conn.mltb
     current_config = dict(dotenv_values('config.env'))
@@ -110,11 +110,9 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
     BOT_TOKEN = environ.get('BOT_TOKEN', '')
     bot_id = BOT_TOKEN.split(':', 1)[0]
     if DATABASE_URL:= environ.get('DATABASE_URL', ''):
-        try:
-            DATABASE_URL = b64decode(DATABASE_URL).decode('utf-8')
-            environ['DATABASE_URL'] = DATABASE_URL
-        except:
-            pass
+        if not DATABASE_URL.startswith('mongodb'):
+            try: DATABASE_URL = b64decode(resub('ini|adalah|pesan|rahasia', '', DATABASE_URL)).decode('utf-8')
+            except: pass
 else:
     config_dict = {}
 
