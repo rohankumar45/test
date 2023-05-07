@@ -315,4 +315,3 @@ class YoutubeDLHelper:
                     self.opts[key].append(value)
             else:
                 self.opts[key] = value
-        LOGGER.info(self.opts)
