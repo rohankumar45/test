@@ -409,7 +409,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
         for ytopt in yt_opt:
             key, value = map(str.strip, ytopt.split(':', 1))
             if value.startswith('^'):
-                value = float(str(value).split('^')[1])
+                value = float(value.split('^')[1])
             elif value.lower() == 'true':
                 value = True
             elif value.lower() == 'false':
