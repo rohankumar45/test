@@ -259,7 +259,7 @@ class YoutubeDLHelper:
         elif leechdl and self.__listener.isLeech and self.__size >= leechdl * 1024**3:
             msgerr = f'Ytdl leech limit is {leechdl}GB'
         if max_pyt and self.is_playlist and (self.playlist_count > max_pyt):
-            msgerr = f'Only {max_pyt} playlist allowed. {self.name} playlist is {self.playlist_count}.'
+            msgerr = f'Only {max_pyt} playlist allowed. Current playlist is {self.playlist_count}.'
         if storage and not await check_storage_threshold(self.__size, arch):
             msgerr = f'Need {storage}GB free storage'
         if msgerr:
