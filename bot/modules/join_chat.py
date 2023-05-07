@@ -23,7 +23,7 @@ async def join_chat(_, message: Message):
             except UserAlreadyParticipant:
                 text = 'Already joined to chat.'
             except InviteHashExpired:
-                text = 'invite link expired!'
+                text = 'Invite link expired!'
             except Exception as e:
                 LOGGER.error(e)
                 text = 'Invalid link!'
