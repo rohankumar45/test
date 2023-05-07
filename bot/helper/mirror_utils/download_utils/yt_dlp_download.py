@@ -126,9 +126,9 @@ class YoutubeDLHelper:
             await self.__listener.onDownloadStart()
             await sendStatusMessage(self.__listener.message)
 
-    def __onDownloadError(self, error, listfile=None):
+    def __onDownloadError(self, error, listfile=None, ename=None):
         self.__is_cancelled = True
-        async_to_sync(self.__listener.onDownloadError, error, listfile, self.name)
+        async_to_sync(self.__listener.onDownloadError, error, listfile, ename or  self.name)
 
     def extractMetaData(self, link, name):
         if link.startswith(('rtmp', 'mms', 'rstp', 'rtmps')):
@@ -139,7 +139,7 @@ class YoutubeDLHelper:
                 if result is None:
                     raise ValueError('Info result is None')
             except Exception as e:
-                self.__onDownloadError(str(e))
+                self.__onDownloadError(str(e), ename=name)
                 return
             if self.is_playlist:
                 self.playlist_count = result.get('playlist_count', 0)
