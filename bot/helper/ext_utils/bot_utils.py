@@ -172,8 +172,6 @@ def presuf_remname_name(user_dict: int, name: str):
             name = f'{LEECH_FILENAME_PREFIX} {name}'
         if remname := user_dict.get('user_remname'):
             name = resub(remname.strip('|'), '', str(name))
-            # for x in remname.split('|'):
-            #     name = str(name).replace(x, '')
     return name
 
 
