@@ -159,7 +159,7 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 filename = f'{fname} {sufname}.{ext}'
             except: pass
         if remname:
-            filename = resub(remname.strip('|'), str(filename))
+            filename = resub(remname.strip('|'), '', str(filename))
             # for rem in remname.split('|'):
             #     filename = filename.replace(rem, '')
         newpath = ospath.join(filedir, filename)
@@ -178,7 +178,7 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 except:
                     pass
             if remname:
-                filename = resub(remname.strip('|'), str(filename))
+                filename = resub(remname.strip('|'), '', str(filename))
                 # for rem in remname.split('|'):
                 #     filename = filename.replace(rem, '')
             if any([prename, remname, sufname]):
