@@ -159,7 +159,8 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 filename = f'{fname} {sufname}.{ext}'
             except: pass
         if remname:
-            filename = resub(remname.strip('|'), '', str(filename))
+            try: filename = resub(remname.strip('|'), '', str(filename))
+            except: pass
         newpath = ospath.join(filedir, filename)
         if any([prename, remname, sufname]):
             await aiorename(path, newpath)
@@ -176,7 +177,8 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 except:
                     pass
             if remname:
-                filename = resub(remname.strip('|'), '', str(filename))
+                try: filename = resub(remname.strip('|'), '', str(filename))
+                except: pass
             if any([prename, remname, sufname]):
                 await aiorename(ospath.join(root, file), ospath.join(root, filename))
     return path
