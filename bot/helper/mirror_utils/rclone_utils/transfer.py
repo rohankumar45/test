@@ -332,10 +332,8 @@ class RcloneTransferHelper:
     async def cancel_download(self):
         self.__is_cancelled = True
         if self.__proc:
-            try:
-                self.__proc.kill()
-            except:
-                pass
+            try: self.__proc.kill()
+            except: pass
         if self.__is_download:
             LOGGER.info(f'Cancelling Download: {self.name}')
             await self.__listener.onDownloadError('Download stopped by user!', ename=self.name)

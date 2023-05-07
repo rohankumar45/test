@@ -61,8 +61,9 @@ class ExtractStatus:
 
     async def cancel_download(self):
         LOGGER.info(f'Cancelling Extract: {self.name()}')
-        if self.__listener.suproc is not None:
-            self.__listener.suproc.kill()
+        if self.__listener.suproc:
+            try: self.__listener.suproc.kill()
+            except: pass
         else:
             self.__listener.suproc = 'cancelled'
         await self.__listener.onUploadError('Extracting stopped by user!', self.name())
