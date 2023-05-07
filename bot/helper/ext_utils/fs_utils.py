@@ -5,13 +5,13 @@ from aioshutil import rmtree as aiormtree, disk_usage
 from asyncio import create_subprocess_exec
 from magic import Magic
 from os import walk, path as ospath
-from re import split as re_split, search as re_search, I
+from re import split as re_split, search as re_search, sub as resub, I
 from shutil import rmtree
 from subprocess import run as srun
 from sys import exit as sexit
 
 from bot import aria2, config_dict, get_client, DOWNLOAD_DIR, LOGGER, GLOBAL_EXTENSION_FILTER
-from bot.helper.ext_utils.bot_utils import sync_to_async, new_task
+from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 
 
@@ -159,8 +159,9 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 filename = f'{fname} {sufname}.{ext}'
             except: pass
         if remname:
-            for rem in remname.split('|'):
-                filename = filename.replace(rem, '')
+            filename = resub(remname.strip('|'), str(filename))
+            # for rem in remname.split('|'):
+            #     filename = filename.replace(rem, '')
         newpath = ospath.join(filedir, filename)
         if any([prename, remname, sufname]):
             await aiorename(path, newpath)
@@ -177,8 +178,9 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 except:
                     pass
             if remname:
-                for rem in remname.split('|'):
-                    filename = filename.replace(rem, '')
+                filename = resub(remname.strip('|'), str(filename))
+                # for rem in remname.split('|'):
+                #     filename = filename.replace(rem, '')
             if any([prename, remname, sufname]):
                 await aiorename(ospath.join(root, file), ospath.join(root, filename))
     return path
