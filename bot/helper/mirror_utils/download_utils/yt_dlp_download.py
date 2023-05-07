@@ -295,9 +295,7 @@ class YoutubeDLHelper:
     def __set_options(self, options):
         options = options.split('|')
         for opt in options:
-            LOGGER.info('=====================================')
             key, value = map(str.strip, opt.split(':', 1))
-            LOGGER.info('=====================================')
             if value.startswith('^'):
                 if '.' in value:
                     value = float(value.split('^')[1])
@@ -310,7 +308,6 @@ class YoutubeDLHelper:
             elif value.startswith(('{', '[', '(')) and value.endswith(('}', ']', ')')):
                 value = eval(value)
 
-            LOGGER.info('=====================================')
             if key == 'postprocessors':
                 if isinstance(value, list):
                     self.opts[key].extend(tuple(value))
@@ -318,3 +315,4 @@ class YoutubeDLHelper:
                     self.opts[key].append(value)
             else:
                 self.opts[key] = value
+        LOGGER.info(self.opts)
