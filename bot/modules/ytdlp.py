@@ -403,13 +403,16 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     listener = MirrorLeechListener(message, isZip, isLeech=isLeech, isGofile=isGofile, pswd=pswd, tag=tag, newname=name, multiId=multiid, sameDir=sameDir, rcFlags=rcf, upPath=up)
     if 'mdisk.me' in link:
         name, link = await _mdisk(link, name)
-    options = {'usenetrc': True, 'cookiefile': 'cookies.txt', 'playlist_items': '0'}
+    options = {'usenetrc': True, 'cookiefile': 'cookies.txt'}
     if opt:
         yt_opt = opt.split('|')
         for ytopt in yt_opt:
             key, value = map(str.strip, ytopt.split(':', 1))
             if value.startswith('^'):
-                value = float(value.split('^')[1])
+                if '.' in value:
+                    value = float(value.split('^')[1])
+                else:
+                    value = int(value.split('^')[1])
             elif value.lower() == 'true':
                 value = True
             elif value.lower() == 'false':
@@ -417,6 +420,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             elif value.startswith(('{', '[', '(')) and value.endswith(('}', ']', ')')):
                 value = eval(value)
             options[key] = value
+        options['playlist_items'] = '0'
     try:
         result = await sync_to_async(extract_info, link, options)
     except Exception as e:
