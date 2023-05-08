@@ -364,13 +364,9 @@ class TgUploader:
         if client == bot:
             self.__send_msg = message
         else:
-            LOGGER.info(f'Using premium client! Resend {text}: ' + message.caption.split('\n')[0])
-            message = await bot.get_messages(message.chat.id, message.id)
-            await message.edit_reply_markup(buttons)
-            # cmsg = await self.__copy_Leech(text, self.__send_msg.chat.id, message, buttons)
-            # if cmsg:
-            #     self.__send_msg = cmsg
-            #     await deleteMessage(message)
+            LOGGER.info(f'Using premium client! Edit markup {text}: ' + message.caption.split('\n')[0])
+            if cmsg:= await (await bot.get_messages(message.chat.id, message.id)).edit_reply_markup(buttons):
+                self.__send_msg = cmsg
 
     async def __send_media_group(self, msgs, subkey, key):
         try:
