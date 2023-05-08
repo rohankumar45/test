@@ -38,6 +38,7 @@ def is_archive_split(file):
 
 
 async def download_gclone():
+    LOGGER.info('Downloading GClone...')
     await clean_target('gclone')
     if GCLONE_URL:= config_dict['GCLONE_URL']:
         try:
@@ -51,6 +52,7 @@ async def download_gclone():
             LOGGER.error(e)
         if await aiopath.exists('gclone'):
             await (await create_subprocess_exec('chmod', '-R', '777', 'gclone')).wait()
+            LOGGER.info('GClone sucessfully downloaded!')
 
 
 async def clean_target(path: str):
