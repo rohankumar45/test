@@ -365,7 +365,7 @@ class TgUploader:
             self.__send_msg = message
         else:
             LOGGER.info(f'Using premium client! Resend {text}: ' + message.caption.split('\n')[0])
-            # message = await bot.get_messages(message.chat.id, message.id)
+            message = await bot.get_messages(message.chat.id, message.id)
             await message.edit_reply_markup(buttons)
             # cmsg = await self.__copy_Leech(text, self.__send_msg.chat.id, message, buttons)
             # if cmsg:
