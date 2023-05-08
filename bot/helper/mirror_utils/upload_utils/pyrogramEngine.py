@@ -5,6 +5,7 @@ from logging import getLogger, ERROR
 from natsort import natsorted
 from os import path as ospath, walk
 from PIL import Image
+from pyrogram import Client
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InputMediaVideo, InputMediaDocument, Message
 from re import match as re_match
@@ -150,15 +151,15 @@ class TgUploader:
                 key = 'documents'
                 if self.__is_cancelled:
                     return
-                cmsg = await self.__client.send_document(chat_id=self.__send_msg.chat.id,
-                                                         document=self.__up_path,
-                                                         thumb=thumb,
-                                                         caption=caption,
-                                                         disable_notification=True,
-                                                         progress=self.__upload_progress,
-                                                         reply_to_message_id=self.__send_msg.id,
-                                                         reply_markup=buttons)
-                await self.__premium_check(key, self.__client, cmsg, buttons)
+                self.__send_msg = await self.__client.send_document(chat_id=self.__send_msg.chat.id,
+                                                                    document=self.__up_path,
+                                                                    thumb=thumb,
+                                                                    caption=caption,
+                                                                    disable_notification=True,
+                                                                    progress=self.__upload_progress,
+                                                                    reply_to_message_id=self.__send_msg.id,
+                                                                    reply_markup=buttons)
+                await self.__premium_check(key, buttons)
             elif is_video:
                 key = 'videos'
                 if thumb:
@@ -179,36 +180,36 @@ class TgUploader:
                         self.__up_path = new_path
                 if self.__is_cancelled:
                     return
-                cmsg = await self.__client.send_video(chat_id=self.__send_msg.chat.id,
-                                                      video=self.__up_path,
-                                                      caption=caption,
-                                                      duration=duration,
-                                                      width=width,
-                                                      height=height,
-                                                      thumb=thumb,
-                                                      supports_streaming=True,
-                                                      disable_notification=True,
-                                                      progress=self.__upload_progress,
-                                                      reply_to_message_id=self.__send_msg.id,
-                                                      reply_markup=buttons)
-                await self.__premium_check(key, self.__client, cmsg, buttons)
+                self.__send_msg = await self.__client.send_video(chat_id=self.__send_msg.chat.id,
+                                                                 video=self.__up_path,
+                                                                 caption=caption,
+                                                                 duration=duration,
+                                                                 width=width,
+                                                                 height=height,
+                                                                 thumb=thumb,
+                                                                 supports_streaming=True,
+                                                                 disable_notification=True,
+                                                                 progress=self.__upload_progress,
+                                                                 reply_to_message_id=self.__send_msg.id,
+                                                                 reply_markup=buttons)
+                await self.__premium_check(key, buttons)
             elif is_audio:
                 key = 'audios'
                 duration, artist, title = await get_media_info(self.__up_path)
                 if self.__is_cancelled:
                     return
-                cmsg = await self.__client.send_audio(chat_id=self.__send_msg.chat.id,
-                                                      audio=self.__up_path,
-                                                      caption=caption,
-                                                      duration=duration,
-                                                      performer=artist,
-                                                      title=title,
-                                                      thumb=thumb,
-                                                      disable_notification=True,
-                                                      progress=self.__upload_progress,
-                                                      reply_to_message_id=self.__send_msg.id,
-                                                      reply_markup=buttons)
-                await self.__premium_check(key, self.__client, cmsg, buttons)
+                self.__send_msg = await self.__client.send_audio(chat_id=self.__send_msg.chat.id,
+                                                                 audio=self.__up_path,
+                                                                 caption=caption,
+                                                                 duration=duration,
+                                                                 performer=artist,
+                                                                 title=title,
+                                                                 thumb=thumb,
+                                                                 disable_notification=True,
+                                                                 progress=self.__upload_progress,
+                                                                 reply_to_message_id=self.__send_msg.id,
+                                                                 reply_markup=buttons)
+                await self.__premium_check(key, buttons)
             else:
                 key = 'photos'
                 if self.__is_cancelled:
@@ -360,13 +361,10 @@ class TgUploader:
             await sleep(f.value * 1.2)
             await self.__msg_to_reply()
 
-    async def __premium_check(self, text, client, message, buttons):
-        if client == bot:
-            self.__send_msg = message
-        else:
-            LOGGER.info(f'Using premium client! Edit markup {text}: ' + message.caption.split('\n')[0])
-            if cmsg:= await (await bot.get_messages(message.chat.id, message.id)).edit_reply_markup(buttons):
-                self.__send_msg = cmsg
+    async def __premium_check(self, text: str, buttons):
+        LOGGER.info(f'Using premium client! Edit markup {text}: ' + self.__send_msg.caption.split('\n')[0])
+        if cmsg:= await (await bot.get_messages(self.__send_msg.chat.id, self.__send_msg.id)).edit_reply_markup(buttons):
+            self.__send_msg = cmsg
 
     async def __send_media_group(self, msgs, subkey, key):
         try:
@@ -422,23 +420,24 @@ class TgUploader:
         except Exception as e:
             LOGGER.error(e)
 
-    async def __copy_Leech(self, text: str, chat_id: int, from_mg: Message, buttons=None):
+    async def __copy_Leech(self, text: str, chat_id: int, message: Message, buttons=None):
         try:
             if buttons:
                 reply_markup = buttons
             elif config_dict['SAVE_MESSAGE'] and self.__listener.isSuperGroup:
-                reply_markup = default_button(from_mg)
+                reply_markup = default_button(message)
             else:
-                reply_markup = from_mg.reply_markup
+                reply_markup = message.reply_markup
+            return await message.copy()
             return await bot.copy_message(chat_id=chat_id,
-                                          message_id=from_mg.id,
-                                          from_chat_id=from_mg.chat.id,
-                                          reply_to_message_id=from_mg.reply_to_message.id if chat_id == from_mg.chat.id else None,
+                                          message_id=message.id,
+                                          from_chat_id=message.chat.id,
+                                          reply_to_message_id=message.reply_to_message.id if chat_id == message.chat.id else None,
                                           reply_markup=reply_markup)
         except FloodWait as f:
             LOGGER.warning(f)
             await sleep(f.value * 1.2)
-            await self.__copy_Leech(text, chat_id, from_mg, buttons)
+            await self.__copy_Leech(text, chat_id, message, buttons)
         except Exception as e:
             LOGGER.error(f'Failed copy {text} to {chat_id}: {e}')
 
