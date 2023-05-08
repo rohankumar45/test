@@ -396,7 +396,7 @@ class MirrorLeechListener:
                     msg_log += f'<b>├ Files: </b>{files}\n'
             msg_log += f'<b>├ Add: </b>{dt_date}\n'
             msg_log += f'<b>├ At: </b>{dt_time} ({TIME_ZONE_TITLE})\n'
-            msg_log += f'<b>└ Source Link:</b>\n{scr_link}'
+            msg_log += f'<b>└ Source Link:</b>\n<code>{scr_link}</code>'
             if reply_to and is_media(reply_to):
                 await sendMedia(msg_log, chat_id, reply_to)
             else:
