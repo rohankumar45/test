@@ -366,10 +366,11 @@ class TgUploader:
         else:
             LOGGER.info(f'Using premium client! Resend {text}: ' + message.caption.split('\n')[0])
             message = await bot.get_messages(message.chat.id, message.id)
-            cmsg = await self.__copy_Leech(text, self.__send_msg.chat.id, message, buttons)
-            if cmsg:
-                self.__send_msg = cmsg
-                await deleteMessage(message)
+            await message.edit_reply_markup(buttons)
+            # cmsg = await self.__copy_Leech(text, self.__send_msg.chat.id, message, buttons)
+            # if cmsg:
+            #     self.__send_msg = cmsg
+            #     await deleteMessage(message)
 
     async def __send_media_group(self, msgs, subkey, key):
         try:
