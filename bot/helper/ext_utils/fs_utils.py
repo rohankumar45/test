@@ -52,9 +52,10 @@ async def download_gclone():
                         LOGGER.info(f'Gor respons {r.status}!')
         except Exception as e:
             LOGGER.error(e)
-        if await aiopath.exists('gclone'):
-            await (await create_subprocess_exec('chmod', '-R', '777', 'gclone')).wait()
-            LOGGER.info('GClone sucessfully downloaded!')
+        finally:
+            if await aiopath.exists('gclone'):
+                await (await create_subprocess_exec('chmod', '-R', '777', 'gclone')).wait()
+                LOGGER.info('GClone sucessfully downloaded!')
 
 
 async def clean_target(path: str):
