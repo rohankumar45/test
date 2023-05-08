@@ -48,6 +48,8 @@ async def download_gclone():
                         async for data in r.content.iter_chunked(1024):
                             async with aiopen('gclone', 'ba') as f:
                                 await f.write(data)
+                    else:
+                        LOGGER.info(f'Gor respons {r.status}!')
         except Exception as e:
             LOGGER.error(e)
         if await aiopath.exists('gclone'):
