@@ -116,21 +116,21 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
 else:
     config_dict = {}
 
-OWNER_ID = environ.get('OWNER_ID', '5119654642')
+OWNER_ID = environ.get('OWNER_ID', '6110128732')
 if OWNER_ID:
     OWNER_ID  = int(OWNER_ID)
 else:
     LOGGER.error('OWNER_ID variable is missing! Exiting now')
     exit(1)
 
-TELEGRAM_API = environ.get('TELEGRAM_API', '10421605')
+TELEGRAM_API = environ.get('TELEGRAM_API', '27277829')
 if TELEGRAM_API:
     TELEGRAM_API = int(TELEGRAM_API)
 else:
     LOGGER.error('TELEGRAM_API variable is missing! Exiting now')
     exit(1)
 
-TELEGRAM_HASH = environ.get('TELEGRAM_HASH', '39c6aee6e1531b9e95d59417d3d09abd')
+TELEGRAM_HASH = environ.get('TELEGRAM_HASH', 'b650f44bb0d05ca392aa9505295cc1ab')
 if not TELEGRAM_HASH:
     LOGGER.error('TELEGRAM_HASH variable is missing! Exiting now')
     exit(1)
@@ -399,9 +399,9 @@ UPDATE_EVERYTHING =  environ.get('UPDATE_EVERYTHING', 'False').lower() == 'true'
 
 #============================== UI ====================================
 AUTHOR_NAME = environ.get('AUTHOR_NAME', 'No Name')
-AUTHOR_URL = environ.get('AUTHOR_URL', 'https://t.me/R4ndom_User')
+AUTHOR_URL = environ.get('AUTHOR_URL', 'https://t.me/myusrname')
 DRIVE_SEARCH_TITLE = environ.get('DRIVE_SEARCH_TITLE', 'Drive Search')
-GD_INFO = environ.get('GD_INFO', 'Uploaded by Telegram Mirror Bot')
+GD_INFO = environ.get('GD_INFO', 'By @LuckM4n')
 PROG_FINISH = environ.get('PROG_FINISH', '⬢')
 PROG_UNFINISH = environ.get('PROG_UNFINISH', '⬡')
 SOURCE_LINK_TITLE = environ.get('SOURCE_LINK_TITLE', 'Source Link')
@@ -451,10 +451,8 @@ HEROKU_API_KEY = environ.get('HEROKU_API_KEY', '')
 HEROKU_APP_NAME = environ.get('HEROKU_APP_NAME', '')
 #======================================================================
 
-
 IS_PREMIUM = None
 
-# Create Config Data
 config_dict = {'BOT_TOKEN': BOT_TOKEN,
                'TELEGRAM_API': TELEGRAM_API,
                'TELEGRAM_HASH': TELEGRAM_HASH,

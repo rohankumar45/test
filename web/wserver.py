@@ -87,7 +87,7 @@ rawindexpage = '''
         </div>
         <h2 class="name">Qbittorrent Selection</h2>
         <div class="social">
-            <a href="https://www.github.com/R4ndomUsers"><i class="fab fa-github"></i></a>
+            <a href="https://www.github.com/myusrname"><i class="fab fa-github"></i></a>
             <a href="https://t.me/r4ndom_releases"><i class="fab fa-telegram"></i></a>
         </div>
     </header>
