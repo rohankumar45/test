@@ -49,7 +49,7 @@ async def download_gclone():
                             async with aiopen('gclone', 'ba') as f:
                                 await f.write(data)
                     else:
-                        LOGGER.info(f'Gor respons {r.status}!')
+                        raise Exception(f'Failed to download GClone, got respons {r.status}!')
         except Exception as e:
             LOGGER.error(e)
         finally:
