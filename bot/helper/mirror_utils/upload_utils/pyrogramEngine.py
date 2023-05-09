@@ -159,7 +159,7 @@ class TgUploader:
                                                                     progress=self.__upload_progress,
                                                                     reply_to_message_id=self.__send_msg.id,
                                                                     reply_markup=buttons)
-                await self.__premium_check(key, buttons)
+                await self.__premium_check(key, self.__client, buttons)
             elif is_video:
                 key = 'videos'
                 if thumb:
@@ -192,7 +192,7 @@ class TgUploader:
                                                                  progress=self.__upload_progress,
                                                                  reply_to_message_id=self.__send_msg.id,
                                                                  reply_markup=buttons)
-                await self.__premium_check(key, buttons)
+                await self.__premium_check(key, self.__client, buttons)
             elif is_audio:
                 key = 'audios'
                 duration, artist, title = await get_media_info(self.__up_path)
@@ -209,7 +209,7 @@ class TgUploader:
                                                                  progress=self.__upload_progress,
                                                                  reply_to_message_id=self.__send_msg.id,
                                                                  reply_markup=buttons)
-                await self.__premium_check(key, buttons)
+                await self.__premium_check(key, self.__client, buttons)
             else:
                 key = 'photos'
                 if self.__is_cancelled:
@@ -361,10 +361,11 @@ class TgUploader:
             await sleep(f.value * 1.2)
             await self.__msg_to_reply()
 
-    async def __premium_check(self, text: str, buttons):
-        LOGGER.info(f'Using premium client! Edit markup {text}: ' + self.__send_msg.caption.split('\n')[0])
-        if cmsg:= await (await bot.get_messages(self.__send_msg.chat.id, self.__send_msg.id)).edit_reply_markup(buttons):
-            self.__send_msg = cmsg
+    async def __premium_check(self, text: str, client, buttons):
+        if client != bot:
+            LOGGER.info(f'Using premium client! Edit markup {text}: ' + self.__send_msg.caption.split('\n')[0])
+            if cmsg:= await (await bot.get_messages(self.__send_msg.chat.id, self.__send_msg.id)).edit_reply_markup(buttons):
+                self.__send_msg = cmsg
 
     async def __send_media_group(self, msgs, subkey, key):
         try:
