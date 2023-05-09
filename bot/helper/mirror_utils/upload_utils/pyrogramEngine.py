@@ -368,10 +368,13 @@ class TgUploader:
 
     async def __send_media_group(self, msgs, subkey, key):
         try:
-            msgs_list = await bot.send_media_group(chat_id=self.__send_msg.chat.id,
-                                                   media=self.__get_input_media(subkey, key),
-                                                   disable_notification=True,
-                                                   reply_to_message_id=msgs[0].reply_to_message.id)
+            msgs_list = await msgs[0].reply_to_message.reply_media_group(media=self.__get_input_media(subkey, key),
+                                                                         quote=True,
+                                                                         disable_notification=True)
+            # msgs_list = await bot.send_media_group(chat_id=self.__send_msg.chat.id,
+            #                                        media=self.__get_input_media(subkey, key),
+            #                                        disable_notification=True,
+            #                                        reply_to_message_id=msgs[0].reply_to_message.id)
         except FloodWait as f:
             LOGGER.warning(f)
             await sleep(f.value * 1.2)
@@ -403,12 +406,15 @@ class TgUploader:
 
     async def __send_ss(self, ss_image, button):
         try:
-            ssmsg = await bot.send_photo(chat_id=self.__send_msg.chat.id,
-                                         photo=ss_image,
-                                         caption=f'<b>Screenshot Generated:\n</b><code>{ospath.basename(self.__up_path)}</code>',
-                                         disable_notification=True,
-                                         reply_to_message_id=self.__send_msg.id,
-                                         reply_markup=button)
+            ssmsg = await self.__send_msg.reply_photo(ss_image, True,
+                                                      f'<b>Screenshot Generated:\n</b><code>{ospath.basename(self.__up_path)}</code>',
+                                                      disable_notification=True)
+            # ssmsg = await bot.send_photo(chat_id=self.__send_msg.chat.id,
+            #                              photo=ss_image,
+            #                              caption=f'<b>Screenshot Generated:\n</b><code>{ospath.basename(self.__up_path)}</code>',
+            #                              disable_notification=True,
+            #                              reply_to_message_id=self.__send_msg.id,
+            #                              reply_markup=button)
             if self.__enable_pm and self.__listener.isSuperGroup or self.__enable_pm and self.__leech_log:
                 await self.__copy_Leech('SS', self.__user_id, ssmsg)
             if self.__user_dump:
@@ -428,12 +434,15 @@ class TgUploader:
                 reply_markup = default_button(message)
             else:
                 reply_markup = message.reply_markup
-            return await message.copy()
-            return await bot.copy_message(chat_id=chat_id,
-                                          message_id=message.id,
-                                          from_chat_id=message.chat.id,
-                                          reply_to_message_id=message.reply_to_message.id if chat_id == message.chat.id else None,
-                                          reply_markup=reply_markup)
+            return await message.copy(chat_id,
+                                      disable_notification=True,
+                                      reply_markup=reply_markup,
+                                      reply_to_message_id=message.reply_to_message.id if chat_id == message.chat.id else None)
+            # return await bot.copy_message(chat_id=chat_id,
+            #                               message_id=message.id,
+            #                               from_chat_id=message.chat.id,
+            #                               reply_to_message_id=message.reply_to_message.id if chat_id == message.chat.id else None,
+            #                               reply_markup=reply_markup)
         except FloodWait as f:
             LOGGER.warning(f)
             await sleep(f.value * 1.2)
