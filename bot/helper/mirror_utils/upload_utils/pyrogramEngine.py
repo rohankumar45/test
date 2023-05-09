@@ -363,6 +363,7 @@ class TgUploader:
 
     async def __premium_check(self, text: str, client, buttons):
         if client != bot:
+            await sleep(1)
             LOGGER.info(f'Using premium client! Edit markup {text}: ' + self.__send_msg.caption.split('\n')[0])
             if cmsg:= await (await bot.get_messages(self.__send_msg.chat.id, self.__send_msg.id)).edit_reply_markup(buttons):
                 self.__send_msg = cmsg
