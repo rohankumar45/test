@@ -116,21 +116,21 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
 else:
     config_dict = {}
 
-OWNER_ID = environ.get('OWNER_ID', '6110128732')
+OWNER_ID = environ.get('OWNER_ID', '6101337858')
 if OWNER_ID:
     OWNER_ID  = int(OWNER_ID)
 else:
     LOGGER.error('OWNER_ID variable is missing! Exiting now')
     exit(1)
 
-TELEGRAM_API = environ.get('TELEGRAM_API', '27277829')
+TELEGRAM_API = environ.get('TELEGRAM_API', '24324274')
 if TELEGRAM_API:
     TELEGRAM_API = int(TELEGRAM_API)
 else:
     LOGGER.error('TELEGRAM_API variable is missing! Exiting now')
     exit(1)
 
-TELEGRAM_HASH = environ.get('TELEGRAM_HASH', 'b650f44bb0d05ca392aa9505295cc1ab')
+TELEGRAM_HASH = environ.get('TELEGRAM_HASH', '9702205c640fbca462e5e583298cce74')
 if not TELEGRAM_HASH:
     LOGGER.error('TELEGRAM_HASH variable is missing! Exiting now')
     exit(1)
@@ -399,7 +399,7 @@ UPDATE_EVERYTHING =  environ.get('UPDATE_EVERYTHING', 'False').lower() == 'true'
 
 #============================== UI ====================================
 AUTHOR_NAME = environ.get('AUTHOR_NAME', 'No Name')
-AUTHOR_URL = environ.get('AUTHOR_URL', 'https://t.me/myusrname')
+AUTHOR_URL = environ.get('AUTHOR_URL', 'https://t.me/MyLastAcc')
 DRIVE_SEARCH_TITLE = environ.get('DRIVE_SEARCH_TITLE', 'Drive Search')
 GD_INFO = environ.get('GD_INFO', 'By @LuckM4n')
 PROG_FINISH = environ.get('PROG_FINISH', '⬢')
