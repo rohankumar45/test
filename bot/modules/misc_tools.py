@@ -308,7 +308,7 @@ async def misc_callback(_, query: CallbackQuery):
     else:
         if omsg:
             del message_dict[omsg.id]
-        await deleteMessage(message, message.reply_to_message, omsg.reply_to_message)
+        await deleteMessage(message, message.reply_to_message, omsg.reply_to_message if omsg else None)
 
 
 bot.add_handler(MessageHandler(misc_tools, filters=command(BotCommands.MiscCommand) & CustomFilters.authorized))
