@@ -120,7 +120,7 @@ class miscTool:
             self.__doc = self.__reply_to
         elif self.__reply_to.document and 'image' in self.__reply_to.document.mime_type:
             self.__doc = self.__reply_to
-        if not self.__doc:
+        if not self.__doc or self.__reply_to.video:
             self.__error = 'ERROR: Invalid reply!'
 
     async def cleanup(self, delete=False):
