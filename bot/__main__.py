@@ -277,7 +277,7 @@ async def restart_notification():
 
 async def main():
     await gather(intialize_userbot(False), set_command(), start_cleanup(), torrent_search.initiate_search_tools())
-    await gather(intialize_savebot(config_dict['USER_SESSION_STRING'], False), restart_notification())
+    await gather(intialize_savebot(config_dict['SAVE_SESSION_STRING'], False), restart_notification())
     if config_dict['ENABLE_MEGAREST']:
         megarest_client()
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
