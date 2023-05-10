@@ -11,7 +11,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_me
 
 async def join_chat(_, message: Message):
     reply = message.reply_to_message
-    if (savebot:= bot_dict['SAVEBOT']) and config_dict['SAVE_CONTENT']:
+    if savebot:= bot_dict['SAVEBOT']:
         args = message.text.split()
         if not reply and len(args) == 1:
             msg = await sendMessage('Please provided a chat join link!', message)
