@@ -64,7 +64,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
     ratio = seed_time = None
     select = seed = isGofile = gdrive_sharer = False
-    multi, mi, file_ = 0, 1
+    multi, mi = 0, 1
     file_ = tg_client = None
     link = folder_name = ''
     multiid = get_multiid(user_id)
