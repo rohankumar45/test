@@ -88,10 +88,7 @@ async def clean_download(path):
 
 async def start_cleanup():
     get_client().torrents_delete(torrent_hashes='all')
-    try:
-        await aiormtree(DOWNLOAD_DIR)
-    except:
-        pass
+    await clean_target(DOWNLOAD_DIR)
     await makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
