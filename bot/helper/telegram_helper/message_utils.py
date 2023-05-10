@@ -202,7 +202,7 @@ async def get_tg_link_content(link: str, user_id: int):
             return userbot, message
         else:
             raise Exception(f'Failed getting data from link, member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
-    elif superChat and (message:= await bot.get_messages(chat, msg_id)) and message.chat:
+    elif not userbot and superChat and (message:= await bot.get_messages(chat, msg_id)) and message.chat:
         return bot, message
     elif userbot and (message := await userbot.get_messages(chat, msg_id)) and message.chat:
         return userbot, message
