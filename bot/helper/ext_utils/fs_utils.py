@@ -5,7 +5,7 @@ from aioshutil import rmtree as aiormtree, disk_usage
 from asyncio import create_subprocess_exec
 from magic import Magic
 from os import walk, path as ospath
-from re import split as re_split, search as re_search, sub as resub, I
+from re import split as re_split, search as re_search, I
 from shutil import rmtree
 from subprocess import run as srun
 from sys import exit as sexit
@@ -164,8 +164,8 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 filename = f'{fname} {sufname}.{ext}'
             except: pass
         if remname:
-            try: filename = resub(remname.strip('|'), '', str(filename))
-            except: pass
+            for x in remname.split('|'):
+                filename = str(filename).replace(x, '')
         newpath = ospath.join(filedir, filename)
         if any([prename, remname, sufname]):
             await aiorename(path, newpath)
@@ -182,8 +182,8 @@ async def presuf_remname_file(path: str, prename: str, sufname: str, remname: st
                 except:
                     pass
             if remname:
-                try: filename = resub(remname.strip('|'), '', str(filename))
-                except: pass
+                for x in remname.split('|'):
+                    filename = str(filename).replace(x, '')
             if any([prename, remname, sufname]):
                 await aiorename(ospath.join(root, file), ospath.join(root, filename))
     return path
