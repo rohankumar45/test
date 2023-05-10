@@ -123,7 +123,8 @@ async def add_mega_download(mega_link, path, listener, name):
     api.addListener(mega_listener)
     if MEGA_USERNAME and MEGA_PASSWORD:
         await executor.do(api.login, (MEGA_USERNAME, MEGA_PASSWORD))
-    if get_mega_link_type(mega_link) == 'file':
+    mega_listener.type = get_mega_link_type(mega_link)
+    if mega_listener.type == 'file':
         await executor.do(api.getPublicNode, (mega_link,))
         node = mega_listener.public_node
     else:

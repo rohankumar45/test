@@ -355,7 +355,7 @@ def default_button(message: Message):
 
 
 def get_mega_link_type(url):
-    return "folder" if "folder" in url or "/#F!" in url else "file"
+    return 'folder' if 'folder' in url or '/#F!' in url else 'file'
 
 
 def get_multiid(user_id: int):

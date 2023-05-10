@@ -64,9 +64,6 @@ class MegaDownloadStatus:
     @property
     def sname(self):
         name = self.name()
-        if not self.__listener.newname and ospath.isfile(ospath.join(self.__listener.dir, name)):
+        if not self.__listener.newname and self.__obj.type == 'file':
             name = presuf_remname_name(self.__listener.user_dict, name)
-        LOGGER.info('=======================================')
-        LOGGER.info(f'{self.__listener.dir}/{name}')
-        LOGGER.info('=======================================')
         return name

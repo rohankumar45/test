@@ -5,7 +5,7 @@ from megasdkrestclient import MegaSdkRestClient, constants
 from pathlib import Path
 
 from bot import download_dict, download_dict_lock, non_queued_dl, queue_dict_lock, config_dict, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_premium_user, sync_to_async, new_task
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_premium_user, sync_to_async, new_task, get_mega_link_type
 from bot.helper.ext_utils.fs_utils import check_storage_threshold
 from bot.helper.ext_utils.task_manager import stop_duplicate_check, is_queued
 from bot.helper.mirror_utils.status_utils.mega_download_status import MegaDownloadStatus
@@ -136,7 +136,7 @@ class MegaDownloader:
             from_queue = True
         else:
             from_queue = False
-
+        self.type = get_mega_link_type(link)
         await self.__onDownloadStart(file_name, file_size, gid, from_queue)
 
     async def cancel_download(self):
