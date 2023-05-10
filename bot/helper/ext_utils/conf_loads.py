@@ -189,7 +189,6 @@ async def load_config():
     MULTI_TIMEGAP = int(environ.get('MULTI_TIMEGAP', 5))
     AS_DOCUMENT = environ.get('AS_DOCUMENT', 'False').lower() == 'true'
     SAVE_MESSAGE = environ.get('SAVE_MESSAGE', 'False').lower() == 'true'
-    SAVE_CONTENT = environ.get('SAVE_CONTENT', 'False').lower() == 'true'
     LEECH_FILENAME_PREFIX = environ.get('LEECH_FILENAME_PREFIX', '')
     USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
     SAVE_SESSION_STRING = environ.get('SAVE_SESSION_STRING', '')
@@ -516,7 +515,6 @@ async def load_config():
                         'MULTI_TIMEGAP': MULTI_TIMEGAP,
                         'AS_DOCUMENT': AS_DOCUMENT,
                         'SAVE_MESSAGE': SAVE_MESSAGE,
-                        'SAVE_CONTENT': SAVE_CONTENT,
                         'LEECH_FILENAME_PREFIX': LEECH_FILENAME_PREFIX,
                         'USER_SESSION_STRING': USER_SESSION_STRING,
                         'SAVE_SESSION_STRING': SAVE_SESSION_STRING,
@@ -721,28 +719,40 @@ async def intialize_userbot(check=True):
     LOGGER.info(f'Leech Split Size: {config_dict["LEECH_SPLIT_SIZE"]}.')
 
 
-async def intialize_savebot(check=True):
-    SAVE_SESSION_STRING = config_dict['SAVE_SESSION_STRING']
-    if SAVE_SESSION_STRING == config_dict['USER_SESSION_STRING'] and (ubot:= bot_dict['USERBOT']):
-        bot_dict['SAVEBOT'] = ubot
+async def intialize_savebot(session_string='None', check=True, user_id=None):
+    if session_string == config_dict['USER_SESSION_STRING'] and (savebot:= bot_dict['SAVEBOT']):
+        bot_dict['SAVEBOT'] = savebot
+        return
+    elif session_string == user_data.get(user_id, {}).get('string', '') and (savebot:= bot_dict['SAVEBOT']):
+        bot_dict.setdefault(user_id, {})
+        bot_dict[user_id]['SAVEBOT'] = savebot
         return
     if check:
-        savebot: Client = bot_dict['SAVEBOT']
+        savebot: Client = bot_dict.get(user_id, {}).get('SAVEBOT') if user_id else bot_dict['SAVEBOT']
         if savebot and savebot.is_connected:
             await savebot.stop()
             LOGGER.info('Savebot stopped.')
-    bot_dict['SAVEBOT'] = None
-    if (SAVE_SESSION_STRING:= config_dict['SAVE_SESSION_STRING']) and config_dict['SAVE_CONTENT']:
+    if user_id:
+        bot_dict.setdefault(user_id, {})
+        bot_dict[user_id]['SAVEBOT'] = None
+    else:
+        bot_dict['SAVEBOT'] = None
+    if session_string:
         try:
-            savebot = await Client('savebot', config_dict['TELEGRAM_API'],
+            savebot = await Client(str(user_id) if user_id else 'savebot',
+                                   config_dict['TELEGRAM_API'],
                                    config_dict['TELEGRAM_HASH'],
-                                   session_string=SAVE_SESSION_STRING,
+                                   session_string=session_string,
                                    parse_mode=enums.ParseMode.HTML,
                                    no_updates=True).start()
-            bot_dict['SAVEBOT'] = savebot
+            if user_id:
+                bot_dict[user_id]['SAVEBOT'] = savebot
+            else:
+                bot_dict['SAVEBOT'] = savebot
             LOGGER.info('Save content mode enabled!')
         except Exception as e:
             LOGGER.error(e)
+
 
 @new_task
 async def megarest_client():

@@ -47,7 +47,7 @@ def progress_bar(percentage):
 
 
 @new_task
-async def stats(client: Client, message: Message):
+async def stats(_, message: Message):
     if await aiopath.exists('.git'):
         last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd \n<b>├ From</b> %cr'", True)
         last_commit = last_commit[0]
@@ -106,7 +106,7 @@ Join @{config_dict['CHANNEL_USERNAME']} for more info...
     await auto_delete_message(message, starmsg)
 
 
-async def restart(client: Client, message: Message):
+async def restart(_, message: Message):
     cmd = message.text.split(maxsplit=1)
     hrestart = hkill = False
     HAPI, HNAME = config_dict['HEROKU_API_KEY'], config_dict['HEROKU_APP_NAME']
@@ -154,7 +154,7 @@ async def restart(client: Client, message: Message):
 
 
 @new_task
-async def ping(client: Client, message: Message):
+async def ping(_, message: Message):
     start_time = int(round(time() * 1000))
     reply = await sendMessage('Starting Ping',  message)
     end_time = int(round(time() * 1000))
@@ -163,12 +163,12 @@ async def ping(client: Client, message: Message):
 
 
 @new_task
-async def log(client: Client, message: Message):
+async def log(_, message: Message):
     await sendFile(message, 'log.txt', thumb=config_dict['IMAGE_LOGS'])
     await auto_delete_message(message)
 
 
-async def help_query(clint, query: CallbackQuery):
+async def help_query(_, query: CallbackQuery):
     data = query.data.split(maxsplit=2)
     message = query.message
     if int(data[1]) != query.from_user.id:
@@ -185,13 +185,13 @@ async def help_query(clint, query: CallbackQuery):
             await editMessage(text, message, buttons)
 
 
-async def bot_help(client: Client, message: Message):
+async def bot_help(_, message: Message):
     text, image, buttons = get_help_button(message.from_user)
     await sendingMessage(text, message, image, buttons)
 
 
 @new_task
-async def new_member(client: Client, message: Message):
+async def new_member(_, message: Message):
     buttons = ButtonMaker()
     buttons.button_link('Owner', f"{config_dict['AUTHOR_URL']}")
     buttons.button_link('Channel', f"https://t.me/{config_dict['CHANNEL_USERNAME']}")
@@ -216,7 +216,7 @@ Hello there <b>{user.mention}</b>, welcome to <b>{(await bot.get_chat(message.ch
 
 
 @new_task
-async def leave_member(client: Client, message: Message):
+async def leave_member(_, message: Message):
     user = message.left_chat_member
     leavemsg = await sendingMessage(f'Yeah... <b>{user.mention}</b>, don\'t come back here! 😕😕', message, config_dict['IMAGE_BYE'])
     await sendCustom('Yeah u are leaved!', user.id)
@@ -277,7 +277,7 @@ async def restart_notification():
 
 async def main():
     await gather(intialize_userbot(False), set_command(), start_cleanup(), torrent_search.initiate_search_tools())
-    await gather(intialize_savebot(False), restart_notification())
+    await gather(intialize_savebot(config_dict['USER_SESSION_STRING'], False), restart_notification())
     if config_dict['ENABLE_MEGAREST']:
         megarest_client()
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))

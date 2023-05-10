@@ -3,7 +3,7 @@ from logging import getLogger, ERROR
 from pyrogram import Client
 from time import time
 
-from bot import bot, bot_dict, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock, config_dict, LOGGER
+from bot import bot, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock, config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_media
 from bot.helper.ext_utils.fs_utils import check_storage_threshold
 from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check
@@ -27,7 +27,6 @@ class TelegramDownloadHelper:
         self.__id = ''
         self.__is_cancelled = False
         self.__client: Client = bot
-        self.__savemessage = None
 
     @property
     def speed(self):
@@ -75,8 +74,8 @@ class TelegramDownloadHelper:
 
     async def __download(self, message, path):
         try:
-            if self.__savemessage:
-                download = await self.__client.download_media(self.__savemessage, file_name=path, progress=self.__onDownloadProgress)
+            if self.__client != bot:
+                download = await self.__client.download_media(message, file_name=path, progress=self.__onDownloadProgress)
             else:
                 download = await message.download(file_name=path, progress=self.__onDownloadProgress)
             if self.__is_cancelled:
@@ -91,14 +90,10 @@ class TelegramDownloadHelper:
         elif not self.__is_cancelled:
             await self.__onDownloadError('Internal error occurred')
 
-    async def add_download(self, message, path, filename, data=None):
-        if data:
-            self.__client: Client = bot_dict['SAVEBOT']
-            _dmsg = await self.__client.get_messages(data[0], data[1])
-            self.__savemessage = _dmsg
-        else:
-            _dmsg = await self.__client.get_messages(message.chat.id, message.id)
-        if media:= is_media(_dmsg):
+    async def add_download(self, message, path, filename, tg_client: Client=None):
+        if tg_client and tg_client != bot:
+            self.__client = tg_client
+        if media:= is_media(message):
             async with global_lock:
                 # For avoiding locking the thread lock for long time unnecessarily
                 download = media.file_unique_id not in GLOBAL_GID
@@ -135,11 +130,11 @@ class TelegramDownloadHelper:
                     from_queue = False
                 await self.__onDownloadStart(name, size, media.file_unique_id, from_queue)
                 LOGGER.info(f'Downloading Telegram file with id: {media.file_unique_id}')
-                await self.__download(_dmsg, path)
+                await self.__download(message, path)
             else:
                 await self.__onDownloadError('File already being downloaded!')
         else:
-            await self.__onDownloadError('No document from given link!' if data else 'No document in the replied message')
+            await self.__onDownloadError('No document from given link!' if tg_client else 'No document in the replied message')
 
     async def cancel_download(self):
         self.__is_cancelled = True

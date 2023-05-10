@@ -75,6 +75,15 @@ class HelpString:
 5. (n:) option doesn't work with torrents.
 '''
 
+    MTG = '''
+Treat links like any direct link
+Some links need user access so sure you must add USER_SESSION_STRING for it.
+Three types of links:
+Public: <code>https://t.me/channel_name/message_id</code>
+Private: <code>tg://openmessage?user_id=xxxxxx&message_id=xxxxx</code>
+Super: <code>https://t.me/c/channel_id/message_id</code>
+'''
+
     MLDL = '''
 <b>Send link along with command line:</b>
 <code>/cmd</code> link n: newname pswd: xx(zip/unzip)
@@ -283,25 +292,28 @@ def get_help_button(from_user: int, data: str=None):
         _build_button('Aria', 'qBit', 'Ytdl', 'Drive', 'User')
     elif data.startswith('mirror'):
         text = f'<b>MIRROR/LEECH NOTES</b>\n{HelpString.MLNOTE}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML')
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
     elif data == 'basic ml':
         text = f'<b>BASIC COMMAND</b>\n{HelpString.MLDL}'
-        _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML')
+        _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
     elif data == 'selection':
         text = f'<b>TORRENT SELECTION</b>\n{HelpString.BTSEL}'
-        _build_button('Basic ML', 'Seed', 'RClone', 'GoFile ML', 'Multi ML')
+        _build_button('Basic ML', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
     elif data == 'seed':
         text = f'<b>TORRENT SEED</b>\n{HelpString.BTSEED}'
-        _build_button('Basic ML', 'Selection', 'RClone', 'GoFile ML', 'Multi ML')
+        _build_button('Basic ML', 'Selection', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
     elif data == 'rclone':
         text = f'<b>RCLONE DOWNLOAD</b>\n{HelpString.RCLONE}'
-        _build_button('Basic ML', 'Selection', 'GoFile ML', 'Multi ML')
+        _build_button('Basic ML', 'Selection', 'GoFile ML', 'Multi ML', 'TG Link')
+    elif data == 'tg link':
+        text = f'<b>TG LINK DOWNLOAD</b>\n{HelpString.MTG}'
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML')
     elif data == 'gofile ml':
         text = f'<b>GOFILE UPLOAD</b>\n{HelpString.GOFILE}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML')
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML', 'TG Link')
     elif data == 'multi ml':
         text = f'<b>MULTI LINK</b>\n{HelpString.MLMULTI}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML')
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'TG Link')
     elif data.startswith('youtube'):
         text = f'<b>YOUTUBE/LEECH NOTES</b>\n{HelpString.YLNOTE}'
         _build_button('Basic YL', 'Quality', 'GoFile YL', 'Multi YL')

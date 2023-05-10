@@ -10,8 +10,9 @@ from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
 from time import time
 
-from bot import bot, user_data, config_dict, DATABASE_URL
+from bot import bot, bot_loop, user_data, config_dict, DATABASE_URL
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread
+from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.fs_utils import clean_target
@@ -66,6 +67,12 @@ Example: <b>- @MyChannel</b>\n
 <code>Batman (2022) [1080p] - H264.mkv</code>
 <b>Result:</b>
 <code>Batman (2022) [1080p] - H264 - @MyChannel.mkv</code>\n
+<i>Timeout: 60s.</i>
+'''
+        SES = f'''
+<b>SESSION SETTING</b>\n
+Send valid session string to download restrict content data without /{BotCommands.JoinChatCommand}.
+<b>Your account must member of the channel</b>\n
 <i>Timeout: 60s.</i>
 '''
         REM = '''
@@ -149,6 +156,9 @@ async def get_user_settings(from_user, data: str, uset_data: str):
 
         buttons.button_data('Caption', f'userset {user_id} capmode')
         buttons.button_data('Zip Mode', f'userset {user_id} zipmode')
+        sesmsg, buttonkey = ('ENABLE ✅', '✅ Session String') if user_dict.get('user_string') else ('DISABLE', 'Session String')
+        buttons.button_data(buttonkey, f'userset {user_id} setdata session')
+
         capmode = user_dict.get('user_cap', 'mono')
         custom_cap = 'ENABLE ✅' if user_dict.get('user_caption') else 'NOT SET'
         if config_dict['PREMIUM_MODE']:
@@ -184,6 +194,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
             f"<b>├ </b>Sufname: <b>{sufname}</b>\n"\
             f"<b>├ </b>Merge Videos: <b>{mergevid}</b>\n"\
             f"<b>├ </b>Custom Caption: <b>{custom_cap}</b>\n"\
+            f"<b>├ </b>Session String: <b>{sesmsg}</b>\n"\
             f"<b>└ </b>YT-DLP Options: {yto}\n\n"
         if remname:
             text += f"<b>Remname:</b> <code>{remname[0:600]}</code>\n\n"
@@ -308,6 +319,13 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                 buttons.button_data('Remove Remname', f'userset {user_id} rremname')
             else:
                 buttons.button_data('Set Remname', f'userset {user_id} prepare remname')
+        elif uset_data == 'session':
+            text, image = MSG.SES.replace('Timeout: 60s.', ''), config_dict['IMAGE_REMNAME']
+            if user_dict.get('user_string'):
+                buttons.button_data('Change Session', f'userset {user_id} prepare session')
+                buttons.button_data('Remove Session', f'userset {user_id} rsession')
+            else:
+                buttons.button_data('Set Session', f'userset {user_id} prepare session')
         elif uset_data == 'yto':
             text, image = MSG.YT.replace('Timeout: 60s.', ''), config_dict['IMAGE_YT']
             if user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']:
@@ -331,6 +349,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                         'prename': (MSG.PRE, config_dict['IMAGE_PRENAME']),
                         'sufname': (MSG.SUF, config_dict['IMAGE_SUFNAME']),
                         'remname': (MSG.REM, config_dict['IMAGE_REMNAME']),
+                        'session': (MSG.SES, config_dict['IMAGE_REMNAME']),
                         'yto': (MSG.YT, config_dict['IMAGE_YT'])}
         text, image = prepare_dict[uset_data]
         buttons.button_data('<<', f'userset {user_id} setdata {uset_data}')
@@ -378,6 +397,8 @@ async def set_user_settings(_, message: Message, query: CallbackQuery, key: str)
         else:
             data = 'capmode' if key == 'user_caption' else None
             await update_user_settings(query, data)
+        if key == 'user_string':
+            bot_loop.create_task(intialize_savebot(value, True, user_id))
     else:
         await update_user_settings(query, 'setdata', 'dumpid')
         msg = await sendMessage('Invalid ID!', message)
@@ -448,6 +469,7 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
                       'prename': 'user_prename',
                       'sufname': 'user_sufname',
                       'remname': 'user_remname',
+                      'session': 'user_string',
                       'sendpm': 'enable_pm',
                       'mergevid': 'merge_vid',
                       'imgss': 'enable_ss'}
@@ -516,6 +538,10 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
     elif data[2] == 'rremname':
         await update_user_ldata(user_id, 'user_remname', False)
         await query.answer("Your Prefix Name Has Been Deleted!", show_alert=True)
+        await update_user_settings(query)
+    elif data[2] == 'rsession':
+        await update_user_ldata(user_id, 'user_string', '')
+        await query.answer("Your Session String Has Been Deleted!", show_alert=True)
         await update_user_settings(query)
     elif data[2] == 'sendpm':
         await update_user_ldata(user_id, 'enable_pm', not user_dict.get('enable_pm', False))
@@ -601,6 +627,7 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
                             'prename': 'user_prename',
                             'sufname': 'user_sufname',
                             'remname': 'user_remname',
+                            'session': 'user_string',
                             'yto': 'yt_opt'}
             key = prepare_dict[data[3]]
             if key == 'dump_id':

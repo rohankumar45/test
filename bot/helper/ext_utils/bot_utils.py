@@ -329,7 +329,7 @@ def is_mega_link(url: str):
 
 
 def is_tele_link(url: str):
-    return 'https://t.me/' in url
+    return url.startswith(('https://t.me/', 'tg://openmessage?user_id='))
 
 
 def is_rclone_path(path):

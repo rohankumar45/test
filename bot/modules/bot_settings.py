@@ -221,7 +221,7 @@ async def edit_variable(_, message: Message, omsg: Message, key: str):
     if key == 'USER_SESSION_STRING':
         await intialize_userbot()
     elif key == 'SAVE_SESSION_STRING':
-        await intialize_savebot()
+        await intialize_savebot(value)
     await update_buttons(omsg, 'var')
     LOGGER.info(f'Change var {key} = {value.__class__.__name__.upper()}: {value}')
     await deleteMessage(message)
@@ -422,7 +422,7 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         await intialize_userbot()
     elif data[1] == 'restartsbot':
         await query.answer('Restarting Savebot!', show_alert=True)
-        await intialize_savebot()
+        await intialize_savebot(config_dict['USER_SESSION_STRING'])
     elif data[1] in ['var', 'aria', 'qbit']:
         await query.answer()
         await update_buttons(message, data[1])
@@ -479,9 +479,6 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         LOGGER.info(f'Change var {data[2]} = {value.__class__.__name__.upper()}: {value}')
         if data[2] == 'USER_SESSION_STRING':
             await intialize_userbot()
-        elif data[2] == 'SAVE_SESSION_STRING':
-            await intialize_savebot()
-            config_dict['SAVE_CONTENT'] = False
         await update_buttons(message, 'var')
         if DATABASE_URL:
             await DbManger().update_config({data[2]: value})

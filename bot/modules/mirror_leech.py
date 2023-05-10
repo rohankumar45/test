@@ -27,7 +27,7 @@ from bot.helper.mirror_utils.download_utils.telegram_download import TelegramDow
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message, deleteMessage, editMessage, sendMessage, sendingMessage
+from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message, deleteMessage, editMessage, sendMessage, sendingMessage, get_tg_link_content
 
 
 @new_task
@@ -63,7 +63,8 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
     ratio = seed_time = None
     select = seed = isGofile = gdrive_sharer = False
-    multi, mi = 0, 1
+    multi, mi, file_ = 0, 1
+    file_ = tg_client = None
     link = folder_name = ''
     multiid = get_multiid(user_id)
 
@@ -140,7 +141,8 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         await sendMessage(f'Upss {tag}, multi mode for premium user only', message)
         return
 
-    mlist = [client, message, multi, mi, folder_name]
+    run_multi([client, message, multi, mi, folder_name], _mirror_leech, isZip, extract, isQbit, isLeech, sameDir)
+
     path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
 
     name = mesg[0].split(' n: ', 1)
@@ -156,7 +158,22 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     up = re_split(' n: | pswd: | rcf: ', up[1])[0].strip() if len(up) > 1 else None
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
-    file_ = None
+
+    if link and is_tele_link(link):
+        try:
+            tg_client, reply_to = await get_tg_link_content(link, user_id)
+        except Exception as e:
+            await editMessage(f'ERROR: {e}', check_)
+            return
+    elif reply_to and reply_to.text:
+        reply_text = reply_to.text.split('\n', 1)[0].strip()
+        if reply_text and is_tele_link(reply_text):
+            try:
+                tg_client, reply_to = await get_tg_link_content(reply_text, user_id)
+            except Exception as e:
+                await editMessage(f'ERROR: {e}', check_)
+                return
+
     if reply_to:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
@@ -211,10 +228,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             except DirectDownloadLinkException as e:
                 if str(e).startswith('ERROR:'):
                     await editMessage(f'{tag}, {e}', check_)
-                    run_multi(mlist, _mirror_leech, isZip, extract, isQbit, isLeech, sameDir)
                     return
-
-    run_multi(mlist, _mirror_leech, isZip, extract, isQbit, isLeech, sameDir)
 
     if not isLeech:
         if config_dict['DEFAULT_UPLOAD'] == 'rc' and up is None or up == 'rc':
@@ -247,13 +261,13 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             await editMessage(up, check_)
             return
 
-    if not is_rclone_path(link) and not is_tele_link(link) and not is_gdrive_link(link):
+    if not is_rclone_path(link) and not is_gdrive_link(link):
         await deleteMessage(check_)
 
     listener = MirrorLeechListener(message, isZip, extract, isQbit, isLeech, isGofile, pswd, tag, select, seed, name, multiid, sameDir, rcf, up)
 
     if file_:
-        await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', name)
+        await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', name, tg_client)
     elif is_rclone_path(link):
         if link.startswith('mrcc:'):
             link = link.split('mrcc:', 1)[1]
@@ -265,20 +279,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             return
         await deleteMessage(check_)
         await add_rclone_download(link, config_path, f'{path}/', name, listener)
-    elif is_tele_link(link):
-        if config_dict['SAVE_CONTENT'] and (savebot:= bot_dict['SAVEBOT']):
-            try:
-                chat, mid = link.rsplit('/', 2)[1:]
-                if chat.isdigit():
-                    chat = int(f'-100{chat}')
-                await savebot.get_chat(chat)
-            except Exception as e:
-                await editMessage(f'Failed getting data from link, member chat required try /{BotCommands.JoinChatCommand}!', check_)
-                return
-            await deleteMessage(check_)
-            await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', name, [chat, int(mid)])
-        else:
-            await editMessage('Save content/telegram link download has been disable!', check_)
     elif is_gdrive_link(link):
         if not isZip and not extract and not isLeech and up == 'gd':
             gmsg = f'Use /{BotCommands.CloneCommand} to clone Google Drive file/folder\n\n'

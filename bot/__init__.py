@@ -201,7 +201,6 @@ IS_TEAM_DRIVE = environ.get('IS_TEAM_DRIVE', 'True').lower() == 'true'
 MULTI_TIMEGAP = int(environ.get('MULTI_TIMEGAP', 5))
 AS_DOCUMENT = environ.get('AS_DOCUMENT', 'False').lower() == 'true'
 SAVE_MESSAGE = environ.get('SAVE_MESSAGE', 'False').lower() == 'true'
-SAVE_CONTENT = environ.get('SAVE_CONTENT', 'False').lower() == 'true'
 LEECH_FILENAME_PREFIX = environ.get('LEECH_FILENAME_PREFIX', '')
 USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 SAVE_SESSION_STRING = environ.get('SAVE_SESSION_STRING', '')
@@ -477,7 +476,6 @@ config_dict = {'BOT_TOKEN': BOT_TOKEN,
                'MULTI_TIMEGAP': MULTI_TIMEGAP,
                'AS_DOCUMENT': AS_DOCUMENT,
                'SAVE_MESSAGE': SAVE_MESSAGE,
-               'SAVE_CONTENT': SAVE_CONTENT,
                'LEECH_FILENAME_PREFIX': LEECH_FILENAME_PREFIX,
                'USER_SESSION_STRING': USER_SESSION_STRING,
                'SAVE_SESSION_STRING': SAVE_SESSION_STRING,

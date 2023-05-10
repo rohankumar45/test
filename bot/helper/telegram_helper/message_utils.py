@@ -3,13 +3,17 @@ from aiofiles.os import path as aiopath
 from aiohttp import ClientSession
 from asyncio import sleep, gather
 from datetime import datetime, timedelta
+from pyrogram import Client
 from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram.types import Message, InlineKeyboardMarkup, InputMediaPhoto, ChatPermissions
+from re import match as re_match
 from time import time
 
-from bot import bot, bot_loop, Interval, status_reply_dict, status_reply_dict_lock, config_dict, download_dict_lock, LOGGER
+from bot import bot, bot_dict, user_data, bot_loop, Interval, status_reply_dict, status_reply_dict_lock, config_dict, download_dict_lock, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async
+from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.fs_utils import clean_target
+from bot.helper.telegram_helper.bot_commands import BotCommands
 
 
 async def sendingMessage(text: str, message: Message, photo, reply_markup: InlineKeyboardMarkup=None):
@@ -171,6 +175,36 @@ async def delete_all_messages():
                 await deleteMessage(data[0])
             except Exception as e:
                 LOGGER.error(e)
+
+
+async def get_tg_link_content(link: str, user_id: int):
+    if link.startswith('https://t.me/'):
+        private = False
+        msg = re_match(r'https:\/\/t\.me\/(?:c\/)?([^\/]+)\/([0-9]+)', link)
+    else:
+        private = True
+        msg = re_match(r'tg:\/\/openmessage\?user_id=([0-9]+)&message_id=([0-9]+)', link)
+    chat, msg_id = msg.group(1), int(msg.group(2))
+    if chat.isdigit():
+        chat = int(chat) if private else int(f'-100{chat}')
+        superChat = True
+    else:
+        superChat = False
+    await intialize_savebot(user_data.get(user_id, {}).get('user_string'), True, user_id)
+    userbot: Client = bot_dict[user_id]['SAVEBOT'] or bot_dict['SAVEBOT']
+    if private:
+        if not userbot:
+            raise Exception(f'User session required for this private link! Try add user session /{BotCommands.UserSetCommand}')
+        if (message:= await userbot.get_messages(chat, msg_id)) and message.chat:
+            return userbot, message
+        else:
+            raise Exception(f'Failed getting data from link, member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
+    elif superChat and (message:= await bot.get_messages(chat, msg_id)) and message.chat:
+        return bot, message
+    elif userbot and (message := await userbot.get_messages(chat, msg_id)) and message.chat:
+        return userbot, message
+    else:
+        raise Exception(f'Failed getting data from link, member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
 
 
 async def update_all_messages(force=False):
