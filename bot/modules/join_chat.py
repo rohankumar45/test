@@ -29,7 +29,7 @@ async def join_chat(_, message: Message):
                 text = 'Invalid link!'
             msg = await sendMessage(text, message)
     else:
-        msg = await sendMessage(f'Deafule save content mode is disabled! Use custom string instead /{BotCommands.UserSetCommand}.', message)
+        msg = await sendMessage(f'Default save content mode is disabled! Use custom string instead /{BotCommands.UserSetCommand}.', message)
     await auto_delete_message(message, msg, reply)
 
 
