@@ -1,6 +1,6 @@
 from os import path as ospath
 
-from bot import config_dict
+from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time, EngineStatus, presuf_remname_name
 
 
@@ -66,4 +66,5 @@ class MegaDownloadStatus:
         name = self.name()
         if not self.__listener.newname and ospath.isfile(ospath.join(self.__listener.dir, name)):
             name = presuf_remname_name(self.__listener.user_dict, name)
+            LOGGER.info('=======================================')
         return name
