@@ -723,7 +723,7 @@ async def intialize_savebot(session_string='None', check=True, user_id=None):
     if session_string == config_dict['USER_SESSION_STRING'] and (savebot:= bot_dict.get('SAVEBOT')):
         bot_dict['SAVEBOT'] = savebot
         return
-    elif session_string == user_data.get(user_id, {}).get('string', '') and (savebot:= bot_dict.get(user_id, {}).get('SAVEBOT')):
+    elif user_id and session_string == user_data.get(user_id, {}).get('string', '') and (savebot:= bot_dict.get(user_id, {}).get('SAVEBOT')):
         bot_dict.setdefault(user_id, {})
         bot_dict[user_id]['SAVEBOT'] = savebot
         return
