@@ -27,7 +27,7 @@ class ForceMode:
         msg_nolink = 'No <b>GDrive or Sharer</b> link given 😑'
         msg_media = f'<code>/{BotCommands.CloneCommand}</code> not for file/media! <b>GDrive or Sharer</b> link only 😑'
         msg_link = 'Your <b>GDrive or Sharer</b> link has been added, will send once done 😊'
-        warn_msg = 'All <b>Clone</b> file(s) will send in bot PM and log channel\n<b>Start me first in PM</b>'
+        warn_msg = 'All <b>Clone</b> result will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg)
 
     @property
