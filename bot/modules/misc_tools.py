@@ -281,7 +281,7 @@ async def misc_callback(_, query: CallbackQuery):
         await deleteMessage(message)
         await misc.cleanup(True)
     elif data[2] == 'ocr':
-        if not omsg.reply_to_message or omsg.reply_to_message.text:
+        if not (reply:= omsg.reply_to_message) or reply.text or reply.video:
             await query.answer('Upss, reply to a photo!', show_alert=True)
             return
         await query.answer()
@@ -290,7 +290,7 @@ async def misc_callback(_, query: CallbackQuery):
         result = await misc.image_ocr()
         await editMessage(f'OCR Result:\n\n{result}', message, buttons.build_menu(2))
     elif data[2] == 'conv':
-        if not omsg.reply_to_message or omsg.reply_to_message.text:
+        if not (reply:= omsg.reply_to_message) or reply.text or reply.video:
             await query.answer('Upss, reply to a photo or static sticker!', show_alert=True)
             return
         await query.answer()
