@@ -162,7 +162,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
     if link and is_tele_link(link):
         try:
-            await intialize_savebot(user_dict.get('user_string', ''), True, user_id)
+            await intialize_savebot(user_dict.get('user_string'), True, user_id)
             tg_client, reply_to = await get_tg_link_content(link, user_id)
         except Exception as e:
             await editMessage(f'ERROR: {e}', check_)
@@ -171,7 +171,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         reply_text = reply_to.text.split('\n', 1)[0].strip()
         if reply_text and is_tele_link(reply_text):
             try:
-                await intialize_savebot(user_dict.get('user_string', ''), True, user_id)
+                await intialize_savebot(user_dict.get('user_string'), True, user_id)
                 tg_client, reply_to = await get_tg_link_content(reply_text, user_id)
             except Exception as e:
                 await editMessage(f'ERROR: {e}', check_)
