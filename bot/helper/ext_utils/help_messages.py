@@ -1,6 +1,77 @@
+from html import escape
+
 from bot import config_dict
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.bot_commands import BotCommands
+
+
+class UsetString:
+        CAP = f'''
+<b>CUSTOM CAPTION SETTING</b>\n
+Set custom caption with <b>HTML</b> style
+Example: <code>{escape("<b>By:</b> <a href='https://t.me/R4ndom_Releases'>Random Releases</a>")}</code>
+Result: <b>By:</b> <a href='https://t.me/R4ndom_Releases'>Random Releases</a>\n
+<i>*Be careful when you use html tag for caption\n
+Timeout: 60s.</i>
+'''
+        DUMP = '''
+<b>DUMPID SETTING</b>\n
+Example: <code>-1005670987</code>\n
+<i>*ID must be startwith <code>-100xxx</code>\n
+Timeout: 60s.</i>
+'''
+        GDX = '''
+<b>CUSTOM GDRIVE SETTING</b>\n
+Example: <b>0AHrdo0ZYDJTgUk9PVA</b>\n
+<b>Index Link (Optional)</b>
+Send index link after GDrive ID separated by space
+Example:
+<code>0AHrdo0ZYDJTgUk9PVA https://xx.xxxxxx.workers.dev/0:</code>\n
+<i>#Add SA-Email to your Drive and give a permission\n
+Timeout: 60s.</i>
+'''
+        PRE = '''
+<b>PRENAME SETTING</b>\n
+Example: <b>@MyChannel -</b>\n
+<b>Org Name:</b>
+<code>Batman (2022) [1080p] - H264.mkv</code>
+<b>Result:</b>
+<code>@MyChannel - Batman (2022) [1080p] - H264.mkv</code>\n
+<i>Timeout: 60s.</i>
+'''
+        SUF = '''
+<b>SUFNAME SETTING</b>\n
+Example: <b>- @MyChannel</b>\n
+<b>Org Name:</b>
+<code>Batman (2022) [1080p] - H264.mkv</code>
+<b>Result:</b>
+<code>Batman (2022) [1080p] - H264 - @MyChannel.mkv</code>\n
+<i>Timeout: 60s.</i>
+'''
+        SES = f'''
+<b>SESSION SETTING</b>\n
+Send valid session string to download content from restricted Chat/Channel without /{BotCommands.JoinChatCommand}.
+<b>Your account must member of the channel.</b>\n
+<i>Timeout: 60s.</i>
+'''
+        REM = '''
+<b>REMNAME SETTING</b>\n
+Example: <code>[</code><b>|</b><code>]</code><b>|</b> <code>-</code>\n
+<b>Org Name:</b>
+<code>Batman (2022) [1080p] - H264.mkv</code>
+<b>Result:</b>
+<code>Batman (2022) 1080p H264.mkv</code>\n
+<i>*Separated by <b>|</b>
+Timeout: 60s.</i>
+'''
+        YT = f'''
+<b>YT-DLP OPTIONS SETTING</b>\n
+Examples:
+1. <code>{escape('bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080]')}</code> this will give 1080p-mp4.
+2. <code>{escape('bv*[height<=720][ext=webm]+ba/b[height<=720]')}</code> this will give 720p-webm.
+Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a> or use this <a href='https://t.me/mltb_official/177'>SCRIPT</a> to convert cli arguments to api options.\n
+<i>Timeout: 60s.</i>
+'''
 
 
 class HelpString:

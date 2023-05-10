@@ -16,6 +16,7 @@ from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.fs_utils import clean_target
+from bot.helper.ext_utils.help_messages import UsetString
 from bot.helper.ext_utils.telegram_helper import content_dict, TeleContent
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -24,75 +25,6 @@ from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_me
 
 
 handler_dict = {}
-
-
-class MSG:
-        CAP = f'''
-<b>CUSTOM CAPTION SETTING</b>\n
-Set custom caption with <b>HTML</b> style
-Example: <code>{escape("<b>By:</b> <a href='https://t.me/R4ndom_Releases'>Random Releases</a>")}</code>
-Result: <b>By:</b> <a href='https://t.me/R4ndom_Releases'>Random Releases</a>\n
-<i>*Be careful when you use html tag for caption\n
-Timeout: 60s.</i>
-'''
-        DUMP = '''
-<b>DUMPID SETTING</b>\n
-Example: <code>-1005670987</code>\n
-<i>*ID must be startwith <code>-100xxx</code>\n
-Timeout: 60s.</i>
-'''
-        GDX = '''
-<b>CUSTOM GDRIVE SETTING</b>\n
-Example: <b>0AHrdo0ZYDJTgUk9PVA</b>\n
-<b>Index Link (Optional)</b>
-Send index link after GDrive ID separated by space
-Example:
-<code>0AHrdo0ZYDJTgUk9PVA https://xx.xxxxxx.workers.dev/0:</code>\n
-<i>#Add SA-Email to your Drive and give a permission\n
-Timeout: 60s.</i>
-'''
-        PRE = '''
-<b>PRENAME SETTING</b>\n
-Example: <b>@MyChannel -</b>\n
-<b>Org Name:</b>
-<code>Batman (2022) [1080p] - H264.mkv</code>
-<b>Result:</b>
-<code>@MyChannel - Batman (2022) [1080p] - H264.mkv</code>\n
-<i>Timeout: 60s.</i>
-'''
-        SUF = '''
-<b>SUFNAME SETTING</b>\n
-Example: <b>- @MyChannel</b>\n
-<b>Org Name:</b>
-<code>Batman (2022) [1080p] - H264.mkv</code>
-<b>Result:</b>
-<code>Batman (2022) [1080p] - H264 - @MyChannel.mkv</code>\n
-<i>Timeout: 60s.</i>
-'''
-        SES = f'''
-<b>SESSION SETTING</b>\n
-Send valid session string to download content from restricted Chat/Channel without /{BotCommands.JoinChatCommand}.
-<b>Your account must member of the channel.</b>\n
-<i>Timeout: 60s.</i>
-'''
-        REM = '''
-<b>REMNAME SETTING</b>\n
-Example: <code>[</code><b>|</b><code>]</code><b>|</b> <code>-</code>\n
-<b>Org Name:</b>
-<code>Batman (2022) [1080p] - H264.mkv</code>
-<b>Result:</b>
-<code>Batman (2022) 1080p H264.mkv</code>\n
-<i>*Separated by <b>|</b>
-Timeout: 60s.</i>
-'''
-        YT = f'''
-<b>YT-DLP OPTIONS SETTING</b>\n
-Examples:
-1. <code>{escape('bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080]')}</code> this will give 1080p-mp4.
-2. <code>{escape('bv*[height<=720][ext=webm]+ba/b[height<=720]')}</code> this will give 720p-webm.
-Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a> or use this <a href='https://t.me/mltb_official/177'>SCRIPT</a> to convert cli arguments to api options.\n
-<i>Timeout: 60s.</i>
-'''
 
 
 async def get_user_settings(from_user, data: str, uset_data: str):
@@ -275,7 +207,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
             else:
                 buttons.button_data('Set RClone', f'userset {user_id} prepare rcc')
         elif uset_data == 'setcap':
-            text, image = MSG.CAP.replace('Timeout: 60s.', ''), config_dict['IMAGE_CAPTION']
+            text, image = UsetString.CAP.replace('Timeout: 60s.', ''), config_dict['IMAGE_CAPTION']
             if user_dict.get('user_caption'):
                 buttons.button_data('Change Caption', f'userset {user_id} prepare setcap')
                 buttons.button_data('Remove Caption', f'userset {user_id} rsetcap')
@@ -283,7 +215,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                 buttons.button_data('Set Caption', f'userset {user_id} prepare setcap')
             buttons.button_data('<<', f'userset {user_id} capmode')
         elif uset_data == 'dumpid':
-            text, image = MSG.DUMP.replace('Timeout: 60s.', ''), config_dict['IMAGE_DUMID']
+            text, image = UsetString.DUMP.replace('Timeout: 60s.', ''), config_dict['IMAGE_DUMID']
             if user_dict.get('dump_id'):
                 buttons.button_data('Change Dump', f'userset {user_id} prepare dumpid')
                 buttons.button_data('Remove ID', f'userset {user_id} rdumpid')
@@ -292,42 +224,42 @@ async def get_user_settings(from_user, data: str, uset_data: str):
             else:
                 buttons.button_data('Set Dump', f'userset {user_id} prepare dumpid')
         elif uset_data == 'gdx':
-            text, image = MSG.GDX.replace('Timeout: 60s.', ''), config_dict['IMAGE_GD']
+            text, image = UsetString.GDX.replace('Timeout: 60s.', ''), config_dict['IMAGE_GD']
             if user_dict.get('cus_gdrive'):
                 buttons.button_data('Change GDX', f'userset {user_id} prepare gdx')
                 buttons.button_data('Remove GDX', f'userset {user_id} rgdx')
             else:
                 buttons.button_data("Set GDX", f"userset {user_id} prepare gdx")
         elif uset_data == 'prename':
-            text, image = MSG.PRE.replace('Timeout: 60s.', ''), config_dict['IMAGE_PRENAME']
+            text, image = UsetString.PRE.replace('Timeout: 60s.', ''), config_dict['IMAGE_PRENAME']
             if user_dict.get('user_prename'):
                 buttons.button_data('Change Prename', f'userset {user_id} prepare prename')
                 buttons.button_data('Remove Prename', f'userset {user_id} rprename')
             else:
                 buttons.button_data('Set Prename', f'userset {user_id} prepare prename')
         elif uset_data == 'sufname':
-            text, image = MSG.SUF.replace('Timeout: 60s.', ''), config_dict['IMAGE_SUFNAME']
+            text, image = UsetString.SUF.replace('Timeout: 60s.', ''), config_dict['IMAGE_SUFNAME']
             if user_dict.get('user_sufname'):
                 buttons.button_data('Change Sufname', f'userset {user_id} prepare sufname')
                 buttons.button_data('Remove Sufname', f'userset {user_id} rsufname')
             else:
                 buttons.button_data('Set Sufname', f'userset {user_id} prepare sufname')
         elif uset_data == 'remname':
-            text, image = MSG.REM.replace('Timeout: 60s.', ''), config_dict['IMAGE_REMNAME']
+            text, image = UsetString.REM.replace('Timeout: 60s.', ''), config_dict['IMAGE_REMNAME']
             if user_dict.get('user_remname'):
                 buttons.button_data('Change Remname', f'userset {user_id} prepare remname')
                 buttons.button_data('Remove Remname', f'userset {user_id} rremname')
             else:
                 buttons.button_data('Set Remname', f'userset {user_id} prepare remname')
         elif uset_data == 'session':
-            text, image = MSG.SES.replace('Timeout: 60s.', ''), config_dict['IMAGE_REMNAME']
+            text, image = UsetString.SES.replace('Timeout: 60s.', ''), config_dict['IMAGE_REMNAME']
             if user_dict.get('user_string'):
                 buttons.button_data('Change Session', f'userset {user_id} prepare session')
                 buttons.button_data('Remove Session', f'userset {user_id} rsession')
             else:
                 buttons.button_data('Set Session', f'userset {user_id} prepare session')
         elif uset_data == 'yto':
-            text, image = MSG.YT.replace('Timeout: 60s.', ''), config_dict['IMAGE_YT']
+            text, image = UsetString.YT.replace('Timeout: 60s.', ''), config_dict['IMAGE_YT']
             if user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']:
                 buttons.button_data('Change YT-DLP', f'userset {user_id} prepare yto')
                 buttons.button_data('Remove YT-DLP', f'userset {user_id} ryto')
@@ -343,14 +275,14 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                     'Send a valid file for <b>config.conf</b>.\n\n<i>Timeout: 60s.</i>'
         prepare_dict = {'sthumb': (msg_thumb, image),
                         'rcc': (msg_rclone, config_dict['IMAGE_RCLONE']),
-                        'dumpid': (MSG.DUMP, config_dict['IMAGE_DUMID']),
-                        'gdx': (MSG.GDX, config_dict['IMAGE_GD']),
-                        'setcap': (MSG.CAP, config_dict['IMAGE_CAPTION']),
-                        'prename': (MSG.PRE, config_dict['IMAGE_PRENAME']),
-                        'sufname': (MSG.SUF, config_dict['IMAGE_SUFNAME']),
-                        'remname': (MSG.REM, config_dict['IMAGE_REMNAME']),
-                        'session': (MSG.SES, config_dict['IMAGE_REMNAME']),
-                        'yto': (MSG.YT, config_dict['IMAGE_YT'])}
+                        'dumpid': (UsetString.DUMP, config_dict['IMAGE_DUMID']),
+                        'gdx': (UsetString.GDX, config_dict['IMAGE_GD']),
+                        'setcap': (UsetString.CAP, config_dict['IMAGE_CAPTION']),
+                        'prename': (UsetString.PRE, config_dict['IMAGE_PRENAME']),
+                        'sufname': (UsetString.SUF, config_dict['IMAGE_SUFNAME']),
+                        'remname': (UsetString.REM, config_dict['IMAGE_REMNAME']),
+                        'session': (UsetString.SES, config_dict['IMAGE_REMNAME']),
+                        'yto': (UsetString.YT, config_dict['IMAGE_YT'])}
         text, image = prepare_dict[uset_data]
         buttons.button_data('<<', f'userset {user_id} setdata {uset_data}')
 
