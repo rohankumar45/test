@@ -6,7 +6,7 @@ from html import escape
 from psutil import virtual_memory, cpu_percent, disk_usage, net_io_counters
 from pyrogram.types import Message
 from pytz import timezone
-from re import match as re_match, split as re_split, sub as resub
+from re import match as re_match, split as re_split
 from requests import head as rhead
 from time import time
 from urllib.request import urlopen
@@ -161,18 +161,18 @@ def action(message: str) -> str:
 
 def presuf_remname_name(user_dict: int, name: str):
     if name:
-        if prename := user_dict.get('user_prename'):
+        if prename:= user_dict.get('user_prename'):
             name = f'{prename} {name}'
-        if sufname := user_dict.get('user_sufname'):
+        if sufname:= user_dict.get('user_sufname'):
             try:
                 fname, ext = str(name).rsplit('.', maxsplit=1)
                 name = f'{fname} {sufname}.{ext}'
             except: pass
         if LEECH_FILENAME_PREFIX := config_dict['LEECH_FILENAME_PREFIX']:
             name = f'{LEECH_FILENAME_PREFIX} {name}'
-        if remname := user_dict.get('user_remname'):
-            try: name = resub(remname.strip('|'), '', str(name))
-            except: pass
+        if remname:= user_dict.get('user_remname'):
+            for x in remname.split('|'):
+                name = str(name).replace(x, '')
     return name
 
 
