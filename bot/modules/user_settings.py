@@ -474,6 +474,7 @@ async def edit_user_settings(client: Client, query: CallbackQuery):
     elif data[2] == 'rsession':
         await update_user_ldata(user_id, 'user_string', '')
         await query.answer("Your Session String Has Been Deleted!", show_alert=True)
+        await intialize_savebot(user_id=user_id)
         await update_user_settings(query)
     elif data[2] == 'sendpm':
         await update_user_ldata(user_id, 'enable_pm', not user_dict.get('enable_pm', False))
