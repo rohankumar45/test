@@ -288,8 +288,7 @@ async def misc_callback(_, query: CallbackQuery):
         await editMessage('<i>Generate text, please wait...</i>', message)
         misc = miscTool(omsg)
         result = await misc.image_ocr()
-        text = misc.error if misc.error else f'OCR Result:\n\n{result}'
-        await editMessage(text, message, buttons.build_menu(2))
+        await editMessage(misc.error or f'OCR Result:\n\n{result}', message, buttons.build_menu(2))
     elif data[2] == 'conv':
         if not (reply:= omsg.reply_to_message) or reply.text or reply.video:
             await query.answer('Upss, reply to a photo or static sticker!', show_alert=True)
