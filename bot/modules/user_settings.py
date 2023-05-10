@@ -673,7 +673,7 @@ async def send_users_settings(_, message: Message):
                 value = get_readable_time(0 if value <= 1 else value)
             elif key == 'daily_limit':
                 value = f"{get_readable_file_size(value)}/{config_dict['DAILY_LIMIT_SIZE']}GB"
-            elif key == 'user_cap':
+            elif key in ['user_cap', 'zipmode']:
                 value = str(value).title()
             elif key in ['thumb', 'rclone']:
                 value = 'Exists' if value else 'Not Exists'
