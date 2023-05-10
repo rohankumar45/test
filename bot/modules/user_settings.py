@@ -252,7 +252,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
             else:
                 buttons.button_data('Set Remname', f'userset {user_id} prepare remname')
         elif uset_data == 'session':
-            text, image = UsetString.SES.replace('Timeout: 60s.', ''), config_dict['IMAGE_REMNAME']
+            text, image = UsetString.SES.replace('Timeout: 60s.', ''), config_dict['IMAGE_USER']
             if user_dict.get('user_string'):
                 buttons.button_data('Change Session', f'userset {user_id} prepare session')
                 buttons.button_data('Remove Session', f'userset {user_id} rsession')
@@ -281,7 +281,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
                         'prename': (UsetString.PRE, config_dict['IMAGE_PRENAME']),
                         'sufname': (UsetString.SUF, config_dict['IMAGE_SUFNAME']),
                         'remname': (UsetString.REM, config_dict['IMAGE_REMNAME']),
-                        'session': (UsetString.SES, config_dict['IMAGE_REMNAME']),
+                        'session': (UsetString.SES, config_dict['IMAGE_USER']),
                         'yto': (UsetString.YT, config_dict['IMAGE_YT'])}
         text, image = prepare_dict[uset_data]
         buttons.button_data('<<', f'userset {user_id} setdata {uset_data}')
