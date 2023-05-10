@@ -9,10 +9,11 @@ from pyrogram.types import Message
 from re import match as re_match, split as re_split
 from urllib.parse import urlparse
 
-from bot import bot, bot_dict, config_dict, user_data, LOGGER, DOWNLOAD_DIR
+from bot import bot, config_dict, user_data, LOGGER, DOWNLOAD_DIR
 from bot.helper.ddl_bypass.direct_link_generator import direct_link_generator
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_media, is_mega_link, is_gdrive_link, is_sharar, get_content_type, \
      is_premium_user, UserDaily, sync_to_async, new_task, is_rclone_path, is_tele_link, get_multiid
+from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.multi import run_multi, MultiSelect
@@ -161,6 +162,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
     if link and is_tele_link(link):
         try:
+            await intialize_savebot(user_dict.get('user_string'), True, user_id)
             tg_client, reply_to = await get_tg_link_content(link, user_id)
         except Exception as e:
             await editMessage(f'ERROR: {e}', check_)
@@ -169,6 +171,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         reply_text = reply_to.text.split('\n', 1)[0].strip()
         if reply_text and is_tele_link(reply_text):
             try:
+                await intialize_savebot(user_dict.get('user_string'), True, user_id)
                 tg_client, reply_to = await get_tg_link_content(reply_text, user_id)
             except Exception as e:
                 await editMessage(f'ERROR: {e}', check_)

@@ -9,9 +9,8 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InputMediaPhoto, ChatP
 from re import match as re_match
 from time import time
 
-from bot import bot, bot_dict, user_data, bot_loop, Interval, status_reply_dict, status_reply_dict_lock, config_dict, download_dict_lock, LOGGER
+from bot import bot, bot_dict, bot_loop, Interval, status_reply_dict, status_reply_dict_lock, config_dict, download_dict_lock, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async
-from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.fs_utils import clean_target
 from bot.helper.telegram_helper.bot_commands import BotCommands
 
@@ -190,7 +189,6 @@ async def get_tg_link_content(link: str, user_id: int):
         superChat = True
     else:
         superChat = False
-    await intialize_savebot(user_data.get(user_id, {}).get('user_string'), True, user_id)
     userbot: Client = bot_dict[user_id]['SAVEBOT'] or bot_dict['SAVEBOT']
     if private:
         if not userbot:
