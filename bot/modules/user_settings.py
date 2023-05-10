@@ -71,8 +71,8 @@ Example: <b>- @MyChannel</b>\n
 '''
         SES = f'''
 <b>SESSION SETTING</b>\n
-Send valid session string to download restrict content data without /{BotCommands.JoinChatCommand}.
-<b>Your account must member of the channel</b>\n
+Send valid session string to download content from restricted Chat/Channel without /{BotCommands.JoinChatCommand}.
+<b>Your account must member of the channel.</b>\n
 <i>Timeout: 60s.</i>
 '''
         REM = '''
