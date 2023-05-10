@@ -150,8 +150,8 @@ async def verify_message(message: Message):
     text = ''
     if reply_to and not reply_to.text:
         await misc.image_ocr()
-        if misc.error:
-            return text, ''
+        if merr:= misc.error:
+            return merr, ''
     if len(lang := message.text.split()) != 1:
         if lang[1] in misc.languages:
             misc.lang = lang[1]
