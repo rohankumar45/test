@@ -190,6 +190,11 @@ async def get_tg_link_content(link: str, user_id: int):
     else:
         superChat = False
     userbot: Client = bot_dict[user_id]['SAVEBOT'] or bot_dict['SAVEBOT']
+    LOGGER.info('=============================================')
+    LOGGER.info(private)
+    LOGGER.info(userbot)
+    LOGGER.info(superChat)
+    LOGGER.info('=============================================')
     if private:
         if not userbot:
             raise Exception(f'User session required for this private link! Try add user session /{BotCommands.UserSetCommand}')
