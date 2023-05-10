@@ -719,7 +719,7 @@ async def intialize_userbot(check=True):
     LOGGER.info(f'Leech Split Size: {config_dict["LEECH_SPLIT_SIZE"]}.')
 
 
-async def intialize_savebot(session_string='None', check=True, user_id=None):
+async def intialize_savebot(session_string=None, check=True, user_id=None):
     if session_string == config_dict['USER_SESSION_STRING'] and (userbot:= bot_dict.get('USERBOT')):
         bot_dict['SAVEBOT'] = userbot
         return

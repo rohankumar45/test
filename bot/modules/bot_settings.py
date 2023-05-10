@@ -422,7 +422,7 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         await intialize_userbot()
     elif data[1] == 'restartsbot':
         await query.answer('Restarting Savebot!', show_alert=True)
-        await intialize_savebot(config_dict['USER_SESSION_STRING'])
+        await intialize_savebot(config_dict['SAVE_SESSION_STRING'])
     elif data[1] in ['var', 'aria', 'qbit']:
         await query.answer()
         await update_buttons(message, data[1])
