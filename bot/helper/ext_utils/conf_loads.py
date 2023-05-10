@@ -728,7 +728,7 @@ async def intialize_savebot(session_string='None', check=True, user_id=None):
         bot_dict[user_id]['SAVEBOT'] = savebot
         return
     if check:
-        savebot: Client = bot_dict.get(user_id, {}).get('SAVEBOT') if user_id else bot_dict.get('SAVEBOT')
+        savebot: Client = bot_dict.get(user_id, {}).get('SAVEBOT') if user_id else bot_dict['SAVEBOT']
         if savebot and savebot.is_connected:
             await savebot.stop()
             LOGGER.info('Savebot stopped.')
