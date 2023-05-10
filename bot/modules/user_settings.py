@@ -677,9 +677,9 @@ async def send_users_settings(_, message: Message):
                 value = str(value).title()
             elif key in ['thumb', 'rclone']:
                 value = 'Exists' if value else 'Not Exists'
-            elif str(value).lower() == 'true':
+            elif str(value).lower() == 'true' or key == 'user_string':
                 value = 'Yes'
-            elif str(value).lower() == 'false':
+            elif str(value).lower() == 'false' or key == '':
                 value = 'No'
             if key != 'user_name':
                 msg += f"⁍ <b>{key.replace('_', ' ').title()}:</b> {escape(str(value))}\n"
