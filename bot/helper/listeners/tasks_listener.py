@@ -348,9 +348,6 @@ class MirrorLeechListener:
             await update_all_messages()
             await sync_to_async(drive.upload, up_name, size, self.multiId[1])
         else:
-            LOGGER.info('====================================')
-            LOGGER.info(self.upPath)
-            LOGGER.info('====================================')
             size = await get_path_size(path)
             LOGGER.info(f'Uploading: {up_name}')
             RCTransfer = RcloneTransferHelper(self, up_name)
