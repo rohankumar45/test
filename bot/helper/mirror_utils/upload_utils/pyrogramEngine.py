@@ -5,6 +5,7 @@ from logging import getLogger, ERROR
 from natsort import natsorted
 from os import path as ospath, walk
 from PIL import Image
+from pyrogram import Client
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InputMediaVideo, InputMediaDocument, Message
 from re import match as re_match
@@ -41,7 +42,7 @@ class TgUploader:
         self.__size = size
         self.__media_dict = {'videos': {}, 'documents': {}}
         self.__last_msg_in_group = False
-        self.__client = None
+        self.__client: Client = None
         self.__up_path = ''
 
     async def __upload_progress(self, current, total):
