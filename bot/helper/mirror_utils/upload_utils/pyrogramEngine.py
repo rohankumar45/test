@@ -159,7 +159,7 @@ class TgUploader:
                                                                     progress=self.__upload_progress,
                                                                     reply_to_message_id=self.__send_msg.id,
                                                                     reply_markup=buttons)
-                await self.__premium_check(self.__client, buttons)
+                await self.__premium_check(buttons)
             elif is_video:
                 key = 'videos'
                 if thumb:
@@ -192,7 +192,7 @@ class TgUploader:
                                                                  progress=self.__upload_progress,
                                                                  reply_to_message_id=self.__send_msg.id,
                                                                  reply_markup=buttons)
-                await self.__premium_check(key, self.__client, buttons)
+                await self.__premium_check(buttons)
             elif is_audio:
                 key = 'audios'
                 duration, artist, title = await get_media_info(self.__up_path)
@@ -209,7 +209,7 @@ class TgUploader:
                                                                  progress=self.__upload_progress,
                                                                  reply_to_message_id=self.__send_msg.id,
                                                                  reply_markup=buttons)
-                await self.__premium_check(key, self.__client, buttons)
+                await self.__premium_check(buttons)
             else:
                 key = 'photos'
                 if self.__is_cancelled:
@@ -361,8 +361,8 @@ class TgUploader:
             await sleep(f.value * 1.2)
             await self.__msg_to_reply()
 
-    async def __premium_check(self, client, buttons):
-        if client != bot:
+    async def __premium_check(self, buttons):
+        if self.__client != bot:
             await sleep(1)
             self.__send_msg = await bot.get_messages(self.__send_msg.chat.id, self.__send_msg.id)
             if buttons:
@@ -372,7 +372,7 @@ class TgUploader:
                 except FloodWait as f:
                     LOGGER.warning(f)
                     await sleep(f.value * 1.2)
-                    await self.__premium_check(client, buttons)
+                    await self.__premium_check(buttons)
                 except Exception as e:
                     LOGGER.error(e)
 
