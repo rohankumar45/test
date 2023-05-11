@@ -5,7 +5,6 @@ from logging import getLogger, ERROR
 from natsort import natsorted
 from os import path as ospath, walk
 from PIL import Image
-from pyrogram import Client
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InputMediaVideo, InputMediaDocument, Message
 from re import match as re_match
@@ -42,7 +41,7 @@ class TgUploader:
         self.__size = size
         self.__media_dict = {'videos': {}, 'documents': {}}
         self.__last_msg_in_group = False
-        self.__client: Client = None
+        self.__client = None
         self.__up_path = ''
 
     async def __upload_progress(self, current, total):
@@ -132,8 +131,8 @@ class TgUploader:
         if self.__is_cancelled:
             return
         try:
-            self.__client = bot_dict['IS_PREMIUM'] if (userbot:= bot_dict['IS_PREMIUM']) and await get_path_size(self.__up_path) > DEFAULT_SPLIT_SIZE \
-                or userbot and config_dict['USERBOT_LEECH'] else bot
+            self.__client = bot_dict['USERBOT'] if bot_dict['IS_PREMIUM'] and await get_path_size(self.__up_path) > DEFAULT_SPLIT_SIZE \
+                or bot_dict['USERBOT'] and config_dict['USERBOT_LEECH'] else bot
             is_video, is_audio, is_image = await get_document_type(self.__up_path)
             if not is_image and thumb is None:
                 file_name = ospath.splitext(file)[0]
