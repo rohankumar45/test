@@ -1,6 +1,5 @@
 from math import ceil
-from asyncio import Lock
-from asyncio import sleep
+from asyncio import Lock, sleep
 
 from bot import bot_loop
 from bot.helper.telegram_helper.button_build import ButtonMaker
