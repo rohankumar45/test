@@ -349,7 +349,7 @@ class MirrorLeechListener:
             await sync_to_async(drive.upload, up_name, size, self.multiId[1])
         else:
             LOGGER.info('====================================')
-            LOGGER.info(path)
+            LOGGER.info(self.upPath)
             LOGGER.info('====================================')
             size = await get_path_size(path)
             LOGGER.info(f'Uploading: {up_name}')
