@@ -5,7 +5,6 @@ from logging import getLogger, ERROR
 from natsort import natsorted
 from os import path as ospath, walk
 from PIL import Image
-from pyrogram import Client
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InputMediaVideo, InputMediaDocument, Message
 from re import match as re_match
