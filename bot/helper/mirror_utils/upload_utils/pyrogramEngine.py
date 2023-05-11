@@ -42,7 +42,7 @@ class TgUploader:
         self.__size = size
         self.__media_dict = {'videos': {}, 'documents': {}}
         self.__last_msg_in_group = False
-        self.__client: Client = bot
+        self.__client = None
         self.__up_path = ''
 
     async def __upload_progress(self, current, total):
@@ -132,8 +132,8 @@ class TgUploader:
         if self.__is_cancelled:
             return
         try:
-            if (userbot:= bot_dict['IS_PREMIUM']) and await get_path_size(self.__up_path) > DEFAULT_SPLIT_SIZE or userbot and config_dict['USERBOT_LEECH']:
-                self.__client = userbot
+            self.__client = bot_dict['IS_PREMIUM'] if (userbot:= bot_dict['IS_PREMIUM']) and await get_path_size(self.__up_path) > DEFAULT_SPLIT_SIZE \
+                or userbot and config_dict['USERBOT_LEECH'] else bot
             is_video, is_audio, is_image = await get_document_type(self.__up_path)
             if not is_image and thumb is None:
                 file_name = ospath.splitext(file)[0]
