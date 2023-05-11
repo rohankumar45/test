@@ -691,6 +691,7 @@ async def send_users_settings(_, message: Message):
     text, buttons = await tele.get_content('usettings')
     await sendMessage(text, message, buttons)
     if len(contents) < 8:
+        tele.cancel()
         del content_dict[message.id]
 
 
@@ -702,6 +703,7 @@ async def users_handler(_, query: CallbackQuery):
         await query.answer('Old Task!', show_alert=True)
     elif data[2] == 'close':
         if tele:
+            tele.cancel()
             del content_dict[int(data[3])]
         await deleteMessage(message, message.reply_to_message)
     else:

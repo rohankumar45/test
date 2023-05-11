@@ -47,6 +47,7 @@ async def _gdtot(_, message: Message):
         text, buttons = await tele.get_content('gdtot')
         await editMessage(text, msg, buttons)
         if len(result) < 5:
+            tele.cancel()
             del content_dict[mid]
     else:
         await editMessage(f'Not found search for <b>{key.title()}</b>!', msg)
@@ -62,6 +63,7 @@ async def gdtot_callbak(_, query: CallbackQuery):
         await query.answer('Old Task!', show_alert=True)
     elif data[2] == 'close':
         if tele:
+            tele.cancel()
             del content_dict[int(data[3])]
         await deleteMessage(message, message.reply_to_message, tele.reply if tele else None)
     else:

@@ -1,6 +1,8 @@
 from math import ceil
 from asyncio import Lock
+from asyncio import sleep
 
+from bot import bot_loop
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
@@ -14,6 +16,7 @@ class TeleContent:
         self.__max = max
         self.__start = 0
         self.__lock = Lock()
+        self.task = bot_loop.create_task(self.__auto_clean())
 
     @property
     def reply(self):
@@ -22,6 +25,17 @@ class TeleContent:
     @property
     def pages(self):
         return self.__pages
+
+    async def __auto_clean(self):
+        await sleep(300)
+        if self.__message.id in content_dict:
+            try:
+                del content_dict[self.__message.id]
+            except:
+                pass
+
+    def cancel(self):
+        self.task.cancel()
 
     async def set_data(self, content, cap):
         if len(content) < 100:

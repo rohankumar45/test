@@ -197,6 +197,7 @@ async def torrentSearchUpdate(_, query: CallbackQuery):
     elif data[2] == 'close':
         await query.answer('Closing torrent search...')
         if tele:
+            tele.cancel()
             del content_dict[mid]
         await deleteMessage(message, message.reply_to_message, tele.reply if tele else None)
     else:
@@ -292,6 +293,7 @@ async def __search(key: str, site: str, message: Message, method: str, style: st
         text, buttons = await tele.get_content('torser')
         await editMessage(text, message, buttons)
         if len(hmsg) < 8:
+            tele.cancel()
             del content_dict[omsg.id]
     elif style == 'graph':
         buttons = ButtonMaker()

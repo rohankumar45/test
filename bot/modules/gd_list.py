@@ -106,6 +106,7 @@ async def select_type(_, query: CallbackQuery):
     else:
         await query.answer('List Closed...')
         if tele and mid in content_dict:
+            tele.cancel()
             del content_dict[mid]
         await deleteMessage(message, message.reply_to_message, tele.reply if tele else None)
     if style:
