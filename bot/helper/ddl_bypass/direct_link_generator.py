@@ -70,7 +70,7 @@ def direct_link_generator(link: str):
         return solidfiles(link)
     elif 'sourceforge.net' in domain:
         return sourceforge(link)
-    elif any(x in domain for x in ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox']):
+    elif any(x in domain for x in ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', '1024tera']):
         return terabox(link)
     elif 'uploadbaz.me' in domain:
         return uploadbaz(link)

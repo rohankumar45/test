@@ -184,22 +184,28 @@ async def get_tg_link_content(link: str, user_id: int):
         private = True
         msg = re_match(r'tg:\/\/openmessage\?user_id=([0-9]+)&message_id=([0-9]+)', link)
     chat, msg_id = msg.group(1), int(msg.group(2))
+    userbot: Client = bot_dict[user_id]['SAVEBOT'] or bot_dict['SAVEBOT']
     if chat.isdigit():
         chat = int(chat) if private else int(f'-100{chat}')
-    userbot: Client = bot_dict[user_id]['SAVEBOT'] or bot_dict['SAVEBOT']
-    if private:
         if not userbot:
             raise Exception(f'User session required for this private link! Try add user session /{BotCommands.UserSetCommand}')
-        if (message:= await userbot.get_messages(chat, msg_id)) and message.chat:
+    try:
+        await bot.get_chat(chat)
+    except Exception as e:
+        private = True
+        if not userbot:
+            raise e
+    if private:
+        if (message:= await userbot.get_messages(chat, msg_id)) and not message.empty:
             return userbot, message
         else:
-            raise Exception(f'Failed getting data from link, member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
-    elif not userbot and (message:= await bot.get_messages(chat, msg_id)) and message.chat:
+            raise Exception('Mostly message has been deleted!')
+    elif not userbot and (message:= await bot.get_messages(chat, msg_id)) and not message.empty:
         return bot, message
-    elif userbot and (message := await userbot.get_messages(chat, msg_id)) and message.chat:
+    elif userbot and (message:= await userbot.get_messages(chat, msg_id)) and not message.empty:
         return userbot, message
     else:
-        raise Exception(f'Failed getting data from link, member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
+        raise Exception(f'Failed getting data from link. Mostly message has been deleted or member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
 
 
 async def update_all_messages(force=False):
