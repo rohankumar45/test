@@ -129,7 +129,7 @@ async def get_user_settings(from_user, data: str, uset_data: str):
             f"<b>├ </b>Session String: <b>{sesmsg}</b>\n"\
             f"<b>└ </b>YT-DLP Options: {yto}\n\n"
         if remname:
-            text += f"<b>Remname:</b> <code>{remname[0:600]}</code>\n\n"
+            text += f"<b>Remname:</b> <code>{remname[0:450]}</code>\n\n"
         text += f"<i>Leech Split Size ~ {get_readable_file_size(config_dict['LEECH_SPLIT_SIZE'])}</i>"
 
     elif data == 'capmode':
