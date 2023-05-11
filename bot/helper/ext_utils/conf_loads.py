@@ -192,6 +192,7 @@ async def load_config():
     LEECH_FILENAME_PREFIX = environ.get('LEECH_FILENAME_PREFIX', '')
     USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
     SAVE_SESSION_STRING = environ.get('SAVE_SESSION_STRING', '')
+    USERBOT_LEECH = environ.get('USERBOT_LEECH', 'False').lower() == 'true'
     AUTO_DELETE_MESSAGE_DURATION = int(environ.get('AUTO_DELETE_MESSAGE_DURATION', 30))
     AUTO_DELETE_UPLOAD_MESSAGE_DURATION = int(environ.get('AUTO_DELETE_UPLOAD_MESSAGE_DURATION', 0))
     YT_DLP_OPTIONS = environ.get('YT_DLP_OPTIONS', '')
@@ -518,6 +519,7 @@ async def load_config():
                         'LEECH_FILENAME_PREFIX': LEECH_FILENAME_PREFIX,
                         'USER_SESSION_STRING': USER_SESSION_STRING,
                         'SAVE_SESSION_STRING': SAVE_SESSION_STRING,
+                        'USERBOT_LEECH': USERBOT_LEECH,
                         'AUTO_DELETE_MESSAGE_DURATION': AUTO_DELETE_MESSAGE_DURATION,
                         'AUTO_DELETE_UPLOAD_MESSAGE_DURATION': AUTO_DELETE_UPLOAD_MESSAGE_DURATION,
                         'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,

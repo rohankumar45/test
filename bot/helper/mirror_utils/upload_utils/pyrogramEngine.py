@@ -42,7 +42,7 @@ class TgUploader:
         self.__size = size
         self.__media_dict = {'videos': {}, 'documents': {}}
         self.__last_msg_in_group = False
-        self.__client = None
+        self.__client: Client = bot
         self.__up_path = ''
 
     async def __upload_progress(self, current, total):
@@ -132,7 +132,8 @@ class TgUploader:
         if self.__is_cancelled:
             return
         try:
-            self.__client = bot_dict['USERBOT'] if bot_dict['IS_PREMIUM'] and await get_path_size(self.__up_path) > DEFAULT_SPLIT_SIZE else bot
+            if (userbot:= bot_dict['IS_PREMIUM']) and await get_path_size(self.__up_path) > DEFAULT_SPLIT_SIZE or userbot and config_dict['USERBOT_LEECH']:
+                self.__client = userbot
             is_video, is_audio, is_image = await get_document_type(self.__up_path)
             if not is_image and thumb is None:
                 file_name = ospath.splitext(file)[0]
@@ -159,7 +160,7 @@ class TgUploader:
                                                                     progress=self.__upload_progress,
                                                                     reply_to_message_id=self.__send_msg.id,
                                                                     reply_markup=buttons)
-                await self.__premium_check(key, self.__client, buttons)
+                await self.__premium_check(self.__client, buttons)
             elif is_video:
                 key = 'videos'
                 if thumb:
@@ -361,14 +362,20 @@ class TgUploader:
             await sleep(f.value * 1.2)
             await self.__msg_to_reply()
 
-    async def __premium_check(self, text: str, client, buttons):
+    async def __premium_check(self, client, buttons):
         if client != bot:
             await sleep(1)
-            LOGGER.info(f'Using premium client! Edit markup {text}: ' + self.__send_msg.caption.split('\n')[0])
             self.__send_msg = await bot.get_messages(self.__send_msg.chat.id, self.__send_msg.id)
             if buttons:
-                if cmsg:= await self.__send_msg.edit_reply_markup(buttons):
-                    self.__send_msg = cmsg
+                try:
+                    if cmsg:= await self.__send_msg.edit_reply_markup(buttons):
+                        self.__send_msg = cmsg
+                except FloodWait as f:
+                    LOGGER.warning(f)
+                    await sleep(f.value * 1.2)
+                    await self.__premium_check(client, buttons)
+                except Exception as e:
+                    LOGGER.error(e)
 
     async def __send_media_group(self, msgs, subkey, key):
         try:
