@@ -47,7 +47,7 @@ def bypass_link(link: str) -> str:
         return rocklinks(link)
     elif 'rslinks.net' in link:
         return rslinks(link)
-    elif any(x in link for x in ['shareus.in', 'shareus.io']) in link:
+    elif any(x in link for x in ['shareus.in', 'shareus.io']):
         return shareus(link)
     elif any(x in link for x in site.shortest_list):
         return shortest(link)
