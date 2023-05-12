@@ -694,25 +694,25 @@ async def intialize_userbot(check=True):
             await userbot.stop()
             LOGGER.info('Userbot stopped.')
     bot_dict.update({'IS_PREMIUM': False, 'USERBOT': None, 'MAX_SPLIT_SIZE': DEFAULT_SPLIT_SIZE})
-    if USER_SESSION_STRING:= config_dict['USER_SESSION_STRING']:
-        try:
-            userbot = await Client('user', config_dict['TELEGRAM_API'],
-                                   config_dict['TELEGRAM_HASH'],
-                                   session_string=USER_SESSION_STRING,
-                                   parse_mode=enums.ParseMode.HTML,
-                                   no_updates=True).start()
-            bot_dict['IS_PREMIUM'] = userbot.me.is_premium
-            if bot_dict['IS_PREMIUM']:
-                bot_dict['USERBOT'] = userbot
-                LOGGER.info(f'Premium detected, 4GB leech enabled.')
-                if not config_dict['LEECH_LOG']:
-                    LOGGER.warning('Premium Leech required Leech Log!')
-                bot_dict['MAX_SPLIT_SIZE'] = 4194304000
-            else:
-                await userbot.stop()
-                LOGGER.info('Not detected premium from session string, using default client!')
-        except Exception as e:
-            LOGGER.error(e)
+    # if USER_SESSION_STRING:= config_dict['USER_SESSION_STRING']:
+    #     try:
+    #         userbot = await Client('user', config_dict['TELEGRAM_API'],
+    #                                config_dict['TELEGRAM_HASH'],
+    #                                session_string=USER_SESSION_STRING,
+    #                                parse_mode=enums.ParseMode.HTML,
+    #                                no_updates=True).start()
+    #         bot_dict['IS_PREMIUM'] = userbot.me.is_premium
+    #         if bot_dict['IS_PREMIUM']:
+    #             bot_dict['USERBOT'] = userbot
+    #             LOGGER.info(f'Premium detected, 4GB leech enabled.')
+    #             if not config_dict['LEECH_LOG']:
+    #                 LOGGER.warning('Premium Leech required Leech Log!')
+    #             bot_dict['MAX_SPLIT_SIZE'] = 4194304000
+    #         else:
+    #             await userbot.stop()
+    #             LOGGER.info('Not detected premium from session string, using default client!')
+    #     except Exception as e:
+    #         LOGGER.error(e)
     LEECH_SPLIT_SIZE, MAX_SPLIT_SIZE = config_dict['LEECH_SPLIT_SIZE'], bot_dict['MAX_SPLIT_SIZE']
     if not LEECH_SPLIT_SIZE or LEECH_SPLIT_SIZE > MAX_SPLIT_SIZE or LEECH_SPLIT_SIZE == DEFAULT_SPLIT_SIZE:
         config_dict['LEECH_SPLIT_SIZE'] = MAX_SPLIT_SIZE
