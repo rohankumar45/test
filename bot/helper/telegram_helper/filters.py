@@ -4,7 +4,6 @@ from bot import user_data, OWNER_ID
 
 
 class CustomFilters:
-
     async def owner_filter(self, client, message):
         user = message.from_user or message.sender_chat
         uid = user.id

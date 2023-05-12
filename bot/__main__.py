@@ -280,7 +280,7 @@ async def main():
     await gather(intialize_savebot(config_dict['SAVE_SESSION_STRING'], False), restart_notification())
     if config_dict['ENABLE_MEGAREST']:
         megarest_client()
-    bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
+    bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand) & CustomFilters.authorized))
     bot.add_handler(MessageHandler(log, filters=command(BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(BotCommands.RestartCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(ping, filters=command(BotCommands.PingCommand) & CustomFilters.authorized))
