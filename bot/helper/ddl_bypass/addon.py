@@ -40,8 +40,8 @@ class SiteList():
 
     @property
     def aio_bypass_list(self):
-        aio_one, aio_two = self.aio_bypass_dict()
-        return tuple(aio_one.keys()) + tuple(aio_two.keys())
+        aio_one, aio_two, aio_three = self.aio_bypass_dict()
+        return tuple(aio_one.keys()) + tuple(aio_two.keys()) + tuple(aio_three.keys())
 
     def __load_site_list(self):
         self.__anon_site = ('anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload.nz', 'letsupload.cc', 'filechan.org',
@@ -58,9 +58,8 @@ class SiteList():
                             'sbplay1.com', 'embedsb.com', 'watchsb.com', 'sbplay2.com', 'japopav.tv', 'viewsb.com', 'sbplay2.xyz', 'sbfast.com', 'sbfull.com',
                             'javplaya.com', 'sbanh.com')
         self.__bypass_sites = ('adf.ly', 'droplink.co', 'filecrypt.co', 'gplinks.co', 'gtlinks.me', 'theforyou.in', 'kinemaster.cc', 'hypershort.com', 'ouo.io',
-                               'rocklinks.net', 'shortly.xyz', 'sirigan.my.id', 'thinfi.com', 'tinyurl.com', 'try2link.com','shortingly.me', 'psa.pm', 'pkin.me',
-                               'flashlink.in', 'bluemediafile.site', 'tnlink.in', 'urlsopen.com', 'short2url.in', 'linkvertise.com', 'mdiskshortners.in', 'tinyfy.in',
-                               'earnl.xyz', 'earn.moneykamalo.com', 'indiurl.in', 'linkbnao.co', 'mdisk.pro', 'rslinks.net', 'bit.ly')
+                               'rocklinks.net', 'shortly.xyz', 'sirigan.my.id', 'thinfi.com', 'tinyurl.com', 'try2link.com', 'psa.pm', 'pkin.me',
+                               'bluemediafile.site', 'tnlink.in', 'linkvertise.com', 'earnl.xyz', 'rslinks.net', 'bit.ly', 'mdisk.pro')
         self.__passvip_list = ('boost.ink', 'exe.io', 'exey.io', 'goo.gl', 'mboost.me', 'ph.apps2app.com', 'rekonise.com', 'shrto.ml',
                                'shortconnect.com', 'social-unlock.com', 'sub2unlock.com', 'sub2unlock.net', 'sub4unlock.com', 't.co', 'ytsubme.com')
         self.__shortest_list = ('shorte.st', 'festyy.com', 'cllkme.com', 'estyy.com', 'gestyy.com', 'corneey.com', 'destyy.com', 'ceesty.com')
@@ -68,34 +67,50 @@ class SiteList():
     @staticmethod
     def aio_bypass_dict():
         shortner_dict_one = {'tekcrypt.in': ['https://tekcrypt.in/tek/', 20],
-                             'go.rocklinks.net': ['https://dwnld.povathemes.com/', 10],
-                             'rocklinks.net': ['https://dwnld.povathemes.com/', 10],
-                             'm.easysky.in': ['https://techy.veganab.co/', 5],
                              'indianshortner.in': ['https://indianshortner.com/', 5],
                              'open.crazyblog.in': ['https://hr.vikashmewada.com/', 7],
-                             'link.tnvalue.in': ['https://internet.webhostingtips.club/', 5],
+                             'tnvalue.in': ['https://internet.webhostingtips.club/', 5],
                              'shortingly.me': ['https://go.techyjeeshan.xyz/', 5],
-                             'dulink.in': ['https://tekcrypt.in/tek/', 20],
                              'bindaaslinks.com': ['https://www.techishant.in/blog/', 5],
                              'pdiskshortener.com': ['https://pdiskshortener.com/', 10],
                              'mdiskshortner.link': ['https://mdiskshortner.link/', 15],
-                             'g.rewayatcafe.com': ['https://course.rewayatcafe.com/', 7],
+                             'rewayatcafe.com': ['https://course.rewayatcafe.com/', 7],
                              'ser2.crazyblog.in': ['https://ser3.crazyblog.in/', 12],
                              'za.uy' : ['https://za.uy/', 5],
-                             'bitshorten.com': ['https://bitshorten.com/', 21],
-                             'rocklink.in': ['https://rocklink.in/', 6]}
-        shortner_dict_two =  {'ez4short.com':['https://ez4short.com/', 'https://techmody.io/', 5],
-                              'xpshort.com': ['https://push.bdnewsx.com/', 'https://veganho.co/', 10],
-                              'vearnl.in': ['https://go.urlearn.xyz/', 'https://v.modmakers.xyz/', 5],
-                              'adrinolinks.in': ['https://adrinolinks.in/', 'https://wikitraveltips.com/', 5],
+                             'bitshorten.com': ['https://bitshorten.com/', 21]}
+
+        shortner_dict_two =  {'vearnl.in': ['https://go.urlearn.xyz/', 'https://v.modmakers.xyz/', 5],
                               'techymozo.com': ['https://push.bdnewsx.com/', 'https://veganho.co/', 8],
                               'linksxyz.in': ['https://blogshangrila.com/insurance/', 'https://cypherroot.com/', 13],
                               'short-jambo.com' :['https://short-jambo.com/', 'https://aghtas.com/how-to-create-a-forex-trading-plan/', 10],
-                              'linkpays.in': ['https://m.techpoints.xyz//', 'https://www.filmypoints.in/', 10],
+                              'linkpays.in': ['https://m.techpoints.xyz/', 'https://www.filmypoints.in/', 10],
                               'pi-l.ink' : ['https://go.pilinks.net/', 'https://poketoonworld.com/', 5],
                               'arn4link.in': ['https://m.open2get.in/','https://ezeviral.com/2022/03/01/why-is-cloud-hosting-the-ideal-solution/', 3],
+                              'indianshortner.in': ['https://indianshortner.com/','https://moddingzone.in/', 5],
                               'open2get.in': ['https://m.open2get.in/', 'https://ezeviral.com/2022/03/01/why-is-cloud-hosting-the-ideal-solution/', 3]}
-        return shortner_dict_one, shortner_dict_two
+
+        shortner_dict_three = {'du-link.in': ['https://du-link.in/', 'https://profitshort.com/', 0.5],
+                               'adrinolinks.in': ['https://adrinolinks.in/', 'https://wikitraveltips.com/', 8],
+                               'ez4short.com':['https://ez4short.com/', 'https://techmody.io/', 8],
+                               'shortingly.in': ['https://shortingly.in/', 'https://tech.gyanitheme.com/', 5],
+                               'mdiskshortners.in': ['https://mdiskshortners.in/', 'https://www.adzz.in/', 2],
+                               'mdisklink.link': ['https://mdisklink.link/', 'https://m.proappapk.com/', 2],
+                               'tinyfy.in': ['https://tinyfy.in/','https://www.yotrickslog.tech/', 0.5],
+                               'earnl.xyz': ['https://v.earnl.xyz/', 'https://link.modmakers.xyz/', 5],
+                               'easysky.in': ['https://techy.veganab.co/', 'https://veganab.co/', 8],
+                               'indiurl.in': ['https://file.earnash.com/', 'https://indiurl.cordtpoint.co.in/', 10],
+                               'linkbnao.com': ['https://vip.linkbnao.com/', 'https://ffworld.xyz/', 2],
+                               'tnshort.in': ['https://page.tnlink.in/','https://business.usanewstoday.club/', 8],
+                               'flashlink.in': ['https://files.earnash.com/','https://flash1.cordtpoint.co.in/', 15],
+                               'short2url.in': ['https://techyuth.xyz/blog/','https://blog.coin2pay.xyz/', 10],
+                               'indianshortner.in': ['https://indianshortner.com/', 'https://moddingzone.in/', 5],
+                               'urlsopen.': ['https://blogpost.viewboonposts.com/e998933f1f665f5e75f2d1ae0009e0063ed66f889000/', 'https://blog.textpage.xyz/', 2],
+                               'xpshort.com': ['https://xpshort.com/', 'https://m.ecowas.in/', 8],
+                               'push.bdnewsx.com': ['https://xpshort.com/', 'https://m.ecowas.in/', 8],
+                               'techymozo.com': ['https://xpshort.com/', 'https://m.ecowas.in/', 8],
+                               'moneykamalo.com': ['https://go.moneykamalo.com/', 'https://techkeshri.com/', 5]}
+
+        return shortner_dict_one, shortner_dict_two, shortner_dict_three
 
 
 def decrypt_url(code) -> str:

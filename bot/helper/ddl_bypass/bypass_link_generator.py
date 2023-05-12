@@ -21,30 +21,20 @@ def bypass_link(link: str) -> str:
         return bit_tiny(link)
     elif 'droplink.co' in link:
         return droplink(link)
-    elif 'earn.moneykamalo.com' in link:
-        return moneykamalo(link)
-    elif 'earnl.xyz' in link:
-        return earnl(link)
     elif any(x in link for x in site.fembed_list):
         return fembed_bypass(link)
     elif 'filecrypt.co' in link:
         return filecrypt(link)
-    elif 'flashlink.in' in link:
-        return flashlink(link)
     elif 'gplinks.co' in link:
         return gplinks(link)
-    elif any(x in link for x in ['gtlinks.me', 'theforyou.in', 'kinemaster.cc']):
-        return gtlinks(link)
+    elif any(x in link for x in ['gyanilinks.com', 'gtlinks.me']):
+        return gyanilinks(link)
     elif 'hypershort.com' in link:
         return hypershort(link)
-    elif 'indiurl.in' in link:
-        return indiurl(link)
-    elif 'linkbnao.co' in link:
-        return linkbnao(link)
+    elif 'krownlinks.me' in link:
+        return krownlinks(link)
     elif 'linkvertise.com' in link:
         return linkvertise(link)
-    elif 'mdiskshortners.in' in link:
-        return mdiskshortners(link)
     elif 'mdisk.pro' in link:
         return mdiskpro(link)
     elif any(x in link for x in ['ouo.io', 'ouo.press']):
@@ -57,32 +47,26 @@ def bypass_link(link: str) -> str:
         return rocklinks(link)
     elif 'rslinks.net' in link:
         return rslinks(link)
-    elif 'shareus.in' in link:
+    elif any(x in link for x in ['shareus.in', 'shareus.io']) in link:
         return shareus(link)
     elif any(x in link for x in site.shortest_list):
         return shortest(link)
-    elif 'short2url.in' in link:
-        return short2url(link)
     elif 'shortly.xyz' in link:
         return shortly(link)
     elif any(x in link for x in tuple(site.aio_bypass_dict()[0].keys())):
         return aio_one(link)
     elif any(x in link for x in tuple(site.aio_bypass_dict()[1].keys())):
         return aio_two(link)
-    elif 'shortingly.me' in link:
-        return shortingly(link)
+    elif any(x in link for x in tuple(site.aio_bypass_dict()[2].keys())):
+        return aio_three(link)
     elif 'sirigan.my.id' in link :
         return sirigan(link)
     elif 'thinfi.com' in link:
         return thinfi(link)
-    elif 'tinyfy.in' in link:
-        return tinyfy(link)
     elif 'tnlink.in' in link:
         return tnlink(link)
     elif 'try2link.com' in link:
         return try2link(link)
-    elif 'urlsopen.com' in link:
-        return urlsopen(link)
     elif any(x in link for x in site.passvip_list):
         return vip_bypass(link)
     else:
@@ -156,7 +140,7 @@ def bluemediafile(url, torrent=True):
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def bit_tiny(url: str) -> str:
+def bit_tiny(url: str):
     response = create_scraper().request('get', url).url
     if 'http' in response:
         return response
@@ -164,21 +148,19 @@ def bit_tiny(url: str) -> str:
         raise DirectDownloadLinkException('ERROR: Error trying to bypass.')
 
 
-def droplink(url: str) -> str:
+def droplink(url: str):
     cget = create_scraper(allow_brotli=False).request
     res = cget('get', url, timeout=5)
     try:
         ref = re_findall("action[ ]{0,}=[ ]{0,}['|\"](.*?)['|\"]", res.text)[0]
-        h = {'referer': ref}
-        res = cget('get', url, headers=h)
+        res = cget('get', url, headers={'referer': ref})
         bs4 = BeautifulSoup(res.content, 'html.parser')
         inputs = bs4.find_all('input')
         data = {input.get('name'): input.get('value') for input in inputs}
-        h = {'content-type': 'application/x-www-form-urlencoded', 'x-requested-with': 'XMLHttpRequest'}
         p = urlparse(url)
         final_url = f'{p.scheme}://{p.netloc}/links/go'
         sleep(3.1)
-        res = cget('post', final_url, data=data, headers=h).json()
+        res = cget('post', final_url, data=data, headers={'content-type': 'application/x-www-form-urlencoded', 'x-requested-with': 'XMLHttpRequest'}).json()
         if stats:= res['status'] == 'success':
             return res['url']
         else:
@@ -188,51 +170,7 @@ def droplink(url: str) -> str:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def moneykamalo(url):
-    cget = create_scraper().request
-    DOMAIN = 'https://go.moneykamalo.com'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://techkeshri.com/'
-    h = {'referer': ref}
-    resp = cget('get', final_url, headers=h)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find_all('input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = {'x-requested-with': 'XMLHttpRequest'}
-        sleep(5)
-        r = cget('post', f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
-def earnl(url):
-    cget = create_scraper().request
-    DOMAIN = 'https://v.earnl.xyz'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://link.modmakers.xyz/'
-    h = {'referer': ref}
-    resp = cget('get', final_url, headers=h)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find_all('input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = { 'x-requested-with': 'XMLHttpRequest' }
-        sleep(5)
-        r = cget('post', f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
-def fembed_bypass(url: str) -> str:
+def fembed_bypass(url: str):
     try:
         dl_url = get_fembed_links(url)
         res = ''
@@ -244,7 +182,7 @@ def fembed_bypass(url: str) -> str:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def filecrypt(url: str) -> str:
+def filecrypt(url: str):
     client = create_scraper(allow_brotli=False)
     headers = {'authority': 'filecrypt.co',
                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -283,66 +221,41 @@ def filecrypt(url: str) -> str:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def flashlink(url):
-    DOMAIN = 'https://files.cordtpoint.co.in'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    client = create_scraper(allow_brotli=False)
-    resp = client.get(final_url)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find(id='go-link').find_all(name='input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = {'x-requested-with': 'XMLHttpRequest'}
-        sleep(15)
-        r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
-def gplinks(url: str) -> str:
+def gplinks(url: str):
+    url = url.rstrip('/')
+    domain ='https://gplinks.co/'
     cget = create_scraper().request
     try:
-        url = url[:-1] if url[-1] == '/' else url
-        domain ='https://gplinks.co/'
         vid = cget('get', url, allow_redirects= False).headers['Location'].split('=')[-1]
         url = f'{url}/?{vid}'
         response = cget('get', url, allow_redirects=False)
         soup = BeautifulSoup(response.content, 'html.parser')
         inputs = soup.find(id='go-link').find_all(name='input')
-        data = { input.get('name'): input.get('value') for input in inputs }
+        data = {input.get('name'): input.get('value') for input in inputs}
         sleep(5)
-        headers={'x-requested-with': 'XMLHttpRequest'}
-        return cget('post', domain+'links/go', data=data, headers=headers).json()['url']
+        return cget('post', f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def gtlinks(url: str) -> str:
+def gyanilinks(url: str):
+    DOMAIN = 'https://go.theforyou.in/'
     client = create_scraper(allow_brotli=False)
-    token = url.split('/')[-1]
-    domain ='https://gplinks.co/'
-    referer = 'https://mynewsmedia.co/'
+    final_url = f"{DOMAIN}/{url.rstrip('/').split('/')[-1]}"
+    resp = client.get(final_url)
+    soup = BeautifulSoup(resp.content, 'html.parser')
     try:
-        vid = client.get(url, allow_redirects= False).headers['Location'].split('=')[-1]
-        url = f'{url}/?{vid}'
-        response = client.get(url, allow_redirects=False)
-        soup = BeautifulSoup(response.content, 'html.parser')
         inputs = soup.find(id='go-link').find_all(name='input')
         data = {input.get('name'): input.get('value') for input in inputs}
-        sleep(10)
-        headers={'x-requested-with': 'XMLHttpRequest'}
-        return client.post(domain+'links/go', data=data, headers=headers).json()['url']
+        sleep(5)
+        return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def hypershort(url: str) -> str:
+def hypershort(url: str):
     cget = create_scraper().request
     response= cget('get', url)
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -351,12 +264,12 @@ def hypershort(url: str) -> str:
     token_regex = re_search('itsToken\.value = \S+', token_response)
     token = token_regex[0].split("=")[1].removesuffix('"').removeprefix(' "')
     inputs = soup.find(id='re-form').find_all(name='input')
-    data = { input.get('name'): input.get('value') for input in inputs }['getData']
+    data = {input.get('name'): input.get('value') for input in inputs}['getData']
     next_page_link = soup.find('form').get('action')
     resp = cget('post', next_page_link, data={'itsToken':token, 'get2Data':data},
-    headers = {'referer':next_page_link})
+    headers = {'referer': next_page_link})
     soup = BeautifulSoup(resp.content, 'html.parser')
-    data = { input.get('name'): input.get('value') for input in inputs }
+    data = {input.get('name'): input.get('value') for input in inputs}
     sleep(4)
     tokenize_url = soup.find(name='iframe', id='anonIt').get('src')
     tokenize_url_resp = cget('get', tokenize_url)
@@ -372,45 +285,17 @@ def hypershort(url: str) -> str:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def indiurl(url):
-    cget = create_scraper().request
-    DOMAIN = 'https://file.earnash.com/'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://indiurl.cordtpoint.co.in/'
-    h = {'referer': ref}
-    resp = cget('get', final_url, headers=h)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find_all('input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = {'x-requested-with': 'XMLHttpRequest'}
-        sleep(10)
-        r = cget('post', f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
-def linkbnao(url):
+def krownlinks(url: str):
     client = create_scraper(allow_brotli=False)
-    DOMAIN = 'https://vip.linkbnao.com'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://ffworld.xyz/'
-    h = {'referer': ref}
-    resp = client.get(final_url, headers=h)
+    DOMAIN = 'https://tech.bloggertheme.xyz'
+    final_url = f"{DOMAIN}/{url.rstrip('/').split('/')[-1]}"
+    resp = client.get(final_url)
     soup = BeautifulSoup(resp.content, 'html.parser')
     try:
-        inputs = soup.find_all('input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = {'x-requested-with': 'XMLHttpRequest'}
-        sleep(2)
-        r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
+        inputs = soup.find(id='go-link').find_all(name='input')
+        data = {input.get('name'): input.get('value') for input in inputs}
+        sleep(10)
+        return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
@@ -425,48 +310,22 @@ def linkvertise(url):
         raise DirectDownloadLinkException(f'ERROR: {response["msg"]}')
 
 
-def mdiskshortners(url):
-    client = create_scraper(allow_brotli=False)
-    DOMAIN = 'https://mdiskshortners.in/'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://www.adzz.in/'
-    h = {'referer': ref}
-    resp = client.get(final_url, headers=h)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find_all('input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = {'x-requested-with': 'XMLHttpRequest'}
-        sleep(2)
-        r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
 def mdiskpro(url):
     client = create_scraper(allow_brotli=False)
     DOMAIN = 'https://mdisk.pro'
-    ref = 'https://m.meclipstudy.in/'
-    h = {'referer': ref}
-    resp = client.get(url, headers=h)
+    resp = client.get(url, headers={'referer': 'https://m.meclipstudy.in/'})
     soup = BeautifulSoup(resp.content, 'html.parser')
     try:
         inputs = soup.find_all('input')
         data = { input.get('name'): input.get('value') for input in inputs }
-        h = {'x-requested-with': 'XMLHttpRequest'}
         sleep(8)
-        r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
+        return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def ouo(url: str) -> str:
+def ouo(url: str):
     cget = create_scraper().request
     try:
         tempurl = url.replace('ouo.press', 'ouo.io')
@@ -495,36 +354,30 @@ def ouo(url: str) -> str:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def pkin(url: str) -> str:
-    url = url[:-1] if url[-1] == '/' else url
-    token = url.split('/')[-1]
+def pkin(url: str):
     domain = 'https://go.paisakamalo.in/'
-    referer = 'https://techkeshri.com/'
-    token = url.split('/')[-1]
     cget = create_scraper().request
-    user_agent= 'Mozilla/5.0 (Linux; Android 11; 2201116PI) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36'
-    response = cget('get', domain+token, headers={'referer': referer, 'user-agent': user_agent})
+    user_agent = 'Mozilla/5.0 (Linux; Android 11; 2201116PI) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36'
+    response = cget('get', f"{domain}{url.rstrip('/').split('/')[-1]}", headers={'referer': 'https://techkeshri.com/', 'user-agent': user_agent})
     soup = BeautifulSoup(response.content, 'html.parser')
     try:
         inputs = soup.find(id='go-link').find_all(name='input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        time.sleep(3)
-        headers = {'x-requested-with': 'XMLHttpRequest', 'user-agent': user_agent}
-        return cget('post', domain+'links/go', data=data, headers=headers).json()['url']
+        data = {input.get('name'): input.get('value') for input in inputs}
+        sleep(3)
+        return cget('post', f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest', 'user-agent': user_agent}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def psa(url: str) -> str:
+def psa(url: str):
     client = create_scraper(allow_brotli=False)
     r = client.get(url)
     soup = BeautifulSoup(r.text, 'html.parser').find_all(class_='dropshadowboxes-drop-shadow dropshadowboxes-rounded-corners dropshadowboxes-inside-and-outside-shadow dropshadowboxes-lifted-both dropshadowboxes-effect-default')
     links = []
     for link in soup:
         try:
-            exit_gate = link.a.get('href')
-            links.append(try2link(exit_gate))
+            links.append(try2link(link.a.get('href')))
         except:
             pass
     if links:
@@ -536,24 +389,21 @@ def psa(url: str) -> str:
         raise DirectDownloadLinkException('ERROR: Error trying bypass from PSA.')
 
 
-def rocklinks(url: str) -> str:
+def rocklinks(url: str):
+    url = url.rstrip('/')
     client = create_scraper(allow_brotli=False)
-    DOMAIN = 'https://rl.techysuccess.com'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
+    DOMAIN = 'https://blog.disheye.com' if 'rocklinks.net' in url else 'https://rocklinks.net'
+    code = url.split("/")[-1]
+    if 'rocklinks.net' in url:
+        code += '?quelle='
     final_url = f'{DOMAIN}/{code}'
-    ref = 'https://disheye.com/'
-    h = {'referer': ref}
-    resp = client.get(final_url, headers=h)
+    resp = client.get(final_url, headers={'referer': 'https://disheye.com/'})
     soup = BeautifulSoup(resp.content, 'html.parser')
-    try: inputs = soup.find(id='go-link').find_all(name='input')
-    except: return 'Incorrect Link'
-    data = { input.get('name'): input.get('value') for input in inputs }
-    h = { 'x-requested-with': 'XMLHttpRequest' }
-    sleep(10)
-    r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
     try:
-        return r.json()['url']
+        inputs = soup.find(id='go-link').find_all(name='input')
+        data = {input.get('name'): input.get('value') for input in inputs}
+        sleep(10)
+        return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
@@ -570,9 +420,9 @@ def rslinks(url):
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
-def shareus(url: str) -> str:
-    token = url.split('=')[-1]
-    bypassed_url = 'https://us-central1-my-apps-server.cloudfunctions.net/r?shortid='+ token
+
+def shareus(url: str):
+    bypassed_url = 'https://us-central1-my-apps-server.cloudfunctions.net/r?shortid='+ url.split('=')[-1]
     cget = create_scraper().request
     response = cget('get', bypassed_url).text
     if not 'Error' in response:
@@ -581,11 +431,11 @@ def shareus(url: str) -> str:
         raise DirectDownloadLinkException('ERROR: Error trying bypass from Shareus.')
 
 
-def shortest(url: str) -> str:
+def shortest(url: str):
     cget = create_scraper().request
+    parsed_url = urlparse(url)
+    resp = cget('get', url, headers={'referer': url})
     try:
-        parsed_url = urlparse(url)
-        resp = cget('get', url, headers={'referer': url})
         session_id = re_findall('''sessionId(?:\s+)?:(?:\s+)?['|'](.*?)['|']''', resp.text)[0]
         final_url = f'{parsed_url.scheme}://{parsed_url.netloc}/shortest-url/end-adsession'
         params = {'adSessionId': session_id, 'callback': '_'}
@@ -597,35 +447,10 @@ def shortest(url: str) -> str:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def short2url(url):
-    client = create_scraper(allow_brotli=False)
-    DOMAIN = 'https://techyuth.xyz/blog'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://blog.coin2pay.xyz/'
-    h = {'referer': ref}
-    resp = client.get(final_url, headers=h)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find_all('input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = { 'x-requested-with': 'XMLHttpRequest' }
-        sleep(10)
-        r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
-def shortly(url: str) -> str:
+def shortly(url: str):
     cget = create_scraper().request
     try:
-        shortly_url = url[:-1] if url[-1] == '/' else url
-        token = shortly_url.split('/')[-1]
-        shortly_bypass_api = 'https://www.shortly.xyz/getlink.php/'
-        return cget('post', shortly_bypass_api, data={'id':token}, headers={'referer':'https://www.shortly.xyz/link'}).text
+        return cget('post', 'https://www.shortly.xyz/getlink.php/', data={'id': url.rstrip('/').split('/')[-1]}, headers={'referer':'https://www.shortly.xyz/link'}).text
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
@@ -634,77 +459,68 @@ def shortly(url: str) -> str:
 def aio_one(url: str)-> str:
     shortner_dict = SiteList().aio_bypass_dict()[0]
     domain, sleep_time = [shortner_dict[x] for x in tuple(shortner_dict.keys()) if x in url][0]
-    shortner_url = url[:-1] if url[-1] == '/' else url
-    token = shortner_url.split('/')[-1]
-    cget = create_scraper().request
-    response = cget('get', domain + token, headers={'referer': domain + token})
+    client = create_scraper(allow_brotli=False)
+    ref = f"{domain}{url.rstrip('/').split('/')[-1]}"
+    response = client.get(ref, headers={'referer': ref})
     soup = BeautifulSoup(response.content, 'html.parser')
     try:
-        inputs = soup.find(id='go-link').find_all(name='input')
-        data = { input.get('name'): input.get('value') for input in inputs }
+        inputs = soup.find(id='go-link').find_all('input')
+        data = {input.get('name'): input.get('value') for input in inputs}
         sleep(sleep_time)
-        headers = {'x-requested-with': 'XMLHttpRequest'}
-        return cget('post', domain + 'links/go', data=data, headers=headers).json()['url']
+        return client.post(f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def aio_two(url: str) -> str:
+def aio_two(url: str):
     shortner_dict = SiteList().aio_bypass_dict()[1]
     domain, referer, sleep_time = [shortner_dict[x] for x in tuple(shortner_dict.keys()) if x in url][0]
-    shortner_url = url[:-1] if url[-1] == '/' else url
-    token = shortner_url.split('/')[-1]
-    cget = create_scraper().request
-    response = cget('get', domain+token, headers={'referer': referer})
+    client = create_scraper(allow_brotli=False)
+    response = client.get(f"{domain}{url.rstrip('/').split('/')[-1]}", headers={'referer': referer})
     soup = BeautifulSoup(response.content, 'html.parser')
     try:
-        inputs = soup.find(id='go-link').find_all(name='input')
-        data = { input.get('name'): input.get('value') for input in inputs }
+        inputs = soup.find(id='go-link').find_all('input')
+        data = {input.get('name'): input.get('value') for input in inputs}
         sleep(sleep_time)
-        headers={'x-requested-with': 'XMLHttpRequest'}
-        return cget('post', domain+'links/go', data=data, headers=headers).json()['url']
+        return client.post(f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def shortingly(url: str) -> str:
+def aio_three(url: str):
+    shortner_dict = SiteList().aio_bypass_dict()[2]
+    domain, referer, sleep_time = [shortner_dict[x] for x in tuple(shortner_dict.keys()) if x in url][0]
     client = create_scraper(allow_brotli=False)
-    DOMAIN = 'https://go.techyjeeshan.xyz'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    resp = client.get(final_url)
-    soup = BeautifulSoup(resp.content, 'html.parser')
+    response = client.get(f"{domain}{url.rstrip('/').split('/')[-1]}", headers={'referer': referer})
+    soup = BeautifulSoup(response.content, 'html.parser')
     try:
-        inputs = soup.find(id='go-link').find_all(name='input')
-    except:
-        raise DirectDownloadLinkException('ERROR: Incorrect link!')
-    data = { input.get('name'): input.get('value') for input in inputs }
-    h = { 'x-requested-with': 'XMLHttpRequest' }
-    sleep(5)
-    r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-    try:
-        return r.json()['url']
+        inputs = soup.find_all('input')
+        data = {input.get('name'): input.get('value') for input in inputs}
+        sleep(sleep_time)
+        return client.post(f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
+        LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def sirigan(url: str) -> str:
+def sirigan(url: str):
     res = create_scraper().request('get', url)
     try:
         url = res.url.split('=', maxsplit=1)[-1]
         while True:
-            try: url = b64decode(url).decode('utf-8')
-            except: break
+            try:
+                url = b64decode(url).decode('utf-8')
+            except:
+                break
         return url.split('url=')[-1]
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def thinfi(thinfi_url: str) -> str :
+def thinfi(thinfi_url: str) :
     response = create_scraper().request('get', thinfi_url)
     try:
         return BeautifulSoup(response.content, 'html.parser').p.a.get('href')
@@ -713,86 +529,36 @@ def thinfi(thinfi_url: str) -> str :
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def tinyfy(url):
-    cget = create_scraper().request
-    DOMAIN = 'https://tinyfy.in'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://www.yotrickslog.tech/'
-    h = {'referer': ref}
-    resp = cget('get', final_url, headers=h)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find_all('input')
-        data = { input.get('name'): input.get('value') for input in inputs }
-        h = {'x-requested-with': 'XMLHttpRequest'}
-        r = cget('post', f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
-def tnlink(url):
+def tnlink(url: str):
     client = create_scraper()
-    DOMAIN = 'https://internet.usanewstoday.club'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://usanewstoday.club/'
-    h = {'referer': ref}
+    DOMAIN = 'https://page.tnlink.in/'
+    final_url = f"{DOMAIN}/{url.rstrip('/').split('/')[-1]}"
     while len(client.cookies) == 0:
-        resp = client.get(final_url, headers=h)
+        resp = client.get(final_url, headers={'referer': 'https://usanewstoday.club/'})
         sleep(2)
     soup = BeautifulSoup(resp.content, 'html.parser')
     try:
         inputs = soup.find_all('input')
         data = {input.get('name'): input.get('value') for input in inputs}
-        h = {'x-requested-with': 'XMLHttpRequest'}
         sleep(8)
-        r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
+        return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
 
 
-def try2link(url):
+def try2link(url: str):
     cget = create_scraper(allow_brotli=False).request
-    url = url[:-1] if url[-1] == '/' else url
+    url = url.rstrip('/')
     params = (('d', int(time()) + (60 * 4)),)
     r = cget('get', url, params=params, headers= {'Referer': 'https://newforex.online/'})
     soup = BeautifulSoup(r.text, 'html.parser')
     try:
         inputs = soup.find(id='go-link').find_all(name='input')
-        data = { input.get('name'): input.get('value') for input in inputs }
+        data = {input.get('name'): input.get('value') for input in inputs}
         time.sleep(7)
         headers = {'Host': 'try2link.com', 'X-Requested-With': 'XMLHttpRequest', 'Origin': 'https://try2link.com', 'Referer': url}
-        bypassed_url = cget('post', 'https://try2link.com/links/go', headers=headers,data=data)
-        return bypassed_url.json()['url']
-    except Exception as e:
-        LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-
-
-def urlsopen(url):
-    client = create_scraper(allow_brotli=False)
-    DOMAIN = 'https://blogpost.viewboonposts.com/ssssssagasdgeardggaegaqe'
-    url = url[:-1] if url[-1] == '/' else url
-    code = url.split('/')[-1]
-    final_url = f'{DOMAIN}/{code}'
-    ref = 'https://blog.textpage.xyz/'
-    h = {'referer': ref}
-    resp = client.get(final_url, headers=h)
-    soup = BeautifulSoup(resp.content, 'html.parser')
-    try:
-        inputs = soup.find_all('input')
-        data = {input.get('name'): input.get('value') for input in inputs}
-        h = {'x-requested-with': 'XMLHttpRequest'}
-        sleep(2)
-        r = client.post(f'{DOMAIN}/links/go', data=data, headers=h)
-        return r.json()['url']
+        return cget('post', 'https://try2link.com/links/go', headers=headers, data=data).json()['url']
     except Exception as e:
         LOGGER.error(e)
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
@@ -801,11 +567,9 @@ def urlsopen(url):
 def vip_bypass(url) -> str:
     cget = create_scraper().request
     try:
-        data = {'url': url,}
-        r = cget('post', 'https://api.bypass.vip/', data=data)
-        b = r.json()
-        if b['success'] == True:
-            return b['destination']
+        resp = cget('post', 'https://api.bypass.vip/', data={'url': url,}).json()
+        if resp['success'] == True:
+            return resp['destination']
         else:
             raise DirectDownloadLinkException(f'ERROR: Error when trying bypass from {urlparse(url).netloc}.')
     except Exception as e:
