@@ -276,10 +276,6 @@ async def restart_notification():
 
 
 async def main():
-    await gather(intialize_userbot(False), set_command(), start_cleanup(), torrent_search.initiate_search_tools())
-    await gather(intialize_savebot(config_dict['SAVE_SESSION_STRING'], False), restart_notification())
-    if config_dict['ENABLE_MEGAREST']:
-        megarest_client()
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(BotCommands.RestartCommand) & CustomFilters.sudo))
@@ -289,6 +285,10 @@ async def main():
     bot.add_handler(CallbackQueryHandler(help_query, filters=regex('help')))
     bot.add_handler(MessageHandler(new_member, filters=new_chat_members))
     bot.add_handler(MessageHandler(leave_member, filters=left_chat_member))
+    await gather(intialize_userbot(False), set_command(), start_cleanup(), torrent_search.initiate_search_tools())
+    await gather(intialize_savebot(config_dict['SAVE_SESSION_STRING'], False), restart_notification())
+    if config_dict['ENABLE_MEGAREST']:
+        megarest_client()
     LOGGER.info('Bot Started!')
     signal(SIGINT, exit_clean_up)
 
