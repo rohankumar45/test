@@ -286,7 +286,7 @@ async def main():
     bot.add_handler(MessageHandler(new_member, filters=new_chat_members))
     bot.add_handler(MessageHandler(leave_member, filters=left_chat_member))
     await gather(intialize_userbot(False), set_command(), start_cleanup(), torrent_search.initiate_search_tools(), return_exceptions=True)
-    await gather(intialize_savebot(config_dict['SAVE_SESSION_STRING'], False), return_exceptions=True)
+    await gather(intialize_savebot(config_dict['SAVE_SESSION_STRING'], False), restart_notification(), return_exceptions=True)
     if config_dict['ENABLE_MEGAREST']:
         megarest_client()
     LOGGER.info('Bot Started!')
