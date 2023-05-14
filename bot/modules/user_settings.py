@@ -11,7 +11,7 @@ from pyrogram.types import CallbackQuery, Message
 from time import time
 
 from bot import bot, bot_loop, user_data, config_dict, DATABASE_URL
-from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread
+from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread, new_task
 from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.force_mode import ForceMode
@@ -21,7 +21,7 @@ from bot.helper.ext_utils.telegram_helper import content_dict, TeleContent
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message, sendPhoto, editPhoto, deleteMessage, editMessage, sendCustom
+from bot.helper.telegram_helper.message_utils import sendMessage, copyMessage, auto_delete_message, sendPhoto, editPhoto, deleteMessage, editMessage, sendCustom
 
 
 handler_dict = {}
@@ -594,6 +594,7 @@ async def event_handler(client: Client, query: CallbackQuery, pfunc: partial, ph
     client.remove_handler(*handler)
 
 
+@new_task
 async def user_settings(_, message: Message):
     if config_dict['FUSERNAME'] and (fmsg:= await ForceMode(message).force_username):
         await auto_delete_message(message, fmsg)
@@ -604,6 +605,7 @@ async def user_settings(_, message: Message):
     await sendPhoto(msg, message, image or config_dict['IMAGE_USETIINGS'], buttons)
 
 
+@new_task
 async def set_premium_users(_, message: Message):
     if not config_dict['PREMIUM_MODE']:
         await sendMessage('<b>Premium Mode</b> is disable!', message)
@@ -637,10 +639,12 @@ async def set_premium_users(_, message: Message):
         await update_user_ldata(premi_id, 'premium_left', -1)
         await update_user_ldata(premi_id, 'is_premium', False)
     msg = await sendMessage(text, message)
+    await copyMessage(premi_id, msg)
     await sendCustom(user_text, premi_id)
     await auto_delete_message(message, msg)
 
 
+@new_task
 async def reset_daily_limit(_, message: Message):
     reply_to = message.reply_to_message
     args = message.text.split()
