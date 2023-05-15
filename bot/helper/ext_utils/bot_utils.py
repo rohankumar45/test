@@ -391,33 +391,13 @@ async def update_user_ldata(id_: int, key: str, value):
 
 
 async def get_link(message: Message):
-    mesg = message.text.split('\n')
-    reply_to = message.reply_to_message
-    message_args = mesg[0].split(maxsplit=1)
     link = ''
-    if len(message_args) > 1:
-        index = 1
-        args = mesg[0].split(maxsplit=4)
-        args.pop(0)
-        for x in args:
-            x = x.strip()
-            if x == 's':
-                index += 1
-            elif x == 'd':
-                index += 1
-            elif x == 'go':
-                index += 1
-            elif x.startswith('d:'):
-                index += 1
-            else:
-                break
-        message_args = mesg[0].split(maxsplit=index)
-        if len(message_args) > index:
-            x = message_args[index].strip()
-            if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:')):
-                link = re_split(r' pswd: | n: | up: | rcf: ', x)[0].strip()
+    reply_to = message.reply_to_message
+    pattern = r'[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
+    if match:= re_match(pattern, message.text.strip()):
+        link = match.group(1)
     if reply_to:
-        if (media := is_media(reply_to)):
+        if (media:= is_media(reply_to)):
             link = f'Source is media/file: {media.mime_type}' if not reply_to.photo else 'Source is image/photo'
         else:
             text = reply_to.text.strip()
