@@ -89,7 +89,6 @@ async def index_scrapper(listener):
     if not reply_to and len(mesg) > 2:
         try:
             msg = msg.split()
-            url = msg[1]
             usr = msg[2]
             pswd = msg[3]
         except:
