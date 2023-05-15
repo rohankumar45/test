@@ -97,7 +97,7 @@ async def index_scrapper(listener):
             usr = pswd = None
     LOGGER.info('============')
     LOGGER.info(listener.link)
-    LOGGER.info(usr)
-    LOGGER.info(pswd)
+    LOGGER.info(type(usr))
+    LOGGER.info(type(pswd))
     LOGGER.info('============')
     return await index_scrap(listener.link, usr, pswd)
