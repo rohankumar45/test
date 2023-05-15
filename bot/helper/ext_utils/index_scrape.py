@@ -94,6 +94,10 @@ async def index_scrapper(listener):
             return
     if reply_to:
         if len(message_args) and len(msg) == 1:
-            usr = None
-            pswd = None
+            usr = pswd = None
+    LOGGER.info('============')
+    LOGGER.info(listener.link)
+    LOGGER.info(usr)
+    LOGGER.info(pswd)
+    LOGGER.info('============')
     return await index_scrap(listener.link, usr, pswd)
