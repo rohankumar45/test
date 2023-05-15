@@ -6,7 +6,7 @@ from html import escape
 from psutil import virtual_memory, cpu_percent, disk_usage, net_io_counters
 from pyrogram.types import Message
 from pytz import timezone
-from re import match as re_match, split as re_split
+from re import match as re_match, search as re_search
 from requests import head as rhead
 from time import time
 from urllib.request import urlopen
@@ -394,7 +394,7 @@ async def get_link(message: Message):
     link = ''
     reply_to = message.reply_to_message
     pattern = r'[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)|magnet:\?xt=urn:(btih|btmh):[-a-zA-Z0-9@:%_\+.~#?&//=]*\s*'
-    if match:= re_match(pattern, message.text.strip()):
+    if match:= re_search(pattern, message.text.strip()):
         link = match.group()
     LOGGER.info('========================================')
     LOGGER.info(match)
