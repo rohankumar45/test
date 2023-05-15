@@ -71,13 +71,11 @@ async def index_scrap(url, username='none', password='none'):
 async def index_scrapper(listener):
     msg = listener.message.text
     reply_to = listener.reply_to
-    url = listener.link
     mesg = msg.split('\n')
     message_args = mesg[0].split(maxsplit=1)
     pswd = usr = ''
     pswd_arg = mesg[0].split(' pswd: ')
     if reply_to:
-        url = reply_to.text
         if len(pswd_arg) > 1:
             pswd = pswd_arg[1]
         if len(mesg) > 2:
@@ -98,4 +96,4 @@ async def index_scrapper(listener):
         if len(message_args) and len(msg) == 1:
             usr = None
             pswd = None
-    return await index_scrap(url, usr, pswd)
+    return await index_scrap(listener.link, usr, pswd)
