@@ -58,7 +58,7 @@ async def get_buttons(key=None, edit_type=None):
             buttons.button_data('Restart Savebot', 'botset restartsbot', 'header')
         buttons.button_data('<<', 'botset back')
         buttons.button_data('Close', 'botset close')
-        for x in range(0, len(config_dict)-1, 20):
+        for x in range(0, len(config_dict), 20):
             buttons.button_data(int(x/20) + 1, f'botset start var {x}', position='footer')
         msg = f'<b>BOT VARIABLES ~ {int(START/20) + 1}\nState:</b> {STATE.title()}'
     elif key == 'private':
@@ -90,7 +90,7 @@ async def get_buttons(key=None, edit_type=None):
         buttons.button_data('Add new key', 'botset editaria newkey')
         buttons.button_data('<<', 'botset back')
         buttons.button_data('Close', 'botset close')
-        for x in range(0, len(aria2_options)-1, 20):
+        for x in range(0, len(aria2_options), 20):
             buttons.button_data(int(x/20) + 1, f'botset start aria {x}', position='footer')
         msg = f'<b>ARIA OPTION ~ {int(START/20) + 1}\nState:</b> {STATE.title()}'
     elif key == 'qbit':
@@ -104,7 +104,7 @@ async def get_buttons(key=None, edit_type=None):
             image = config_dict['IMAGE_CONEDIT']
         buttons.button_data('<<', 'botset back')
         buttons.button_data('Close', 'botset close')
-        for x in range(0, len(qbit_options)-1, 20):
+        for x in range(0, len(qbit_options), 20):
             buttons.button_data(int(x/20) + 1, f'botset start qbit {x}', position='footer')
         msg = f'<b>QBITTORRENT OPTIONS ~ {int(START/20) + 1}\nState:</b> {STATE.title()}'
     elif edit_type == 'editvar':
