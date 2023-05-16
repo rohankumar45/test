@@ -18,7 +18,7 @@ async def search_gdtot(query):
                     text += f"{str(i).zfill(3)}. <a href='{link['href']}'>{str(title).strip()}</a>\n{inf}\n"
                     for x in soup.select('a'):
                         link = x['href']
-                        if 'gdbot.xyz' not in link:
+                        if 'gdtot.pro' not in link:
                             text += f"<a href='{link}'><b>{str(urlparse(link).hostname).upper()}</b></a> "
                     text += '\n\n'
                 result.append(text)
