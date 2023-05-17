@@ -301,8 +301,8 @@ async def misc_callback(_, query: CallbackQuery):
         await editMessage(f'<i>Searching <b>{text.title()}</b>, please wait...</i>', message)
         result = await misc.pahe_search(text)
         head = ''
-        if len(result) == 0:
-            result =f'Not found Pahe search for <b>{text.title()}</b>'
+        if not result:
+            result = f'Not found Pahe search for <b>{text.title()}</b>'
         elif not misc.error:
             head = f'<b>Search Pahe For {text.upper()}</b>\n\n'
             result = ''.join(f"{count}. <a href=\'{x['link']}\'>{x['judul']}</a>\n" for count, x in enumerate(result, start=1))
