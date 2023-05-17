@@ -302,7 +302,7 @@ async def misc_callback(_, query: CallbackQuery):
         result = await misc.pahe_search(text)
         head = ''
         if err:= misc.error or not result:
-            result = f'Not found Pahe search for <b>{text.title()}</b>'
+            result = f'Not found Pahe search for <b>{text.title()}</b>.'
             if err:
                 result += f'\nERROR: {err}'
         else:
