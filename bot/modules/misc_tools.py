@@ -47,7 +47,7 @@ class miscTool:
         if mode == 'webss':
             LOGGER.info(f'Generated Screemshot: {url}')
             url = f'https://webss.yasirapi.eu.org/api?url={url}&width=1080&height=720'
-        self.__file = f'Webss_{self.__message.id}.png'
+            self.__file = f'Webss_{self.__message.id}.png'
         async with ClientSession() as session:
             async with session.get(url) as r:
                 if r.status == 200:
