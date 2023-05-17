@@ -1,6 +1,7 @@
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath, makedirs
 from aiohttp import ClientSession
+from asyncio import sleep
 from gtts import gTTS
 from os import path as ospath
 from PIL import Image
@@ -282,6 +283,8 @@ async def misc_callback(_, query: CallbackQuery):
         await editMessage(f'Sucsesfully generating {len(pngs)} thumbnail poster for {text.title()}. Sending the files...', message)
         for png in pngs:
             await sendPhoto(f'<code>{ospath.basename(png)}</code>', omsg, png)
+            if len(pngs) > 1:
+                await sleep(5)
         await editMessage(f'Sucsesfully generating {len(pngs)} thumbnail poster for {text.title()}.', message, buttons.build_menu(2))
         await clean_target(dirpath)
     elif data[2] == 'pahe':
