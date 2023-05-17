@@ -1,10 +1,14 @@
 from aiofiles import open as aiopen
+from aiofiles.os import path as aiopath
 from aiohttp import ClientSession
 from gtts import gTTS
+from os import path as ospath
+from PIL import Image
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
 from telegraph import upload_file
+from urllib.parse import quote_plus
 
 from bot import bot, config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import ButtonMaker, is_premium_user, is_url, sync_to_async, new_task
@@ -39,11 +43,13 @@ class miscTool:
         url = f'https://script.google.com/macros/s/AKfycbyhNk6uVgrtJLEFRUT6y5B2pxETQugCZ9pKvu01-bE1gKkDRsw/exec?q={text}&target={self.lang}'
         return (await self.__get_content(url))['text'].strip()
 
-    async def webss(self, url):
-        LOGGER.info(f'Generated Screemshot: {url}')
+    async def webss(self, url, mode='webss'):
+        if mode == 'webss':
+            LOGGER.info(f'Generated Screemshot: {url}')
+            url = f'https://webss.yasirapi.eu.org/api?url={url}&width=1080&height=720'
         self.__file = f'Webss_{self.__message.id}.png'
         async with ClientSession() as session:
-            async with session.get(f'https://webss.yasirapi.eu.org/api?url={url}&width=1080&height=720') as r:
+            async with session.get(url) as r:
                 if r.status == 200:
                     async for data in r.content.iter_chunked(1024):
                         async with aiopen(self.__file, 'ba') as f:
@@ -61,6 +67,25 @@ class miscTool:
             return
         self.__file = vidss.rimage
         return vidss
+
+    async def thumb(self, title):
+        url = f'https://yasirapi.eu.org/justwatch?q={quote_plus(title)}&locale={self.lang}'
+        json_data = await self.__get_content(url)
+        if not json_data:
+            return
+        files, base_dir = [], ospath.join(config_dict['DOWNLOAD_DIR'], f'{self.__message.id}')
+        for item in json_data['results']['items']:
+            base_name = item['full_path'].rsplit('/', 1)[-1]
+            url = f"https://images.justwatch.com/{item['poster'].rsplit('/', 1)[0]}/s592/{base_name}.webp"
+            self.__file = ospath.join(base_dir, f'{base_name.title()}.webp')
+            await self.webss(url, mode='thumb')
+            if await aiopath.exists(self.__file):
+                img = Image.open(self.__file).convert('RGB')
+                png_image = ospath.join(base_dir, f'{base_name.title()}.png')
+                img.save(png_image, 'png')
+                await clean_target(self.__file)
+                files.append(png_image)
+        return files, base_dir
 
     async def pahe_search(self, title):
         url = f'https://yasirapi.eu.org/pahe?q={title}'
@@ -178,6 +203,7 @@ async def get_button(from_user, mid: int):
                 'Pahe': f'{dat_} pahe {mid}',
                 'Translate': f'{dat_} tr {mid}',
                 'Convert': f'{dat_} conv {mid}',
+                'Thumb': f'{dat_} thumb {mid}',
                 'Close': f'{dat_} close {mid}'}
     head = f"Task For ~ <b><a href='tg://user?id={from_user.id}'>{from_user.first_name}</a></b>"
     for key, value in but_dict.items():
@@ -241,6 +267,21 @@ async def misc_callback(_, query: CallbackQuery):
                 await message.reply_audio(res, quote=True, reply_to_message_id=omsg.id,
                                           caption=f'Text to Speech -> {misc.lang.upper()}\n\n<b>Original Text:</b>\n<code>{text}</code>')
             await misc.cleanup(True)
+    elif data[2] == 'thumb':
+        await query.answer()
+        await editMessage('<i>Getting thumbnail(s), please wait...</i>', message)
+        text, misc = await verify_message(omsg)
+        if not misc:
+            await editMessage(text, message, buttons.build_menu(2))
+            return
+        pngs, dirpath = await misc.thumb(text)
+        if not pngs:
+            await editMessage(f'Failed getting thumbnail for <b>{text.title()}</b>!', message, buttons.build_menu(2))
+            return
+        for png in pngs:
+            await sendPhoto(f'<code>{ospath.basename(png)}</code>', omsg, png)
+        await editMessage(f'Sucsesfully generateing {len(pngs)} thumbnail poster for {text.title()}.', message, buttons.build_menu(2))
+        await clean_target(dirpath)
     elif data[2] == 'pahe':
         await query.answer()
         await editMessage('<i>Processing pahe search...</i>', message)

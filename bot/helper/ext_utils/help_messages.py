@@ -175,7 +175,8 @@ Super: <code>https://t.me/c/channel_id/message_id</code>
 5. Vidss: Generate screenshot from ddl.
 6. Translate: Translate from text or image.
 7. Pahe: Find movie by title from Pahe website.
-8. Convert: Convert non animation sticker from image or from sticker to image.\n
+8. Convert: Convert non animation sticker from image or from sticker to image.
+9. Thumbnail: Genearte some thumbnail poster.\n
 <b>Note</b>\nAvailable code for TTS and Translate <b><a href='https://graph.org/Support-Site-12-07-2'>Here</a></b>.
 <b>Example:</b> <code>/{BotCommands.MiscCommand} id</code>, result will in id (Indonesia) language.
 <i>*Some laguage may not work for TTS.</i>
