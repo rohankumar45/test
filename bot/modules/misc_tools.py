@@ -70,7 +70,7 @@ class miscTool:
         return vidss
 
     async def thumb(self, title):
-        url = f'https://yasirapi.eu.org/justwatch?q={quote_plus(title)}&locale={self.lang}'
+        url = f'https://yasirapi.eu.org/justwatch?q={quote_plus(title)}&locale=US'
         json_data = await self.__get_content(url)
         if not json_data:
             return
