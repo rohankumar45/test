@@ -76,7 +76,7 @@ class miscTool:
             return
         files, base_dir = [], ospath.join(config_dict['DOWNLOAD_DIR'], f'{self.__message.id}')
         await makedirs(base_dir, exist_ok=True)
-        for item in json_data['results']['items']:
+        for item in json_data['results']['items'][:5]:
             base_name = item['full_path'].rsplit('/', 1)[-1]
             url = f"https://images.justwatch.com/{item['poster'].rsplit('/', 1)[0]}/s592/{base_name}.webp"
             self.__file = ospath.join(base_dir, f'{base_name.title()}.webp')
@@ -280,7 +280,7 @@ async def misc_callback(_, query: CallbackQuery):
         if not pngs:
             await editMessage(f'Failed getting thumbnail for <b>{text.title()}</b>!', message, buttons.build_menu(2))
             return
-        msg = f'Sucsesfully generating {len(pngs)} thumbnail poster for <b>{text.title()}</b>.'
+        msg = f'Sucsesfully generating thumbnail poster for <b>{text.title()}</b>.'
         await editMessage(f'{msg}\n<i>Sending the files...</i>', message)
         for png in pngs:
             await sendPhoto(f'<code>{ospath.basename(png)}</code>', omsg, png)
