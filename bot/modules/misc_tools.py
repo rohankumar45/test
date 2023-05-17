@@ -280,12 +280,13 @@ async def misc_callback(_, query: CallbackQuery):
         if not pngs:
             await editMessage(f'Failed getting thumbnail for <b>{text.title()}</b>!', message, buttons.build_menu(2))
             return
-        await editMessage(f'Sucsesfully generating {len(pngs)} thumbnail poster for {text.title()}. Sending the files...', message)
+        msg = f'Sucsesfully generating {len(pngs)} thumbnail poster for <b>{text.title()}</b>.'
+        await editMessage(f'{msg} Sending the files...', message)
         for png in pngs:
             await sendPhoto(f'<code>{ospath.basename(png)}</code>', omsg, png)
             if len(pngs) > 1:
                 await sleep(5)
-        await editMessage(f'Sucsesfully generating {len(pngs)} thumbnail poster for {text.title()}.', message, buttons.build_menu(2))
+        await editMessage(msg, message, buttons.build_menu(2))
         await clean_target(dirpath)
     elif data[2] == 'pahe':
         await query.answer()
