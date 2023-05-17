@@ -1,5 +1,5 @@
 from aiofiles import open as aiopen
-from aiofiles.os import path as aiopath
+from aiofiles.os import path as aiopath, makedirs
 from aiohttp import ClientSession
 from gtts import gTTS
 from os import path as ospath
@@ -74,11 +74,12 @@ class miscTool:
         if not json_data:
             return
         files, base_dir = [], ospath.join(config_dict['DOWNLOAD_DIR'], f'{self.__message.id}')
+        await makedirs(base_dir, exist_ok=True)
         for item in json_data['results']['items']:
             base_name = item['full_path'].rsplit('/', 1)[-1]
             url = f"https://images.justwatch.com/{item['poster'].rsplit('/', 1)[0]}/s592/{base_name}.webp"
             self.__file = ospath.join(base_dir, f'{base_name.title()}.webp')
-            await self.webss(url, mode='thumb')
+            await self.webss(url, 'thumb')
             if await aiopath.exists(self.__file):
                 img = Image.open(self.__file).convert('RGB')
                 png_image = ospath.join(base_dir, f'{base_name.title()}.png')
