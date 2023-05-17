@@ -224,6 +224,7 @@ async def cloneNode(client: Client, message: Message):
 
     newname = text.split(' n: ', 1)
     newname = re_split(' rcf: | up: ', newname[1])[0].strip() if len(newname) > 1 else ''
+    newname = newname.replace('/', '.')
     rcf = text.split(' rcf: ', 1)
     rcf = re_split(' up: ', rcf[1])[0].strip() if len(rcf) > 1 else None
     dst_path = text.split(' up: ', 1)

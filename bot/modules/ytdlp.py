@@ -336,6 +336,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
 
     name = mssg.split(' n: ', 1)
     name = re_split(' pswd: | opt: | up: | rcf: ', name[1])[0].strip() if len(name) > 1 else ''
+    name = name.replace('/', '.')
 
     pswd = mssg.split(' pswd: ', 1)
     pswd = re_split(' n: | opt: | up: | rcf: ', pswd[1])[0] if len(pswd) > 1 else None

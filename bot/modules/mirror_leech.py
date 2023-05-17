@@ -148,6 +148,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
     name = mesg[0].split(' n: ', 1)
     name = re_split(' pswd: | rcf: | up: ', name[1])[0].strip() if len(name) > 1 else ''
+    name = name.replace('/', '.')
 
     pswd = mesg[0].split(' pswd: ', 1)
     pswd = re_split(' n: | rcf: | up: ', pswd[1])[0] if len(pswd) > 1 else None
