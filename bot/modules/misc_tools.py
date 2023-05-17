@@ -78,15 +78,18 @@ class miscTool:
         await makedirs(base_dir, exist_ok=True)
         for item in json_data['results']['items'][:5]:
             base_name = item['full_path'].rsplit('/', 1)[-1]
-            url = f"https://images.justwatch.com/{item['poster'].rsplit('/', 1)[0]}/s592/{base_name}.webp"
-            self.__file = ospath.join(base_dir, f'{base_name.title()}.webp')
-            await self.webss(url, 'thumb')
-            if await aiopath.exists(self.__file):
-                img = Image.open(self.__file).convert('RGB')
-                png_image = ospath.join(base_dir, f'{base_name.title()}.png')
-                img.save(png_image, 'png')
-                await clean_target(self.__file)
-                files.append(png_image)
+            try:
+                url = f"https://images.justwatch.com/{item['poster'].rsplit('/', 1)[0]}/s592/{base_name}.webp"
+                self.__file = ospath.join(base_dir, f'{base_name.title()}.webp')
+                await self.webss(url, 'thumb')
+                if await aiopath.exists(self.__file):
+                    img = Image.open(self.__file).convert('RGB')
+                    png_image = ospath.join(base_dir, f'{base_name.title()}.png')
+                    img.save(png_image, 'png')
+                    await clean_target(self.__file)
+                    files.append(png_image)
+            except Exception as e:
+                LOGGER.error(e)
         return files, base_dir
 
     async def pahe_search(self, title):
