@@ -94,10 +94,10 @@ class miscTool:
 
     async def pahe_search(self, title):
         url = f'https://yasirapi.eu.org/pahe?q={title}'
-        result = (await self.__get_content(url))['result']
+        result = await self.__get_content(url)
         if self.__error:
             return
-        return result
+        return result['result']
 
     async def image_ocr(self):
         self.__is_image()
