@@ -100,8 +100,7 @@ async def copyMessage(chat_id: int, message: Message, reply_markup: InlineKeyboa
         if not reply_markup:
             if (markup:= message.reply_markup) and markup.inline_keyboard:
                 reply_markup = markup
-        return await message.copy(chat_id, disable_notification=True,
-                                  reply_markup=reply_markup or message.reply_markup)
+        return await message.copy(chat_id, disable_notification=True, reply_markup=reply_markup)
     except FloodWait as f:
         LOGGER.warning(f)
         await sleep(f.value * 1.2)
