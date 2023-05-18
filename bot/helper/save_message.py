@@ -15,8 +15,7 @@ async def save_handler(client: Client, query: CallbackQuery):
         await query.answer(text='Upss, for premium user only!!', show_alert=True)
         return
     buttons = default_button(message)
-    msg = await copyMessage(user_id, message, buttons)
-    if not msg:
+    if not await copyMessage(user_id, message, buttons):
         await query.answer('Upss, start me in PM and try agian!', show_alert=True)
     else:
         await query.answer('Saving message...')

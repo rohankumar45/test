@@ -350,8 +350,8 @@ def default_button(message: Message):
         del message.reply_markup.inline_keyboard[-1]
     except:
         pass
-    if message.reply_markup and message.reply_markup.inline_keyboard:
-        return message.reply_markup
+    if (markup:= message.reply_markup) and markup.inline_keyboard:
+        return markup
 
 
 def get_mega_link_type(url):
