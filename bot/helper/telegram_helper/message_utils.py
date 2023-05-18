@@ -97,6 +97,9 @@ async def editMessage(text: str, message: Message, reply_markup=None):
 
 async def copyMessage(chat_id: int, message: Message, reply_markup: InlineKeyboardMarkup=None):
     try:
+        if not reply_markup:
+            if (markup:= message.reply_markup) and markup.inline_keyboard:
+                reply_markup = markup
         return await message.copy(chat_id, disable_notification=True,
                                   reply_markup=reply_markup or message.reply_markup)
     except FloodWait as f:

@@ -14,8 +14,6 @@ async def save_handler(_, query: CallbackQuery):
         await query.answer('Upss, for premium user only!!', True)
         return
     buttons = default_button(message)
-    LOGGER.info(buttons)
-    LOGGER.info(message.reply_markup)
     if not await copyMessage(user_id, message, buttons):
         await query.answer('Upss, start me in PM and try agian!', True)
     else:
