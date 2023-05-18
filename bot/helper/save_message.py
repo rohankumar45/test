@@ -3,7 +3,7 @@ from pyrogram.filters import regex
 from pyrogram.handlers import CallbackQueryHandler
 from pyrogram.types import CallbackQuery
 
-from bot import bot, config_dict
+from bot import bot, config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import is_premium_user, default_button
 from bot.helper.telegram_helper.message_utils import copyMessage
 
@@ -15,6 +15,7 @@ async def save_handler(client: Client, query: CallbackQuery):
         await query.answer('Upss, for premium user only!!', True)
         return
     buttons = default_button(message)
+    LOGGER.info(buttons)
     if not await copyMessage(user_id, message, buttons):
         await query.answer('Upss, start me in PM and try agian!', True)
     else:
