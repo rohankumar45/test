@@ -76,7 +76,7 @@ class miscTool:
             return
         files, base_dir = [], ospath.join(config_dict['DOWNLOAD_DIR'], f'{self.__message.id}')
         await makedirs(base_dir, exist_ok=True)
-        for item in json_data['results']['items'][:5]:
+        for item in json_data['results']['items'][:3]:
             base_name = item['full_path'].rsplit('/', 1)[-1]
             try:
                 url = f"https://images.justwatch.com/{item['poster'].rsplit('/', 1)[0]}/s592/{base_name}.webp"
