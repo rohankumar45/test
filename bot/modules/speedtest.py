@@ -24,7 +24,7 @@ async def speedtest(_, message: Message):
 <b>SPEEDTEST RESULT</b>
 <b>┌ IP: </b>{result['client']['ip']}
 <b>├ ISP: </b>{result['client']['isp']}
-<b>├ Ping: </b>{result['ping']} ms
+<b>├ Ping: </b>{int(result['ping'])} ms
 <b>├ ISP Rating: </b>{result['client']['isprating']}
 <b>├ ISP Rating: </b>{result['client']['isprating']}
 <b>├ Sponsor: </b>{result['server']['sponsor']}
@@ -32,7 +32,7 @@ async def speedtest(_, message: Message):
 <b>├ Download: </b>{get_readable_file_size(result['download'] / 8)}
 <b>├ Server Name: </b>{result['server']['name']}
 <b>├ Country: </b>{result['server']['country']}, {result['server']['cc']}
-<b>└ LAT/LON </b>{result['client']['lat']}/{result['client']['lat']}
+<b>└ LAT/LON </b>{result['client']['lat']}/{result['client']['lon']}
 '''
         await deleteMessage(msg)
         await sendPhoto(caption, message, result['share'])
