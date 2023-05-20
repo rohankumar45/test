@@ -22,7 +22,8 @@ async def speedtest(_, message: Message):
         result = await sync_to_async(test.results.dict)
         caption = f'''
 <b>SPEEDTEST RESULT</b>
-<b>┌ ISP: </b>{result['client']['isp']}
+<b>┌ IP: </b>{result['client']['ip']}
+<b>├ ISP: </b>{result['client']['isp']}
 <b>├ Ping: </b>{result['ping']} ms
 <b>├ ISP Rating: </b>{result['client']['isprating']}
 <b>├ Sponsor: </b>{result['server']['sponsor']}
