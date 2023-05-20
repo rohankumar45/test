@@ -20,7 +20,7 @@ async def is_multi_streams(path):
         return False
     fields = eval(result[0]).get('streams')
     if fields is None:
-        LOGGER.error(f'get_video_streams: {result}')
+        LOGGER.error(f'Get Video Streams: {result}')
         return False
     videos = audios = 0
     for stream in fields:
