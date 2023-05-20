@@ -2,9 +2,10 @@ from base64 import b64decode
 from dotenv import load_dotenv, dotenv_values
 from logging import FileHandler, StreamHandler, basicConfig, error as log_error, info as log_info, INFO
 from os import path as ospath, environ, remove
+from pkg_resources import working_set
 from pymongo import MongoClient
 from re import sub as resub
-from subprocess import run as srun
+from subprocess import run as srun, call as scall
 
 
 if ospath.exists('log.txt'):
@@ -43,8 +44,8 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
         environ['UPDATE_EVERYTHING'] = str(config_dict.get('UPDATE_EVERYTHING'))
     conn.close()
 
-if environ.get('UPDATE_EVERYTHING', 'False').lower() == 'true':
-    srun(['pip3', 'install', '-U', '--no-cache-dir', '-r', 'requirements.txt'])
+if environ.get('UPDATE_EVERYTHING', 'True').lower() == 'true':
+    scall('pip3 install --upgrade --no-cache-dir ' + ' '.join([dist.project_name for dist in working_set]), shell=True)
 
 if (UPSTREAM_REPO:= environ.get('UPSTREAM_REPO')) and (UPSTREAM_BRANCH:= environ.get('UPSTREAM_BRANCH')):
     if ospath.exists('.git'):
