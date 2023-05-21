@@ -48,4 +48,4 @@ async def rclone_serve_booter():
     except Exception as e:
         LOGGER.error(e)
 
-bot_loop.run_until_complete(rclone_serve_booter())
+bot_loop.create_task(rclone_serve_booter())

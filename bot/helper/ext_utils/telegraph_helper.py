@@ -91,7 +91,5 @@ class TelePost:
 
 telegraph = TelegraphHelper(config_dict['AUTHOR_NAME'], config_dict['AUTHOR_URL'])
 
-try:
-    bot_loop.run_until_complete(telegraph.create_account())
-except Exception as e:
-    LOGGER.error(e)
+
+bot_loop.create_task(telegraph.create_account())
