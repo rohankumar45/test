@@ -75,11 +75,13 @@ class MegaAppListener(MegaListener):
 
     def onTransferFinish(self, api: MegaApi, transfer: MegaTransfer, error):
         LOGGER.info('================================================')
+        LOGGER.info(transfer.getFileName())
+        LOGGER.info(self.__name)
+        LOGGER.info('================================================')
         try:
             if self.is_cancelled:
                 self.continue_event.set()
             elif transfer.isFinished() and (transfer.isFolderTransfer() or transfer.getFileName() == self.__name):
-                LOGGER.info('================================================')
                 async_to_sync(self.listener.onDownloadComplete)
                 self.continue_event.set()
         except Exception as e:
