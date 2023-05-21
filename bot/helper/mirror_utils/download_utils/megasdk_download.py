@@ -38,6 +38,7 @@ class MegaAppListener(MegaListener):
         return self.__bytes_transferred
 
     def onRequestFinish(self, api, request, error):
+        LOGGER.info('================================================')
         if str(error).lower() != 'no error':
             self.error = error.copy()
             LOGGER.error(f'Mega onRequestFinishError: {self.error}')
