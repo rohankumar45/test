@@ -38,7 +38,6 @@ class MegaAppListener(MegaListener):
         return self.__bytes_transferred
 
     def onRequestFinish(self, api, request, error):
-        LOGGER.info('================================================')
         if str(error).lower() != 'no error':
             self.error = error.copy()
             LOGGER.error(f'Mega onRequestFinishError: {self.error}')
@@ -75,10 +74,12 @@ class MegaAppListener(MegaListener):
         self.__bytes_transferred = transfer.getTransferredBytes()
 
     def onTransferFinish(self, api: MegaApi, transfer: MegaTransfer, error):
+        LOGGER.info('================================================')
         try:
             if self.is_cancelled:
                 self.continue_event.set()
             elif transfer.isFinished() and (transfer.isFolderTransfer() or transfer.getFileName() == self.__name):
+                LOGGER.info('================================================')
                 async_to_sync(self.listener.onDownloadComplete)
                 self.continue_event.set()
         except Exception as e:
