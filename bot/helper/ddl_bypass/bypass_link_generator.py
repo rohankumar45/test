@@ -92,7 +92,7 @@ def adfly(url:str) -> str:
         return out['bypassed_url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def bluemediafile(url, torrent=True):
@@ -137,7 +137,7 @@ def bluemediafile(url, torrent=True):
         return furl
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def bit_tiny(url: str):
@@ -167,7 +167,7 @@ def droplink(url: str):
             raise DirectDownloadLinkException(f'ERROR: status {stats}.')
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def fembed_bypass(url: str):
@@ -179,7 +179,7 @@ def fembed_bypass(url: str):
         return res
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def filecrypt(url: str):
@@ -218,7 +218,7 @@ def filecrypt(url: str):
         return links
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def gplinks(url: str):
@@ -236,7 +236,7 @@ def gplinks(url: str):
         return cget('post', f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def gyanilinks(url: str):
@@ -252,7 +252,7 @@ def gyanilinks(url: str):
         return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def hypershort(url: str):
@@ -282,7 +282,7 @@ def hypershort(url: str):
                     headers={'x-requested-with': 'XMLHttpRequest', 'referer':tokenize_url}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def krownlinks(url: str):
@@ -298,7 +298,7 @@ def krownlinks(url: str):
         return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def linkvertise(url):
@@ -322,7 +322,7 @@ def mdiskpro(url):
         return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def ouo(url: str):
@@ -351,7 +351,7 @@ def ouo(url: str):
         return result
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def pkin(url: str):
@@ -367,7 +367,7 @@ def pkin(url: str):
         return cget('post', f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest', 'user-agent': user_agent}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def psa(url: str):
@@ -406,7 +406,7 @@ def rocklinks(url: str):
         return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def rslinks(url):
@@ -418,7 +418,7 @@ def rslinks(url):
         return final
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def shareus(url: str):
@@ -444,7 +444,7 @@ def shortest(url: str):
         return re_findall('"(.*?)"', response.text)[1].replace('\/','/')
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def shortly(url: str):
@@ -453,7 +453,7 @@ def shortly(url: str):
         return cget('post', 'https://www.shortly.xyz/getlink.php/', data={'id': url.rstrip('/').split('/')[-1]}, headers={'referer':'https://www.shortly.xyz/link'}).text
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def aio_one(url: str)-> str:
@@ -470,7 +470,7 @@ def aio_one(url: str)-> str:
         return client.post(f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def aio_two(url: str):
@@ -486,7 +486,7 @@ def aio_two(url: str):
         return client.post(f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def aio_three(url: str):
@@ -502,7 +502,7 @@ def aio_three(url: str):
         return client.post(f'{domain}links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def sirigan(url: str):
@@ -517,7 +517,7 @@ def sirigan(url: str):
         return url.split('url=')[-1]
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def thinfi(thinfi_url: str) :
@@ -526,7 +526,7 @@ def thinfi(thinfi_url: str) :
         return BeautifulSoup(response.content, 'html.parser').p.a.get('href')
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def tnlink(url: str):
@@ -544,7 +544,7 @@ def tnlink(url: str):
         return client.post(f'{DOMAIN}/links/go', data=data, headers={'x-requested-with': 'XMLHttpRequest'}).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def try2link(url: str):
@@ -561,7 +561,7 @@ def try2link(url: str):
         return cget('post', 'https://try2link.com/links/go', headers=headers, data=data).json()['url']
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
 
 
 def vip_bypass(url) -> str:
@@ -574,4 +574,4 @@ def vip_bypass(url) -> str:
             raise DirectDownloadLinkException(f'ERROR: Error when trying bypass from {urlparse(url).netloc}.')
     except Exception as e:
         LOGGER.error(e)
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e}')
