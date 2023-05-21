@@ -24,6 +24,7 @@ class MegaAppListener(MegaListener):
         self.listener = listener
         self.is_cancelled = False
         self.error = None
+        self.is_rename = ''
         self.__name = ''
         self.__bytes_transferred = 0
         self.__speed = 0
@@ -74,14 +75,12 @@ class MegaAppListener(MegaListener):
         self.__bytes_transferred = transfer.getTransferredBytes()
 
     def onTransferFinish(self, api: MegaApi, transfer: MegaTransfer, error):
-        LOGGER.info('================================================')
         LOGGER.info(transfer.getFileName())
         LOGGER.info(self.__name)
-        LOGGER.info('================================================')
         try:
             if self.is_cancelled:
                 self.continue_event.set()
-            elif transfer.isFinished() and (transfer.isFolderTransfer() or transfer.getFileName() == self.__name):
+            elif transfer.isFinished() and (transfer.isFolderTransfer() or transfer.getFileName() == self.__name or self.is_rename):
                 async_to_sync(self.listener.onDownloadComplete)
                 self.continue_event.set()
         except Exception as e:
@@ -127,6 +126,7 @@ async def add_mega_download(mega_link, path, listener, name):
     api.addListener(mega_listener)
     if MEGA_USERNAME and MEGA_PASSWORD:
         await executor.do(api.login, (MEGA_USERNAME, MEGA_PASSWORD))
+    mega_listener.is_rename = name
     mega_listener.type = get_mega_link_type(mega_link)
     if mega_listener.type == 'file':
         await executor.do(api.getPublicNode, (mega_link,))
