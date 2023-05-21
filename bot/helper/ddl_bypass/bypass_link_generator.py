@@ -397,9 +397,9 @@ def rocklinks(url: str):
     if 'rocklinks.net' in url:
         code += '?quelle='
     final_url = f'{DOMAIN}/{code}'
-    resp = client.get(final_url, headers={'referer': 'https://disheye.com/'})
-    soup = BeautifulSoup(resp.content, 'html.parser')
     try:
+        resp = client.get(final_url, headers={'referer': 'https://disheye.com/'})
+        soup = BeautifulSoup(resp.content, 'html.parser')
         inputs = soup.find(id='go-link').find_all(name='input')
         data = {input.get('name'): input.get('value') for input in inputs}
         sleep(10)
