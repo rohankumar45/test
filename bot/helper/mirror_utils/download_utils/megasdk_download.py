@@ -75,8 +75,6 @@ class MegaAppListener(MegaListener):
         self.__bytes_transferred = transfer.getTransferredBytes()
 
     def onTransferFinish(self, api: MegaApi, transfer: MegaTransfer, error):
-        LOGGER.info(transfer.getFileName())
-        LOGGER.info(self.__name)
         try:
             if self.is_cancelled:
                 self.continue_event.set()
