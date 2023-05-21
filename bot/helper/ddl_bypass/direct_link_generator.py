@@ -913,7 +913,7 @@ def gdtot_plus(url):
         raise DirectDownloadLinkException(f'ERROR: {e} with {token_url}')
     path = re_findall('\("(.*?)"\)', token_page.text)
     if not path:
-        raise DirectDownloadLinkException('ERROR: Cannot bypass this.')
+        raise DirectDownloadLinkException('ERROR: Cannot bypass this link!')
     path = path[0]
     raw = urlparse(token_url)
     final_url = f'{raw.scheme}://{raw.hostname}{path}'
