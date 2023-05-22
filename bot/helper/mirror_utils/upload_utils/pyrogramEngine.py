@@ -430,7 +430,7 @@ class TgUploader:
             if buttons:
                 reply_markup = buttons
             elif config_dict['SAVE_MESSAGE'] and self.__listener.isSuperGroup:
-                reply_markup = default_button(message)
+                reply_markup = await default_button(message)
             else:
                 reply_markup = message.reply_markup
             return await message.copy(chat_id, disable_notification=True, reply_markup=reply_markup,

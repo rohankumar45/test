@@ -11,7 +11,7 @@ from requests import head as rhead
 from time import time
 from urllib.request import urlopen
 
-from bot import bot_name, bot_loop, download_dict, download_dict_lock, botStartTime, user_data, config_dict, DATABASE_URL, LOGGER
+from bot import bot, bot_name, bot_loop, download_dict, download_dict_lock, botStartTime, user_data, config_dict, DATABASE_URL, LOGGER
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -345,7 +345,8 @@ def get_date_time(message: Message):
     return dt.strftime('%B %d, %Y'), dt.strftime('%H:%M:%S')
 
 
-def default_button(message: Message):
+async def default_button(message: Message):
+    message = await bot.get_messages(message.chat.id, message.id)
     try:
         del message.reply_markup.inline_keyboard[-1]
     except:

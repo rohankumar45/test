@@ -541,7 +541,7 @@ class MirrorLeechListener:
             if chat_id := config_dict['MIRROR_LOG']:
                 await copyMessage(chat_id, uploadmsg)
             if self.user_dict.get('enable_pm') and self.isSuperGroup:
-                button = default_button(uploadmsg) if config_dict['SAVE_MESSAGE'] else uploadmsg.reply_markup
+                button = await default_button(uploadmsg) if config_dict['SAVE_MESSAGE'] else uploadmsg.reply_markup
                 if reply_to and is_media(reply_to):
                     await sendMedia(msg, self.user_id, reply_to, button)
                 else:

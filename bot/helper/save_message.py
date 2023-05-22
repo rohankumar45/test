@@ -13,7 +13,7 @@ async def save_handler(_, query: CallbackQuery):
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id):
         await query.answer('Upss, for premium user only!!', True)
         return
-    buttons = default_button(message)
+    buttons = await default_button(message)
     if not await copyMessage(user_id, message, buttons):
         await query.answer('Upss, start me in PM and try agian!', True)
     else:
