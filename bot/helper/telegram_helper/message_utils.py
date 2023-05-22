@@ -197,12 +197,7 @@ async def get_tg_link_content(link: str, user_id: int):
         private = True
         if not userbot:
             raise e
-    LOGGER.info('==================================')
-    LOGGER.info(chat)
-    LOGGER.info(msg_id)
-    LOGGER.info('==================================')
     if private:
-        LOGGER.info('PRIVATE!')
         if (message:= await userbot.get_messages(chat, msg_id)) and not message.empty:
             return userbot, message
         else:
