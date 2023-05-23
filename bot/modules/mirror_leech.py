@@ -142,13 +142,16 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             message_args = mesg[0].split(maxsplit=index)
             if len(message_args) > index:
                 x = message_args[index].strip()
+                LOGGER.info('=================================')
+                LOGGER.info(bulk)
+                LOGGER.info(x)
+                LOGGER.info('=================================')
                 if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:')):
                     link = re_split(r' pswd: | n: | up: | rcf: ', x)[0].strip()
 
         if len(folder_name) > 0:
             seed = False
-            ratio = None
-            seed_time = None
+            ratio = seed_time = None
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage(f'Upss {tag}, multi/bulk mode for premium user only', message)
@@ -179,10 +182,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     up = re_split(' n: | pswd: | rcf: ', up[1])[0].strip() if len(up) > 1 else None
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
-
-    LOGGER.info('=================================')
-    LOGGER.info(link)
-    LOGGER.info('=================================')
 
     if link and is_tele_link(link):
         try:
