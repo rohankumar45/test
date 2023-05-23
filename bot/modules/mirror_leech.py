@@ -122,9 +122,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                 index += 1
                 if len(marg) > 1:
                     folder_name = f"/{marg[1]}"
-                    if not sameDir:
-                        sameDir = set()
-                    sameDir.add(message.id)
             elif x == 'b':
                 is_bulk = True
                 bi = index
@@ -149,6 +146,10 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         if len(folder_name) > 0:
             seed = False
             ratio = seed_time = None
+            if not is_bulk:
+                if not sameDir:
+                    sameDir = set()
+                sameDir.add(message.id)
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage(f'Upss {tag}, multi/bulk mode for premium user only', message)

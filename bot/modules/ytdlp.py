@@ -336,6 +336,11 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
                 if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:', 'opt:')):
                     link = re_split(r' opt: | pswd: | n: | rcf: | up: ', x)[0].strip()
 
+        if len(folder_name) > 0 and not is_bulk:
+            if not sameDir:
+                sameDir = set()
+            sameDir.add(message.id)
+
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
         return
