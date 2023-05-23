@@ -50,7 +50,7 @@ class Merge:
             input_file = ospath.join(path, 'input.txt')
             async with aiopen(input_file, 'w') as f:
                 await f.write('\n'.join(list_files))
-            LOGGER.info(f'Merging {len(list_files)} --> {name}')
+            LOGGER.info(f'Merging {len(list_files)} videos --> {name}')
             outfile = f'{ospath.join(path, name)}.mkv'
             cmd = ['ffmpeg', '-ignore_unknown', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', input_file, '-map', '0', '-c', 'copy', outfile]
             self.__listener.suproc = await create_subprocess_exec(*cmd)
