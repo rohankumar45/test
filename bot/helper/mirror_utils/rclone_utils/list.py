@@ -198,8 +198,6 @@ class RcloneList:
 async def path_updates(_, query: CallbackQuery, obj: RcloneList):
     await query.answer()
     data = query.data.split()
-    LOGGER.info(data)
-    LOGGER.info(obj.path)
     if data[1] == 'cancel':
         obj.remote = 'Task has been cancelled!'
         obj.path = ''
