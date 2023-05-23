@@ -62,11 +62,11 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             msg = await sendMessage('U have enable leech dump feature but didn\'t add me to chat!', message)
 
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
-    select = seed = is_bulk = isGofile = gdrive_sharer = False
     mi = index = 1
     link = folder_name = ''
     multi = bulk_start = bulk_end = 0
     file_ = tg_client = ratio = seed_time = None
+    select = seed = is_bulk = isGofile = gdrive_sharer = False
     multiid = get_multiid(user_id)
 
     fmode = ForceMode(message)

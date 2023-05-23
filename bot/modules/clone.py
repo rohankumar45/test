@@ -13,11 +13,11 @@ from urllib.parse import urlparse
 
 from bot import bot, download_dict, download_dict_lock, config_dict, user_data, LOGGER
 from bot.helper.ddl_bypass.direct_link_generator import direct_link_generator
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_gdrive_link, is_media, is_premium_user, is_sharar, sync_to_async, new_task, is_rclone_path, cmd_exec, is_url, get_multiid
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_gdrive_link, is_premium_user, is_sharar, sync_to_async, new_task, is_rclone_path, cmd_exec, is_url, get_multiid
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.help_messages import HelpString
-from bot.helper.ext_utils.multi import run_multi, MultiSelect
+from bot.helper.ext_utils.multi import run_multi, run_bulk, MultiSelect
 from bot.helper.ext_utils.task_manager import stop_duplicate_check
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
@@ -180,7 +180,7 @@ async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSu
 
 
 @new_task
-async def cloneNode(client: Client, message: Message):
+async def cloneNode(client: Client, message: Message, bulk=[]):
     user_id = message.from_user.id
     user_dict = user_data.get(user_id, {})
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
@@ -198,27 +198,53 @@ async def cloneNode(client: Client, message: Message):
         return
     reply_to = message.reply_to_message
     tag = message.from_user.mention
-    multi, link = 0, ''
+    multi = bulk_start = bulk_end = 0
+    Index, link, is_bulk= 1, '', False
     text = message.text
     args = text.split(maxsplit=1)
+    args.pop(0)
+    if len(args) > 0:
+        index = 1
+        for x in args:
+            x = x.strip()
+            if x.strip().isdigit():
+                multi = int(x)
+                index += 1
+            elif x == 'b':
+                is_bulk = True
+                bi = index
+                index += 1
+            elif x.startswith('b:'):
+                is_bulk = True
+                bi = index
+                index += 1
+                dargs = x.split(':')
+                bulk_start = dargs[1] or 0
+                if len(dargs) == 3:
+                    bulk_end = dargs[2] or 0
+            else:
+                break
 
-    if len(args) > 1:
-        link = args[1].strip()
+    if multi == 0 or bulk:
+        link = args[0].strip()
         if not link.startswith(('up:', 'rcf:')):
             link = re_split(r' up: | rcf: ', link)[0].strip()
-        if link.isdigit():
-            multi = int(link)
-            link = ''
 
-    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and multi > 0:
-        await sendMessage('Upss, multi mode for premium user only', message)
+    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
+        await sendMessage('Upss, multi/bulk mode for premium user only', message)
         return
 
-    if reply_to:
+    if not link and reply_to and reply_to.text:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
-        if not is_media(reply_to):
-            link = reply_to.text.split('\n', 1)[0].strip()
+        link = reply_to.text.split('\n', 1)[0].strip()
+
+    if is_bulk:
+        await run_bulk([client, message, index, bulk_start, bulk_end, bi], cloneNode, bulk)
+        return
+
+    if bulk:
+        del bulk[0]
 
     newname = text.split(' n: ', 1)
     newname = re_split(' rcf: | up: ', newname[1])[0].strip() if len(newname) > 1 else ''
@@ -228,7 +254,7 @@ async def cloneNode(client: Client, message: Message):
     dst_path = text.split(' up: ', 1)
     dst_path = re_split(' rcf: ', dst_path[1])[0].strip() if len(dst_path) > 1 else None
 
-    run_multi([client, message, multi, 1, 1, ''], cloneNode)
+    run_multi([client, message, multi, Index, 1, ''], cloneNode)
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
     gdrive_sharer = is_sharar(link)
