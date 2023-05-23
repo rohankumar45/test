@@ -218,9 +218,9 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
                 bi = index
                 index += 1
                 dargs = x.split(':')
-                bulk_start = int(dargs[1]) or 0
+                bulk_start = dargs[1] or 0
                 if len(dargs) == 3:
-                    bulk_end = int(dargs[2]) or 0
+                    bulk_end = dargs[2] or 0
             else:
                 break
 
