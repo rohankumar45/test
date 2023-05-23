@@ -164,7 +164,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         b_msg[bi] = f'{len(bulk)}'
         b_msg.insert(index, bulk[0].replace('\\n', '\n'))
         b_msg = ' '.join(b_msg)
-        nextmsg = await sendMessage(message, b_msg)
+        nextmsg = await sendMessage(b_msg, message)
         nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
         nextmsg.from_user = message.from_user
         _mirror_leech(client, nextmsg, isZip, extract, isQbit, isLeech, sameDir, bulk)
