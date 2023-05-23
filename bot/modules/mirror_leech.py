@@ -153,8 +153,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         await sendMessage(f'Upss {tag}, multi/bulk mode for premium user only', message)
         return
 
-    LOGGER.info(bulk)
-
     if is_bulk:
         await run_bulk([client, message, index, bulk_start, bulk_end, bi], _mirror_leech, isZip, extract, isQbit, isLeech, sameDir, bulk)
         return
