@@ -54,7 +54,7 @@ async def run_bulk(blist, func, *args):
     args = list(args)
     args[-1] = bulk
     args = tuple(args)
-    func(client, nextmsg, args)
+    func(client, nextmsg, *args)
 
 
 class MultiSelect:
