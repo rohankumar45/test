@@ -180,6 +180,10 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
 
+    LOGGER.info('=================================')
+    LOGGER.info(link)
+    LOGGER.info('=================================')
+
     if link and is_tele_link(link):
         try:
             await intialize_savebot(user_dict.get('user_string'), True, user_id)
@@ -197,6 +201,10 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                 await editMessage(f'ERROR: {e}', check_)
                 return
 
+    LOGGER.info('=================================')
+    LOGGER.info(link)
+    LOGGER.info('=================================')
+
     if reply_to:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
@@ -210,9 +218,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                 link = await reply_to.download()
                 file_ = None
 
-    LOGGER.info('=================================')
-    LOGGER.info(link)
-    LOGGER.info('=================================')
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and not file_:
         help_msg = f'Invalid argument, type /{BotCommands.HelpCommand} for more details.'
