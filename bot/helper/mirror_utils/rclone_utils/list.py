@@ -4,7 +4,6 @@ from asyncio import wait_for, Event, wrap_future
 from configparser import ConfigParser
 from functools import partial
 from json import loads
-from math import ceil
 from pyrogram import Client
 from pyrogram.filters import regex, user
 from pyrogram.handlers import CallbackQueryHandler
@@ -196,9 +195,10 @@ class RcloneList:
 
 
 @new_task
-async def path_updates(client: Client, query: CallbackQuery, obj: RcloneList):
+async def path_updates(_, query: CallbackQuery, obj: RcloneList):
     await query.answer()
     data = query.data.split()
+    LOGGER.info(data)
     if data[1] == 'cancel':
         obj.remote = 'Task has been cancelled!'
         obj.path = ''
