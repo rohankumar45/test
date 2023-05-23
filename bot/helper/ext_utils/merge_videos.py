@@ -43,6 +43,7 @@ class Merge:
                     list_files.append(f"file '{video_file}'")
                     remove_files.append(video_file)
         if len(list_files) > 1:
+            LOGGER.info(f'Merging {len(list_files)}...')
             name = ospath.basename(path)
             async with download_dict_lock:
                 download_dict[self.__listener.uid] = MergeStatus(name, size, gid, self, self.__listener)
