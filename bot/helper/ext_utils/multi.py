@@ -51,6 +51,7 @@ async def run_bulk(blist, func, *args):
     nextmsg = await sendMessage(b_msg, message)
     nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
     nextmsg.from_user = message.from_user
+    args[-1] = bulk
     func(client, nextmsg, *args)
 
 
