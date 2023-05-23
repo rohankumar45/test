@@ -13,9 +13,8 @@ from yt_dlp import YoutubeDL
 
 from bot import bot, config_dict, user_data, DOWNLOAD_DIR, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_url, is_premium_user, is_media, UserDaily, sync_to_async, new_task, is_rclone_path, get_multiid, get_readable_time, new_thread
-from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.ext_utils.force_mode import ForceMode
-from bot.helper.ext_utils.multi import run_multi, MultiSelect
+from bot.helper.ext_utils.multi import run_multi, run_bulk, MultiSelect
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.mirror_utils.download_utils.yt_dlp_download import YoutubeDLHelper
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
@@ -342,18 +341,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
         return
 
     if is_bulk:
-        bulk = await extract_bulk_links(message, bulk_start, bulk_end)
-        if len(bulk) == 0:
-            await sendMessage('Reply to text file or to tg message that have links seperated by new line!', message)
-            return
-        b_msg = mssg.split(maxsplit=bi)
-        b_msg[bi] = f'{len(bulk)}'
-        b_msg.insert(index, bulk[0])
-        b_msg = ' '.join(b_msg)
-        nextmsg = await sendMessage(b_msg, message)
-        nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
-        nextmsg.from_user = message.from_user
-        _ytdl(client, nextmsg, isZip, isLeech, sameDir, bulk)
+        await run_bulk([client, message, index, bulk_start, bulk_end, bi], _ytdl, isZip, isLeech, sameDir, bulk)
         return
 
     if bulk:

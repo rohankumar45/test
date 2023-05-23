@@ -7,6 +7,7 @@ from pyrogram.types import Message, CallbackQuery
 
 from bot import drive_dict, config_dict
 from bot.helper.ext_utils.bot_utils import new_task, new_thread, setInterval
+from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 
@@ -35,6 +36,22 @@ async def run_multi(mlist, func, *args):
         nextmsg.from_user = message.from_user
         await sleep(4)
         func(client, nextmsg, *args)
+
+
+async def run_bulk(blist, func, *args):
+    client, message, index, bulk_start, bulk_end, bi = blist
+    bulk = await extract_bulk_links(message, bulk_start, bulk_end)
+    if not bulk:
+        await sendMessage('Reply to text file or to tg message that have links seperated by new line!', message)
+        return
+    b_msg = message.text.split(maxsplit=bi)
+    b_msg[bi] = f'{len(bulk)}'
+    b_msg.insert(index, bulk[0].replace('\\n', '\n'))
+    b_msg = ' '.join(b_msg)
+    nextmsg = await sendMessage(b_msg, message)
+    nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
+    nextmsg.from_user = message.from_user
+    func(client, nextmsg, *args)
 
 
 class MultiSelect:
