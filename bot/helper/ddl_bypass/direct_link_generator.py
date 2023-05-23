@@ -103,7 +103,7 @@ def direct_link_generator(link: str):
             return link
         elif 'gdtot' in domain:
             return gdtot(link)
-        elif 'filepress' in domain:
+        elif any(x in domain for x in ['filepress', 'onlystream']):
             return filepress(link)
         elif 'sharer.pw' in domain:
             return sharerpw(link)
