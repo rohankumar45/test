@@ -201,7 +201,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     multi = bulk_start = bulk_end = 0
     Index, link, is_bulk = 1, '', False
     text = message.text
-    args = text.split(maxsplit=2)
+    args = text.split(maxsplit=3)
     args.pop(0)
     if len(args) > 0:
         index = 1
