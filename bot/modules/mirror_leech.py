@@ -210,6 +210,10 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                 link = await reply_to.download()
                 file_ = None
 
+    LOGGER.info('=================================')
+    LOGGER.info(link)
+    LOGGER.info('=================================')
+
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and not file_:
         help_msg = f'Invalid argument, type /{BotCommands.HelpCommand} for more details.'
         if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(help_msg)):
