@@ -13,10 +13,11 @@ from bot import bot, config_dict, user_data, LOGGER, DOWNLOAD_DIR
 from bot.helper.ddl_bypass.direct_link_generator import direct_link_generator
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_media, is_mega_link, is_gdrive_link, is_sharar, get_content_type, \
      is_premium_user, UserDaily, sync_to_async, new_task, is_rclone_path, is_tele_link, get_multiid
+from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
-from bot.helper.ext_utils.multi import run_multi, run_bulk, MultiSelect
+from bot.helper.ext_utils.multi import run_multi, MultiSelect
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.mirror_utils.download_utils.aria2_download import add_aria2c_download
 from bot.helper.mirror_utils.download_utils.gd_download import add_gd_download
@@ -138,28 +139,35 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                     bulk_end = dargs[2] or 0
             else:
                 break
-        if multi == 0 or bulk:
-            LOGGER.info('=================================')
+        if multi == 0 or len(bulk) != 0:
             message_args = mesg[0].split(maxsplit=index)
-            LOGGER.info(message_args)
             if len(message_args) > index:
                 x = message_args[index].strip()
-                LOGGER.info(bulk)
-                LOGGER.info(x)
-                LOGGER.info('=================================')
                 if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:')):
                     link = re_split(r' pswd: | n: | up: | rcf: ', x)[0].strip()
 
         if len(folder_name) > 0:
             seed = False
-            ratio = seed_time = None
+            ratio = None
+            seed_time = None
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage(f'Upss {tag}, multi/bulk mode for premium user only', message)
         return
 
     if is_bulk:
-        await run_bulk([client, message, index, bulk_start, bulk_end, bi], _mirror_leech, isZip, extract, isQbit, isLeech, sameDir, bulk)
+        bulk = await extract_bulk_links(message, bulk_start, bulk_end)
+        if len(bulk) == 0:
+            await sendMessage('Reply to text file or to tg message that have links seperated by new line!', message)
+            return
+        b_msg = message.text.split(maxsplit=bi)
+        b_msg[bi] = f'{len(bulk)}'
+        b_msg.insert(index, bulk[0].replace('\\n', '\n'))
+        b_msg = ' '.join(b_msg)
+        nextmsg = await sendMessage(b_msg, message)
+        nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
+        nextmsg.from_user = message.from_user
+        _mirror_leech(client, nextmsg, isZip, extract, isQbit, isLeech, sameDir, bulk)
         return
 
     if len(bulk) != 0:
@@ -200,10 +208,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             except Exception as e:
                 await editMessage(f'ERROR: {e}', check_)
                 return
-
-    LOGGER.info('=================================')
-    LOGGER.info(link)
-    LOGGER.info('=================================')
 
     if reply_to:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
