@@ -16,18 +16,17 @@ async def run_multi(mlist, func, *args):
     client, message, index, multi, mi, folder_name = mlist
     if multi > 1:
         await sleep(config_dict['MULTI_TIMEGAP'])
+        msg = message.text.split(' ', maxsplit=mi+1)
         msg[mi] = f'{multi - 1}'
         if args and (bulk:= args[-1]):
             msg[index] = bulk[0]
             msg = ' '.join(msg)
             nextmsg = await sendMessage(msg, message)
         else:
-            msg = message.text.split(' ', maxsplit=mi+1)
             if len(msg) == 2 and len(msgauth:= message.text.split('\n')) > 1:
                 auth = '\n{}'.format('\n'.join(msgauth[1:]))
             else:
                 auth = ''
-            msg[mi] = f'{multi - 1}'
             nextmsg = await client.get_messages(message.chat.id, message.reply_to_message_id + 1)
             nextmsg = await sendMessage(' '.join(msg) + auth, nextmsg)
         nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
