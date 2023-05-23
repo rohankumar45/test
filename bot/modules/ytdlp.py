@@ -294,7 +294,6 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     args = mssg.split(maxsplit=5)
     args.pop(0)
     if len(args) > 0:
-        index = 1
         for x in args:
             x = x.strip()
             if x == 's':

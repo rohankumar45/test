@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 from bot import bot, download_dict, download_dict_lock, config_dict, user_data, LOGGER
 from bot.helper.ddl_bypass.direct_link_generator import direct_link_generator
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_gdrive_link, is_premium_user, is_sharar, sync_to_async, new_task, is_rclone_path, cmd_exec, is_url, get_multiid
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_gdrive_link, is_premium_user, is_sharar, sync_to_async, new_task, is_rclone_path, cmd_exec, is_url, get_multiid, get_link
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.help_messages import HelpString
@@ -199,12 +199,11 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     reply_to = message.reply_to_message
     tag = message.from_user.mention
     multi = bulk_start = bulk_end = 0
-    Index, link, is_bulk = 1, '', False
+    Index, link, is_bulk = 1, '',
     text = message.text
-    args = text.split(maxsplit=3)
+    args = text.split(maxsplit=2)
     args.pop(0)
     if len(args) > 0:
-        index = 1
         for x in args:
             x = x.strip()
             if x.strip().isdigit():
@@ -224,13 +223,8 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
                     bulk_end = dargs[2] or 0
             else:
                 break
-
-    LOGGER.info(bulk)
-
-    if multi == 0 or bulk:
-        link = args[0].strip()
-        if not link.startswith(('up:', 'rcf:')):
-            link = re_split(r' up: | rcf: ', link)[0].strip()
+        if multi == 0 or bulk:
+            link = await get_link()
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
