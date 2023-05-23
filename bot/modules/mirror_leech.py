@@ -138,7 +138,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                     bulk_end = dargs[2] or 0
             else:
                 break
-        if multi == 0 or len(bulk) != 0:
+        if multi == 0 or bulk:
             message_args = mesg[0].split(maxsplit=index)
             if len(message_args) > index:
                 x = message_args[index].strip()
