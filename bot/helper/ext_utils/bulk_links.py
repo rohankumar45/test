@@ -33,9 +33,9 @@ async def get_links_from_file(message, bulk_start, bulk_end):
 
 
 async def extract_bulk_links(message, bulk_start, bulk_end):
-    if bulk_start and isinstance(bulk_start, str) and bulk_start.isdigit():
+    if bulk_start and bulk_start.isdigit():
         bulk_start = int(bulk_start)
-    if bulk_end and isinstance(bulk_end, str) and bulk_end.isdigit():
+    if bulk_end and bulk_end.isdigit():
         bulk_end = int(bulk_end)
     if (reply_to := message.reply_to_message) and (file_ := reply_to.document) and (file_.mime_type == 'text/plain'):
         return await get_links_from_file(message.reply_to_message, bulk_start, bulk_end)
