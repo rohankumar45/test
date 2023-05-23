@@ -13,7 +13,7 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 
 @new_task
 async def run_multi(mlist, func, *args):
-    client, message, index, multi, mi, folder_name = mlist
+    client, message, multi, index, mi, folder_name = mlist
     if multi > 1:
         await sleep(config_dict['MULTI_TIMEGAP'])
         msg = message.text.split(' ', maxsplit=mi+1)
