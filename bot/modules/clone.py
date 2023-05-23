@@ -199,7 +199,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     reply_to = message.reply_to_message
     tag = message.from_user.mention
     multi = bulk_start = bulk_end = 0
-    Index, link, is_bulk = 1, '', False
+    index, link, is_bulk = 1, '', False
     text = message.text
     args = text.split(maxsplit=2)
     args.pop(0)
