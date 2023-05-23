@@ -13,6 +13,7 @@ from time import time
 from bot import LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_time, cmd_exec, new_thread, get_readable_file_size, new_task
 from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import editMessage
 
 LIST_LIMIT = 6
@@ -44,7 +45,7 @@ class RcloneList:
     @new_thread
     async def __event_handler(self):
         pfunc = partial(path_updates, obj=self)
-        handler = self.__client.add_handler(CallbackQueryHandler(pfunc, filters=regex('^rcq') & user(self.__user_id)), group=-1)
+        handler = self.__client.add_handler(CallbackQueryHandler(pfunc, filters=regex('^rcq') & user(self.__user_id) & CustomFilters.authorized), group=-1)
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
         except:
