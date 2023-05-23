@@ -41,7 +41,7 @@ class RcloneList:
         self.iter_start = 0
         self.page_step = 1
 
-    @new_task
+    @new_thread
     async def __event_handler(self):
         pfunc = partial(path_updates, obj=self)
         handler = self.__client.add_handler(CallbackQueryHandler(pfunc, filters=regex('^rcq') & user(self.__user_id)), group=-1)
