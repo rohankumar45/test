@@ -53,7 +53,6 @@ async def run_bulk(blist, func, *args):
     nextmsg.from_user = message.from_user
     args = list(args)
     args[-1] = bulk
-    args = tuple(args)
     func(client, nextmsg, *args)
 
 
