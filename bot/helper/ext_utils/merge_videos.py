@@ -43,7 +43,6 @@ class Merge:
                     list_files.append(f"file '{video_file}'")
                     remove_files.append(video_file)
         if len(list_files) > 1:
-            LOGGER.info(f'Merging {len(list_files)}...')
             name = ospath.basename(path)
             async with download_dict_lock:
                 download_dict[self.__listener.uid] = MergeStatus(name, size, gid, self, self.__listener)
@@ -51,7 +50,7 @@ class Merge:
             input_file = ospath.join(path, 'input.txt')
             async with aiopen(input_file, 'w') as f:
                 await f.write('\n'.join(list_files))
-            LOGGER.info(f'Merging: {name}')
+            LOGGER.info(f'Merging {len(list_files)} --> {name}')
             outfile = f'{ospath.join(path, name)}.mkv'
             cmd = ['ffmpeg', '-ignore_unknown', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', input_file, '-map', '0', '-c', 'copy', outfile]
             self.__listener.suproc = await create_subprocess_exec(*cmd)
