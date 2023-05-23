@@ -214,8 +214,6 @@ async def cloneNode(client: Client, message: Message):
         await sendMessage('Upss, multi mode for premium user only', message)
         return
 
-    mlist = [client, message, multi, 1, '']
-
     if reply_to:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
@@ -230,7 +228,7 @@ async def cloneNode(client: Client, message: Message):
     dst_path = text.split(' up: ', 1)
     dst_path = re_split(' rcf: ', dst_path[1])[0].strip() if len(dst_path) > 1 else None
 
-    run_multi(mlist, cloneNode)
+    run_multi([client, message, multi, 1, 1, ''], cloneNode)
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
     gdrive_sharer = is_sharar(link)

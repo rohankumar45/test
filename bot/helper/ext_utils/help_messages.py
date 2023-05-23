@@ -141,7 +141,7 @@ class HelpString:
 <b>NOTES:</b>
 1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
 2. Options (<b>n: and pswd:</b>) should be added randomly after the link if link along with the cmd and after any other option
-3. Options (<b>d, s, m: go and multi</b>) should be added randomly before the link and before any other option.
+3. Options (<b>d, s, m:, b and multi</b>) should be added randomly before the link and before any other option.
 4. Commands that start with <b>qb</b> are <b>ONLY</b> for torrents.
 5. (n:) option doesn't work with torrents.
 '''
@@ -166,6 +166,16 @@ Super: <code>https://t.me/c/channel_id/message_id</code>
 <code>/cmd</code> link n: newname pswd: xx(zip/unzip)
 <b>username</b>
 <b>password</b>
+'''
+
+    MLBULK = '''
+Bulk can be used by text message and by replying to text file contains links seperated by new line.
+You can use it only by reply to message(text/file). Options that came after link should be added along with and after link and not with cmd.
+Example:
+link n: newname up: remote1:path1
+link pswd: pass(zip/unzip) \\nusername\\npassword(authentication) up: remote2:path2
+Reply to this example by this cmd for example <code>/cmd</code> b(bulk) d:2:10(seed) m:folder_name(same dir)
+You can set start and end of the links from the bulk with b:start:end or only end by b::end or only start by b:start. The default start is from zero(first link) to inf.
 '''
 
     MISC = f'''
@@ -257,7 +267,7 @@ Number and m:folder_name (folder_name without space) should be always before n: 
 
     YLNOTE = '''
 1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
-2. Options (<b>s, m: go and multi</b>) should be added randomly before link and before any other option.
+2. Options (<b>b, s, m: and multi</b>) should be added randomly before link and before any other option.
 3. Options (<b>n:, pswd: and opt:</b>) should be added randomly after the link if link along with the cmd or after cmd if by reply.
 4. You can always add video quality from yt-dlp api options.
 5. Don't add file extension while rename using `n:`
@@ -277,8 +287,18 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
 <code>/cmd</code> n: newname pswd: xx(zip) opt: x:y|x1:y1
 '''
 
+    YLBULK = '''
+Bulk can be used by text message and by replying to text file contains links seperated by new line.
+You can use it only by reply to message(text/file). Options that came after link should be added along with and after link and not with cmd.
+Example:
+link n: newname up: remote1:path1
+link pswd: pass(zip/unzip) opt: ytdlpoptions up: remote2:path2
+Reply to this example by this cmd for example <code>/cmd</code> b(bulk) m:folder_name(same dir)
+You can set start and end of the links from the bulk with b:start:end or only end by b::end or only start by b:start. The default start is from zero(first link) to inf.
+'''
+
     YLQUAL = '''
-Incase default quality added but you need to select quality for specific link or links with multi links feature.
+Incase default quality added from yt-dlp options using format option and you need to select quality for specific link or links with multi links feature.
 <code>/cmd</code> s link
 This option should be always before n:, pswd: and opt:
 
@@ -364,42 +384,48 @@ def get_help_button(from_user: int, data: str=None):
         _build_button('Aria', 'qBit', 'Ytdl', 'Drive', 'User')
     elif data.startswith('mirror'):
         text = f'<b>MIRROR/LEECH NOTES</b>\n{HelpString.MLNOTE}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
     elif data == 'basic ml':
         text = f'<b>BASIC COMMAND</b>\n{HelpString.MLDL}'
+        _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
+    elif data == 'bulk':
+        text = f'<b>BULK DOWNLOAD</b>\n{HelpString.MLBULK}'
         _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
     elif data == 'selection':
         text = f'<b>TORRENT SELECTION</b>\n{HelpString.BTSEL}'
-        _build_button('Basic ML', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
+        _build_button('Basic ML', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
     elif data == 'seed':
         text = f'<b>TORRENT SEED</b>\n{HelpString.BTSEED}'
-        _build_button('Basic ML', 'Selection', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
+        _build_button('Basic ML', 'Selection', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
     elif data == 'rclone':
         text = f'<b>RCLONE DOWNLOAD</b>\n{HelpString.RCLONE}'
-        _build_button('Basic ML', 'Selection', 'GoFile ML', 'Multi ML', 'TG Link')
+        _build_button('Basic ML', 'Selection', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
     elif data == 'tg link':
         text = f'<b>TG LINK DOWNLOAD</b>\n{HelpString.MTG}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML')
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML', 'Bulk ML')
     elif data == 'gofile ml':
         text = f'<b>GOFILE UPLOAD</b>\n{HelpString.GOFILE}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML', 'TG Link')
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML', 'TG Link', 'Bulk ML')
     elif data == 'multi ml':
         text = f'<b>MULTI LINK</b>\n{HelpString.MLMULTI}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'TG Link')
+        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'TG Link', 'Bulk ML')
     elif data.startswith('youtube'):
         text = f'<b>YOUTUBE/LEECH NOTES</b>\n{HelpString.YLNOTE}'
-        _build_button('Basic YL', 'Quality', 'GoFile YL', 'Multi YL')
+        _build_button('Basic YL', 'Quality', 'GoFile YL', 'Multi YL', 'Bulk YL')
     elif data == 'basic yl':
         text = f'<b>BASIC COMMAND</b>\n{HelpString.YLDL}'
+        _build_button('Quality', 'GoFile YL', 'Multi YL', 'Bulk YL')
+    elif data == 'bulk yl':
+        text = f'<b>BULK DOWNLOAD</b>\n{HelpString.YLBULK}'
         _build_button('Quality', 'GoFile YL', 'Multi YL')
     elif data == 'quality':
         text = f'<b>YOUTUBE QUALITY</b>\n{HelpString.YLQUAL}'
-        _build_button('Basic YL', 'GoFile YL', 'Multi YL')
+        _build_button('Basic YL', 'GoFile YL', 'Multi YL', 'Bulk YL')
     elif data == 'gofile yl':
         text = f'<b>GOFILE UPLOAD</b>\n{HelpString.GOFILE}'
-        _build_button('Basic YL', 'Quality', 'Multi YL')
+        _build_button('Basic YL', 'Quality', 'Multi YL', 'Bulk YL')
     elif data == 'multi yl':
         text = f'<b>MULTI LINK</b>\n{HelpString.YLMULTI}'
-        _build_button('Basic YL', 'Quality', 'GoFile YL')
+        _build_button('Basic YL', 'Quality', 'GoFile YL', 'Bulk YL')
     buttons.button_data('Close', f'help {from_user.id} close', 'footer')
     return text, image, buttons.build_menu(3)

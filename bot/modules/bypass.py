@@ -104,7 +104,7 @@ async def bypass(client: Client, message: Message):
     if user_data.get(user_id, {}).get('enable_pm') and isSuperGroup and result:
         await copyMessage(user_id, bpmsg, buttons.build_menu(1))
 
-    run_multi([client, message, multi, 1, ''], bypass)
+    run_multi([client, message, multi, 1, 1, ''], bypass)
 
     if isSuperGroup and (stime:= config_dict['AUTO_DELETE_UPLOAD_MESSAGE_DURATION']):
         await auto_delete_message(message, reply_to, stime=stime)

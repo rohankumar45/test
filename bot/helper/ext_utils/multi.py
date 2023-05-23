@@ -13,20 +13,26 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 
 @new_task
 async def run_multi(mlist, func, *args):
-    client, message, multi, mi, folder_name = mlist
+    client, message, index, multi, mi, folder_name = mlist
     if multi > 1:
         await sleep(config_dict['MULTI_TIMEGAP'])
-        nextmsg = await client.get_messages(message.chat.id, message.reply_to_message.id + 1)
-        msg = message.text.split(' ', maxsplit=mi+1)
-        if len(msg) == 2 and len(msgauth:= message.text.split('\n')) > 1:
-            auth = '\n{}'.format('\n'.join(msgauth[1:]))
-        else:
-            auth = ''
         msg[mi] = f'{multi - 1}'
-        nextmsg = await sendMessage(' '.join(msg) + auth, nextmsg)
+        if args and (bulk:= args[-1]):
+            msg[index] = bulk[0]
+            msg = ' '.join(msg)
+            nextmsg = await sendMessage(msg, message)
+        else:
+            msg = message.text.split(' ', maxsplit=mi+1)
+            if len(msg) == 2 and len(msgauth:= message.text.split('\n')) > 1:
+                auth = '\n{}'.format('\n'.join(msgauth[1:]))
+            else:
+                auth = ''
+            msg[mi] = f'{multi - 1}'
+            nextmsg = await client.get_messages(message.chat.id, message.reply_to_message_id + 1)
+            nextmsg = await sendMessage(' '.join(msg) + auth, nextmsg)
         nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
         if folder_name and len(folder_name) > 0:
-            args[-1].add(nextmsg.id)
+            args[-2].add(nextmsg.id)
         nextmsg.from_user = message.from_user
         await sleep(4)
         func(client, nextmsg, *args)

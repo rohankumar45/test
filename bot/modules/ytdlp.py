@@ -13,6 +13,7 @@ from yt_dlp import YoutubeDL
 
 from bot import bot, config_dict, user_data, DOWNLOAD_DIR, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_url, is_premium_user, is_media, UserDaily, sync_to_async, new_task, is_rclone_path, get_multiid, get_readable_time, new_thread
+from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.multi import run_multi, MultiSelect
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
@@ -234,7 +235,7 @@ async def _mdisk(link: str, name: str):
             return name, link
 
 @new_task
-async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sameDir={}):
+async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sameDir={}, bulk=[]):
     mssg = message.text
     msplit = message.text.split('\n')
     if len(msplit) > 1 and msplit[1].startswith('Tag: '):
@@ -266,9 +267,10 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     msg_id = message.id
     tag = message.from_user.mention
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
+    mi = index = 1
     qual = link = folder_name = ''
-    select = isGofile = False
-    multi, mi = 0, 1
+    multi = bulk_start = bulk_end = 0
+    select = isGofile = is_bulk = False
     multiid = get_multiid(user_id)
 
     fmode = ForceMode(message)
@@ -290,7 +292,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             await auto_delete_message(message, msg, reply_to)
             return
 
-    args = mssg.split(maxsplit=4)
+    args = mssg.split(maxsplit=5)
     args.pop(0)
     if len(args) > 0:
         index = 1
@@ -306,6 +308,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             elif x.strip().isdigit():
                 multi = int(x)
                 mi = index
+                index += 1
             elif x.startswith('m:'):
                 marg = x.split('m:', 1)
                 if len(marg) > 1:
@@ -313,20 +316,50 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
                     if not sameDir:
                         sameDir = set()
                     sameDir.add(message.id)
+            elif x == 'b':
+                is_bulk = True
+                bi = index
+                index += 1
+            elif x.startswith('b:'):
+                is_bulk = True
+                bi = index
+                index += 1
+                dargs = x.split(':')
+                bulk_start = dargs[1] or 0
+                if len(dargs) == 3:
+                    bulk_end = dargs[2] or 0
             else:
                 break
-        if multi == 0:
+        if multi == 0 or bulk:
             args = mssg.split(maxsplit=index)
             if len(args) > index:
                 x = args[index].strip()
                 if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:', 'opt:')):
                     link = re_split(r' opt: | pswd: | n: | rcf: | up: ', x)[0].strip()
 
-    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and multi > 0:
-        await sendMessage('Upss, multi mode for premium user only', message)
+    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
+        await sendMessage('Upss, multi/bulk mode for premium user only', message)
         return
 
-    mlist = [client, message, multi, mi, folder_name]
+    if is_bulk:
+        bulk = await extract_bulk_links(message, bulk_start, bulk_end)
+        if len(bulk) == 0:
+            await sendMessage('Reply to text file or to tg message that have links seperated by new line!', message)
+            return
+        b_msg = mssg.split(maxsplit=bi)
+        b_msg[bi] = f'{len(bulk)}'
+        b_msg.insert(index, bulk[0])
+        b_msg = ' '.join(b_msg)
+        nextmsg = await sendMessage(b_msg, message)
+        nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
+        nextmsg.from_user = message.from_user
+        _ytdl(client, nextmsg, isZip, isLeech, sameDir, bulk)
+        return
+
+    if bulk:
+        del bulk[0]
+
+    mlist = [client, message, multi, index, mi, folder_name]
     path = f'{DOWNLOAD_DIR}{msg_id}{folder_name}'
 
     if config_dict['AUTO_MUTE'] and isSuperGroup:
@@ -352,7 +385,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
 
     opt = opt or config_dict['YT_DLP_OPTIONS']
 
-    if reply_to:
+    if not link and reply_to:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
         if not is_media(reply_to) and len(link) == 0:
@@ -427,9 +460,9 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     except Exception as e:
         e = str(e).replace('<', ' ').replace('>', ' ')
         await editMessage(f'{tag} {e}', check_)
-        run_multi(mlist, _ytdl, isZip, isLeech, sameDir)
+        run_multi(mlist, _ytdl, isZip, isLeech, sameDir, bulk)
         return
-    run_multi(mlist, _ytdl, isZip, isLeech, sameDir)
+    run_multi(mlist, _ytdl, isZip, isLeech, sameDir, bulk)
     if not select:
         user_dict = user_data.get(user_id, {})
         if 'format' in options:

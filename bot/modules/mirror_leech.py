@@ -13,6 +13,7 @@ from bot import bot, config_dict, user_data, LOGGER, DOWNLOAD_DIR
 from bot.helper.ddl_bypass.direct_link_generator import direct_link_generator
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_media, is_mega_link, is_gdrive_link, is_sharar, get_content_type, \
      is_premium_user, UserDaily, sync_to_async, new_task, is_rclone_path, is_tele_link, get_multiid
+from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
@@ -32,7 +33,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_me
 
 
 @new_task
-async def _mirror_leech(client: Client, message: Message, isZip=False, extract=False, isQbit=False, isLeech=False, sameDir={}):
+async def _mirror_leech(client: Client, message: Message, isZip=False, extract=False, isQbit=False, isLeech=False, sameDir={}, bulk=[]):
     mesg = message.text.split('\n')
     message_args = mesg[0].split(maxsplit=1)
     if len(mesg) > 1 and mesg[1].startswith('Tag: '):
@@ -62,11 +63,11 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             msg = await sendMessage('U have enable leech dump feature but didn\'t add me to chat!', message)
 
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
-    ratio = seed_time = None
-    select = seed = isGofile = gdrive_sharer = False
-    multi, mi = 0, 1
-    file_ = tg_client = None
+    select = seed = is_bulk = isGofile = gdrive_sharer = False
+    mi = index = 1
     link = folder_name = ''
+    multi = bulk_start = bulk_end = 0
+    file_ = tg_client = ratio = seed_time = None
     multiid = get_multiid(user_id)
 
     fmode = ForceMode(message)
@@ -92,8 +93,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             return
 
     if len(message_args) > 1:
-        index = 1
-        args = mesg[0].split(maxsplit=5)
+        args = mesg[0].split(maxsplit=6)
         args.pop(0)
         for x in args:
             x = x.strip()
@@ -117,6 +117,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             elif x.isdigit():
                 multi = int(x)
                 mi = index
+                index += 1
             elif x.startswith('m:'):
                 marg = x.split('m:', 1)
                 if len(marg) > 1:
@@ -124,9 +125,21 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                     if not sameDir:
                         sameDir = set()
                     sameDir.add(message.id)
+            elif x == 'b':
+                is_bulk = True
+                bi = index
+                index += 1
+            elif x.startswith('b:'):
+                is_bulk = True
+                bi = index
+                index += 1
+                dargs = x.split(':')
+                bulk_start = dargs[1] or 0
+                if len(dargs) == 3:
+                    bulk_end = dargs[2] or 0
             else:
                 break
-        if multi == 0:
+        if multi == 0 or len(bulk) != 0:
             message_args = mesg[0].split(maxsplit=index)
             if len(message_args) > index:
                 x = message_args[index].strip()
@@ -138,11 +151,29 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             ratio = None
             seed_time = None
 
-    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and multi > 0:
-        await sendMessage(f'Upss {tag}, multi mode for premium user only', message)
+    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
+        await sendMessage(f'Upss {tag}, multi/bulk mode for premium user only', message)
         return
 
-    run_multi([client, message, multi, mi, folder_name], _mirror_leech, isZip, extract, isQbit, isLeech, sameDir)
+    if is_bulk:
+        bulk = await extract_bulk_links(message, bulk_start, bulk_end)
+        if len(bulk) == 0:
+            await sendMessage('Reply to text file or to tg message that have links seperated by new line!', message)
+            return
+        b_msg = message.text.split(maxsplit=bi)
+        b_msg[bi] = f'{len(bulk)}'
+        b_msg.insert(index, bulk[0].replace('\\n', '\n'))
+        b_msg = ' '.join(b_msg)
+        nextmsg = await sendMessage(message, b_msg)
+        nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
+        nextmsg.from_user = message.from_user
+        _mirror_leech(client, nextmsg, isZip, extract, isQbit, isLeech, sameDir, bulk)
+        return
+
+    if len(bulk) != 0:
+        del bulk[0]
+
+    run_multi([client, message, multi, index, mi, folder_name], _mirror_leech, isZip, extract, isQbit, isLeech, sameDir, bulk)
 
     path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
 
@@ -168,7 +199,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         except Exception as e:
             await editMessage(f'ERROR: {e}', check_)
             return
-    elif reply_to and reply_to.text:
+    elif not link and reply_to and reply_to.text:
         reply_text = reply_to.text.split('\n', 1)[0].strip()
         if reply_text and is_tele_link(reply_text):
             try:
@@ -182,7 +213,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
         file_ = is_media(reply_to)
-        if len(link) == 0 or not is_url(link) and not is_magnet(link):
+        if not is_url(link) and not is_magnet(link):
             if not file_:
                 reply_text = reply_to.text.split('\n', 1)[0].strip()
                 if is_url(reply_text) or is_magnet(reply_text):
