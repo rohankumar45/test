@@ -37,8 +37,8 @@ async def extract_bulk_links(message, bulk_start, bulk_end):
         bulk_start = int(bulk_start)
     if bulk_end and bulk_end.isdigit():
         bulk_end = int(bulk_end)
-    if (reply_to := message.reply_to_message) and (file_ := reply_to.document) and (file_.mime_type == 'text/plain'):
+    if (reply_to:= message.reply_to_message) and (file_:= reply_to.document) and (file_.mime_type == 'text/plain'):
         return await get_links_from_file(message.reply_to_message, bulk_start, bulk_end)
-    elif text := message.reply_to_message.text:
+    elif reply_to and (text:= message.reply_to_message.text):
         return await get_links_from_message(text, bulk_start, bulk_end)
     return []
