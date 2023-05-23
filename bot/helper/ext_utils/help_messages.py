@@ -388,7 +388,7 @@ def get_help_button(from_user: int, data: str=None):
     elif data == 'basic ml':
         text = f'<b>BASIC COMMAND</b>\n{HelpString.MLDL}'
         _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
-    elif data == 'bulk':
+    elif data == 'bulk ml':
         text = f'<b>BULK DOWNLOAD</b>\n{HelpString.MLBULK}'
         _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
     elif data == 'selection':
