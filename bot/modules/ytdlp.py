@@ -309,6 +309,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
                 index += 1
             elif x.startswith('m:'):
                 marg = x.split('m:', 1)
+                index += 1
                 if len(marg) > 1:
                     folder_name = f'/{marg[1]}'
                     if not sameDir:
