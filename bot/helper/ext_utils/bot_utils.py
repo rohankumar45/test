@@ -400,7 +400,7 @@ async def get_link(message: Message):
         if (media:= is_media(reply_to)):
             link = f'Source is media/file: {media.mime_type}' if not reply_to.photo else 'Source is image/photo'
         else:
-            text = reply_to.text.strip()
+            text = reply_to.text.split('\n', 1)[0].strip()
             link = text if is_magnet(text.strip()) or is_url(text.strip()) else ''
     return link
 
