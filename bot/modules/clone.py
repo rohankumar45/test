@@ -225,6 +225,8 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             else:
                 break
 
+    LOGGER.info(bulk)
+
     if multi == 0 or bulk:
         link = args[0].strip()
         if not link.startswith(('up:', 'rcf:')):
