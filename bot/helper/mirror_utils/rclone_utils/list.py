@@ -44,7 +44,7 @@ class RcloneList:
     @new_thread
     async def __event_handler(self):
         pfunc = partial(path_updates, obj=self)
-        handler = self.__client.add_handler(CallbackQueryHandler(pfunc, filters=regex('^rcq')), group=-1)
+        handler = self.__client.add_handler(CallbackQueryHandler(pfunc, filters=regex('^rcq') & user(self.__user_id)), group=-1)
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
         except:
