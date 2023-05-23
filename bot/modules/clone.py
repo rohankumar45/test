@@ -250,7 +250,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     dst_path = text.split(' up: ', 1)
     dst_path = re_split(' rcf: ', dst_path[1])[0].strip() if len(dst_path) > 1 else None
 
-    run_multi([client, message, multi, Index, 1, ''], cloneNode, bulk)
+    run_multi([client, message, multi, index, 1, ''], cloneNode, bulk)
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
     gdrive_sharer = is_sharar(link)
