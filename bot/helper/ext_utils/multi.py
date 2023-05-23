@@ -5,7 +5,7 @@ from pyrogram.filters import regex, user
 from pyrogram.handlers import CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
 
-from bot import drive_dict, config_dict
+from bot import drive_dict, config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import new_task, new_thread, setInterval
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -54,6 +54,7 @@ async def run_bulk(blist, func, *args):
     args = list(args)
     args[-1] = bulk
     args = tuple(args)
+    LOGGER.info(args)
     func(client, nextmsg, args)
 
 
