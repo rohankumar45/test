@@ -139,10 +139,11 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             else:
                 break
         if multi == 0 or bulk:
+            LOGGER.info('=================================')
             message_args = mesg[0].split(maxsplit=index)
+            LOGGER.info(message_args)
             if len(message_args) > index:
                 x = message_args[index].strip()
-                LOGGER.info('=================================')
                 LOGGER.info(bulk)
                 LOGGER.info(x)
                 LOGGER.info('=================================')
