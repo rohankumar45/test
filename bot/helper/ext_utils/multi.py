@@ -17,13 +17,14 @@ async def run_multi(mlist, func, *args):
     client, message, multi, index, mi, folder_name = mlist
     if multi > 1:
         await sleep(config_dict['MULTI_TIMEGAP'])
-        msg = message.text.split(' ', maxsplit=mi+1)
-        msg[mi] = f'{multi - 1}'
         if args and (bulk:= args[-1]):
+            msg = message.text.split(' ', maxsplit=index)
+            msg[mi] = f'{multi - 1}'
             msg[index] = bulk[0]
-            msg = ' '.join(msg)
-            nextmsg = await sendMessage(msg, message)
+            nextmsg = await sendMessage(' '.join(msg), message)
         else:
+            msg = message.text.split(' ', maxsplit=mi+1)
+            msg[mi] = f'{multi - 1}'
             if len(msg) == 2 and len(msgauth:= message.text.split('\n')) > 1:
                 auth = '\n{}'.format('\n'.join(msgauth[1:]))
             else:
@@ -44,11 +45,10 @@ async def run_bulk(blist, func, *args):
     if not bulk:
         await sendMessage('Reply to text file or to tg message that have links seperated by new line!', message)
         return
-    b_msg = message.text.split(maxsplit=bi)
+    b_msg = message.text.split(maxsplit=index)
     b_msg[bi] = f'{len(bulk)}'
     b_msg.insert(index, bulk[0].replace('\\n', '\n'))
-    b_msg = ' '.join(b_msg)
-    nextmsg = await sendMessage(b_msg, message)
+    nextmsg = await sendMessage(' '.join(b_msg), message)
     nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
     nextmsg.from_user = message.from_user
     args = list(args)
