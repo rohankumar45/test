@@ -81,6 +81,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
                 msg = f'Error: While getting rclone stat. Path: {remote}:{src_path}. Stderr: {res[1][:4000]}'
                 await editMessage(msg, editable)
             return
+        await deleteMessage(editable)
         rstat = loads(res[0])
         if rstat['IsDir']:
             name = src_path.rsplit('/', 1)[-1] if src_path else remote
@@ -89,7 +90,6 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         else:
             name = src_path.rsplit('/', 1)[-1]
             mime_type = rstat['MimeType']
-    await deleteMessage(editable)
     listener = MirrorLeechListener(message, tag=tag)
     await listener.onDownloadStart()
     RCTransfer = RcloneTransferHelper(listener, name)
