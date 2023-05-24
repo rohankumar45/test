@@ -747,7 +747,7 @@ else:
             del qb_opt[k]
     qb_client.app_set_preferences(qb_opt)
 
-LOGGER.info('Creating client from BOT_TOKEN')
+LOGGER.info('Creating client...')
 kwargs = {'parse_mode': enums.ParseMode.HTML}
 if __version__ != '2.0.73':
     kwargs.update({'max_concurrent_transmissions': 1000, 'worker': 1000})
