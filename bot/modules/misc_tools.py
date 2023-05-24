@@ -18,7 +18,7 @@ from bot.helper.ext_utils.genss import GenSS
 from bot.helper.ext_utils.help_messages import HelpString
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, sendMessage, editMessage, deleteMessage, sendPhoto, sendSticker
+from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, deleteMessage, sendPhoto, sendSticker
 
 message_dict = {}
 

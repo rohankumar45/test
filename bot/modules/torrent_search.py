@@ -16,7 +16,7 @@ from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, sendMessage, deleteMessage, sendFile, auto_delete_message, sendingMessage
+from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, deleteMessage, sendFile, auto_delete_message, sendingMessage
 
 
 TELEGRAPH_LIMIT = 300

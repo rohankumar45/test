@@ -33,7 +33,7 @@ async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_
         download = (await sync_to_async(aria2.add, link, a2c_opt))[0]
     except Exception as e:
         LOGGER.info(f'Aria2c Download Error: {e}')
-        await sendMessage(listener.message, f'{e}')
+        await sendMessage(f'{e}', listener.message)
         return
     if await aiopath.exists(link):
         await aioremove(link)
