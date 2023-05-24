@@ -346,11 +346,10 @@ def get_date_time(message: Message):
 
 
 async def default_button(message: Message):
-    try:
-        message = await bot.get_messages(message.chat.id, message.id)
-        del message.reply_markup.inline_keyboard[-1]
-    except:
-        pass
+    try: message = await bot.get_messages(message.chat.id, message.id)
+    except: pass
+    try: del message.reply_markup.inline_keyboard[-1]
+    except: pass
     if (markup:= message.reply_markup) and markup.inline_keyboard:
         return markup
 
