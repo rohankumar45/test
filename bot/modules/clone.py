@@ -53,7 +53,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         if not is_rclone_path(dst_path):
             await editMessage(dst_path, editable)
             return
-    dst_path = (dst_path or config_dict['RCLONE_PATH']).strip('/')
+    dst_path = (dst_path or config_dict['RCLONE_PATH']).strip('/').rstrip('mrcc:')
     if dst_path.startswith('mrcc:'):
         if is_gdlink:
             config_path = user_config
