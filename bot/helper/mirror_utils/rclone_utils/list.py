@@ -21,14 +21,13 @@ LIST_LIMIT = 6
 class RcloneList:
     def __init__(self, client: Client, message: Message, user_id: int):
         self.__client = client
-        self.__message = message
         self.__user_id = user_id
         self.__rc_user = False
         self.__rc_owner = False
         self.__sections = []
         self.__time = time()
         self.__timeout = 240
-        self.__reply_to = None
+        self.message = message
         self.remote = ''
         self.is_cancelled = False
         self.query_proc = False
@@ -59,9 +58,9 @@ class RcloneList:
     async def __send_list_message(self, msg, button):
         if not self.is_cancelled:
             # if self.__reply_to is None:
-            #     self.__reply_to = await sendMessage(msg, self.__message, button)
+            #     self.__reply_to = await sendMessage(msg, self.message, button)
             # else:
-                await editMessage(msg, self.__message, button)
+                await editMessage(msg, self.message, button)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)
@@ -201,6 +200,7 @@ class RcloneList:
 
 @new_task
 async def path_updates(_, query: CallbackQuery, obj: RcloneList):
+    obj.message = query.message
     await query.answer()
     data = query.data.split()
     if data[1] == 'cancel':
