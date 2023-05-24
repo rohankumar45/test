@@ -20,14 +20,12 @@ LIST_LIMIT = 6
 @new_task
 async def path_updates(client, query, obj):
     await query.answer()
-    message = query.message
     data = query.data.split()
     if data[1] == 'cancel':
         obj.remote = 'Task has been cancelled!'
         obj.path = ''
         obj.is_cancelled = True
         obj.event.set()
-        await message.delete()
         return
     if obj.query_proc:
         return
@@ -54,7 +52,6 @@ async def path_updates(client, query, obj):
         if data[2] == 'fo':
             await obj.get_path()
         else:
-            await message.delete()
             obj.event.set()
     elif data[1] == 'ps':
         if obj.page_step == int(data[2]):
@@ -68,7 +65,6 @@ async def path_updates(client, query, obj):
         obj.item_type = data[2]
         await obj.get_path()
     elif data[1] == 'cur':
-        await message.delete()
         obj.event.set()
     elif data[1] == 'owner':
         obj.config_path = 'rclone.conf'
