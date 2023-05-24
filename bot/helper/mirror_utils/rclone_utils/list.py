@@ -59,11 +59,10 @@ class RcloneList:
     async def __send_list_message(self, msg, buttons):
         if not self.is_cancelled:
             if not self.__reply_to:
-                # await editMessage('<i>Waiting for rclone select...</i>', self.__message)
-                # self.__reply_to = await sendMessage(msg, self.__message, buttons)
-                self.__reply_to = await self.__client.get_messages(self.__message.chat.id, self.__message.id)
-            # else:
-            await editMessage(msg, self.__reply_to, buttons)
+                await editMessage('<i>Waiting for rclone select...</i>', self.__message)
+                self.__reply_to = await sendMessage(msg, self.__message, buttons)
+            else:
+                await editMessage(msg, self.__reply_to, buttons)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)
@@ -184,7 +183,6 @@ class RcloneList:
             await self.list_config()
 
     async def get_rclone_path(self, status, config_path=None):
-        self.__reply_to = await self.__client.get_messages(self.__message.chat.id, self.__message.id)
         self.list_status = status
         future = self.__event_handler()
         if config_path:
@@ -198,7 +196,7 @@ class RcloneList:
                 return 'Rclone Config not Exists!'
             await self.list_config()
         await wrap_future(future)
-        # await deleteMessage(self.__reply_to)
+        await deleteMessage(self.__reply_to)
         if self.config_path != 'rclone.conf' and not self.is_cancelled:
             return f'mrcc:{self.remote}{self.path}'
         return f'{self.remote}{self.path}'
