@@ -84,8 +84,8 @@ async def path_updates(client, query, obj):
 
 
 class RcloneList:
-    def __init__(self, client, message, _):
-        self.__user_id = message.from_user.id
+    def __init__(self, client, message, user_id):
+        self.__user_id = user_id
         self.__rc_user = False
         self.__rc_owner = False
         self.__client = client
