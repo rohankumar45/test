@@ -37,9 +37,10 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
             await editMessage(link, editable)
             return
     is_gdlink = is_gdrive_link(link)
+    user_config = ospath.join('rclone', f'{user_id}.conf')
     if link.startswith('mrcc:'):
         link = link.split('mrcc:', 1)[1]
-        config_path = ospath.join('rclone', f'{user_id}.conf')
+        config_path = user_config
     elif is_gdlink:
         config_path = ''
     else:
@@ -54,12 +55,16 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
             return
     dst_path = (dst_path or config_dict['RCLONE_PATH']).strip('/')
     if dst_path.startswith('mrcc:'):
-        if config_path != ospath.join('rclone', f'{user_id}.conf'):
+        if is_gdlink:
+            config_path = user_config
+        if config_path != user_config:
             await editMessage('You should use same rclone.conf to clone between pathies!', editable)
             return
     elif not is_gdlink and config_path != 'rclone.conf':
         await editMessage('You should use same rclone.conf to clone between pathies!', editable)
         return
+    else:
+        config_path = 'rclone.conf'
     if is_gdlink:
         gd = GoogleDriveHelper()
         drive_id = await sync_to_async(gd.get_id, link)
