@@ -275,7 +275,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             await editMessage(f'{tag}, {e}', check_)
             return
     LOGGER.info(link)
-    if not is_url(link) and link != 'rcl':
+    if not is_url(link) and not is_rclone_path(link):
         if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(HelpString.CLONE)):
             await deleteMessage(check_)
             check_ = fmsg
@@ -288,6 +288,9 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             return
         if not config_dict['RCLONE_PATH'] and not dst_path:
             await editMessage('Destination not specified!', check_)
+            return
+        if link.startswith('up:'):
+            await editMessage('Source not specified!', check_)
             return
         await rcloneNode(client, message, check_, user_id, link, dst_path, rcf, tag)
     else:
