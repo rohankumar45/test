@@ -125,9 +125,9 @@ class RcloneList:
     async def __send_list_message(self, msg, button):
         if not self.is_cancelled:
             if self.__reply_to is None:
-                self.__reply_to = await sendMessage(self.__message, msg, button)
+                self.__reply_to = await sendMessage(msg, self.__message, button)
             else:
-                await editMessage(self.__reply_to, msg, button)
+                await editMessage(msg, self.__reply_to, button)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)
@@ -146,27 +146,27 @@ class RcloneList:
             else:
                 ptype = 'fi'
                 name = f"[{get_readable_file_size(idict['Size'])}] {idict['Path']}"
-            buttons.ibutton(name, f'rcq pa {ptype} {orig_index}')
+            buttons.button_data(name, f'rcq pa {ptype} {orig_index}')
         if items_no > LIST_LIMIT:
             for i in [1, 2, 4, 6, 10, 30, 50, 100]:
-                buttons.ibutton(i, f'rcq ps {i}', position='header')
-            buttons.ibutton('Previous', 'rcq pre', position='footer')
-            buttons.ibutton('Next', 'rcq nex', position='footer')
+                buttons.button_data(i, f'rcq ps {i}', position='header')
+            buttons.button_data('Previous', 'rcq pre', position='footer')
+            buttons.button_data('Next', 'rcq nex', position='footer')
         if self.list_status == 'rcd':
             if self.item_type == '--dirs-only':
-                buttons.ibutton(
+                buttons.button_data(
                     'Files', 'rcq itype --files-only', position='footer')
             else:
-                buttons.ibutton(
+                buttons.button_data(
                     'Folders', 'rcq itype --dirs-only', position='footer')
         if self.list_status == 'rcu' or len(self.path_list) > 0:
-            buttons.ibutton('Choose Current Path',
+            buttons.button_data('Choose Current Path',
                             'rcq cur', position='footer')
         if self.path or len(self.__sections) > 1 or self.__rc_user and self.__rc_owner:
-            buttons.ibutton('Back', 'rcq back pa', position='footer')
+            buttons.button_data('Back', 'rcq back pa', position='footer')
         if self.path:
-            buttons.ibutton('Back To Root', 'rcq root', position='footer')
-        buttons.ibutton('Cancel', 'rcq cancel', position='footer')
+            buttons.button_data('Back To Root', 'rcq root', position='footer')
+        buttons.button_data('Cancel', 'rcq cancel', position='footer')
         button = buttons.build_menu(f_cols=2)
         msg = 'Choose Path:' + ('\nTransfer Type: <i>Download</i>' if self.list_status ==
                                 'rcd' else '\nTransfer Type: <i>Upload</i>')
@@ -223,10 +223,10 @@ class RcloneList:
             msg += f'\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time))}'
             buttons = ButtonMaker()
             for remote in self.__sections:
-                buttons.ibutton(remote, f'rcq re {remote}:')
+                buttons.button_data(remote, f'rcq re {remote}:')
             if self.__rc_user and self.__rc_owner:
-                buttons.ibutton('Back', 'rcq back re', position='footer')
-            buttons.ibutton('Cancel', 'rcq cancel', position='footer')
+                buttons.button_data('Back', 'rcq back re', position='footer')
+            buttons.button_data('Cancel', 'rcq cancel', position='footer')
             button = buttons.build_menu(2)
             await self.__send_list_message(msg, button)
 
@@ -237,9 +237,9 @@ class RcloneList:
                  'rcd' else '\nTransfer Type: Upload')
             msg += f'\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time))}'
             buttons = ButtonMaker()
-            buttons.ibutton('Owner Config', 'rcq owner')
-            buttons.ibutton('My Config', 'rcq user')
-            buttons.ibutton('Cancel', 'rcq cancel')
+            buttons.button_data('Owner Config', 'rcq owner')
+            buttons.button_data('My Config', 'rcq user')
+            buttons.button_data('Cancel', 'rcq cancel')
             button = buttons.build_menu(2)
             await self.__send_list_message(msg, button)
         else:
