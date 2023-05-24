@@ -89,6 +89,7 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         else:
             name = src_path.rsplit('/', 1)[-1]
             mime_type = rstat['MimeType']
+    await deleteMessage(editable)
     listener = MirrorLeechListener(message, tag=tag)
     await listener.onDownloadStart()
     RCTransfer = RcloneTransferHelper(listener, name)

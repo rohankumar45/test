@@ -111,7 +111,8 @@ class RcloneList:
         await self.__send_list_message(msg, buttons.build_menu(f_cols=2))
 
     async def get_path(self, itype=''):
-        await editMessage(f'<i>Listing file(s), please wait...</i>', self.__reply_to)
+        if self.__reply_to:
+            await editMessage(f'<i>Listing file(s), please wait...</i>', self.__reply_to)
         if itype:
             self.item_type == itype
         elif self.list_status == 'rcu':
