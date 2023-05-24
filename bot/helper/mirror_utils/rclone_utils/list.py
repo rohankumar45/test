@@ -1,97 +1,31 @@
-#!/usr/bin/env python3
-from asyncio import wait_for, Event, wrap_future
-from aiofiles.os import path as aiopath
 from aiofiles import open as aiopen
+from aiofiles.os import path as aiopath
+from asyncio import wait_for, Event, wrap_future
 from configparser import ConfigParser
-from pyrogram.handlers import CallbackQueryHandler
-from pyrogram.filters import regex, user
 from functools import partial
 from json import loads
+from pyrogram import Client
+from pyrogram.filters import regex, user
+from pyrogram.handlers import CallbackQueryHandler
+from pyrogram.types import Message, CallbackQuery
 from time import time
 
 from bot import LOGGER
+from bot.helper.ext_utils.bot_utils import cmd_exec, new_thread, get_readable_file_size, new_task, get_readable_time
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage
-from bot.helper.ext_utils.bot_utils import cmd_exec, new_thread, get_readable_file_size, new_task, get_readable_time
 
 LIST_LIMIT = 6
 
 
-@new_task
-async def path_updates(client, query, obj):
-    await query.answer()
-    message = query.message
-    data = query.data.split()
-    if data[1] == 'cancel':
-        obj.remote = 'Task has been cancelled!'
-        obj.path = ''
-        obj.is_cancelled = True
-        obj.event.set()
-        await message.delete()
-        return
-    if obj.query_proc:
-        return
-    obj.query_proc = True
-    if data[1] == 'pre':
-        obj.iter_start -= LIST_LIMIT * obj.page_step
-        await obj.get_path_buttons()
-    elif data[1] == 'nex':
-        obj.iter_start += LIST_LIMIT * obj.page_step
-        await obj.get_path_buttons()
-    elif data[1] == 'back':
-        if data[2] == 're':
-            await obj.list_config()
-        else:
-            await obj.back_from_path()
-    elif data[1] == 're':
-        # some remotes has space
-        data = query.data.split(maxsplit=2)
-        obj.remote = data[2]
-        await obj.get_path()
-    elif data[1] == 'pa':
-        index = int(data[3])
-        obj.path += f"/{obj.path_list[index]['Path']}" if obj.path else obj.path_list[index]['Path']
-        if data[2] == 'fo':
-            await obj.get_path()
-        else:
-            await message.delete()
-            obj.event.set()
-    elif data[1] == 'ps':
-        if obj.page_step == int(data[2]):
-            return
-        obj.page_step = int(data[2])
-        await obj.get_path_buttons()
-    elif data[1] == 'root':
-        obj.path = ''
-        await obj.get_path()
-    elif data[1] == 'itype':
-        obj.item_type = data[2]
-        await obj.get_path()
-    elif data[1] == 'cur':
-        await message.delete()
-        obj.event.set()
-    elif data[1] == 'owner':
-        obj.config_path = 'rclone.conf'
-        obj.path = ''
-        obj.remote = ''
-        await obj.list_remotes()
-    elif data[1] == 'user':
-        obj.config_path = obj.user_rcc_path
-        obj.path = ''
-        obj.remote = ''
-        await obj.list_remotes()
-    obj.query_proc = False
-
-
 class RcloneList:
-    def __init__(self, client, message, user_id):
+    def __init__(self, client: Client, message: Message, user_id: int):
         self.__user_id = user_id
         self.__rc_user = False
         self.__rc_owner = False
         self.__client = client
         self.__message = message
         self.__sections = []
-        self.__reply_to = None
         self.__time = time()
         self.__timeout = 240
         self.remote = ''
@@ -122,12 +56,9 @@ class RcloneList:
         finally:
             self.__client.remove_handler(*handler)
 
-    async def __send_list_message(self, msg, button):
+    async def __send_list_message(self, msg, buttons):
         if not self.is_cancelled:
-            if self.__reply_to is None:
-                self.__reply_to = await sendMessage(msg, self.__message, button)
-            else:
-                await editMessage(msg, self.__reply_to, button)
+            await editMessage(msg, self.__message, buttons)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)
@@ -270,7 +201,70 @@ class RcloneList:
             self.config_path = config_path
             await self.list_remotes()
         await wrap_future(future)
-        await self.__reply_to.delete()
         if self.config_path != 'rclone.conf' and not self.is_cancelled:
             return f'mrcc:{self.remote}{self.path}'
         return f'{self.remote}{self.path}'
+
+
+@new_task
+async def path_updates(_, query: CallbackQuery, obj: RcloneList):
+    await query.answer()
+    message = query.message
+    data = query.data.split()
+    if data[1] == 'cancel':
+        obj.remote = 'Task has been cancelled!'
+        obj.path = ''
+        obj.is_cancelled = True
+        obj.event.set()
+        await message.delete()
+        return
+    if obj.query_proc:
+        return
+    obj.query_proc = True
+    if data[1] == 'pre':
+        obj.iter_start -= LIST_LIMIT * obj.page_step
+        await obj.get_path_buttons()
+    elif data[1] == 'nex':
+        obj.iter_start += LIST_LIMIT * obj.page_step
+        await obj.get_path_buttons()
+    elif data[1] == 'back':
+        if data[2] == 're':
+            await obj.list_config()
+        else:
+            await obj.back_from_path()
+    elif data[1] == 're':
+        # some remotes has space
+        data = query.data.split(maxsplit=2)
+        obj.remote = data[2]
+        await obj.get_path()
+    elif data[1] == 'pa':
+        index = int(data[3])
+        obj.path += f"/{obj.path_list[index]['Path']}" if obj.path else obj.path_list[index]['Path']
+        if data[2] == 'fo':
+            await obj.get_path()
+        else:
+            obj.event.set()
+    elif data[1] == 'ps':
+        if obj.page_step == int(data[2]):
+            return
+        obj.page_step = int(data[2])
+        await obj.get_path_buttons()
+    elif data[1] == 'root':
+        obj.path = ''
+        await obj.get_path()
+    elif data[1] == 'itype':
+        obj.item_type = data[2]
+        await obj.get_path()
+    elif data[1] == 'cur':
+        obj.event.set()
+    elif data[1] == 'owner':
+        obj.config_path = 'rclone.conf'
+        obj.path = ''
+        obj.remote = ''
+        await obj.list_remotes()
+    elif data[1] == 'user':
+        obj.config_path = obj.user_rcc_path
+        obj.path = ''
+        obj.remote = ''
+        await obj.list_remotes()
+    obj.query_proc = False
