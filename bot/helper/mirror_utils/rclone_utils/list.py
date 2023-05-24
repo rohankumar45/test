@@ -119,7 +119,10 @@ class RcloneList:
 
     async def __send_list_message(self, msg, button):
         if not self.is_cancelled:
-            await editMessage(msg, self.__message, button)
+            if self.__reply_to is None:
+                self.__reply_to = await sendMessage(msg, self.__message, button)
+            else:
+                await editMessage(msg, self.__reply_to, button)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)
