@@ -189,14 +189,12 @@ async def get_tg_link_content(link: str, user_id: int):
     userbot: Client = bot_dict[user_id]['SAVEBOT'] or bot_dict['SAVEBOT']
     if chat.isdigit():
         chat = int(chat) if private else int(f'-100{chat}')
-        if not userbot:
-            raise Exception(f'User session required for this private link! Try add user session /{BotCommands.UserSetCommand}')
     try:
         await bot.get_chat(chat)
     except Exception as e:
         private = True
         if not userbot:
-            raise e
+            raise Exception(f'User session required for this private link! Try add user session /{BotCommands.UserSetCommand}')
     if private:
         if (message:= await userbot.get_messages(chat, msg_id)) and not message.empty:
             return userbot, message
