@@ -4,7 +4,7 @@ from asyncio import create_subprocess_exec, create_subprocess_shell
 from os import environ
 from pyrogram import Client, enums
 
-from bot import bot_dict, aria2, aria2_options, config_dict, user_data, download_dict, status_reply_dict_lock, images, Interval, drive_dict, \
+from bot import bot_dict, aria2, aria2_options, config_dict, kwargs, user_data, download_dict, status_reply_dict_lock, images, Interval, drive_dict, \
                 LOGGER, GLOBAL_EXTENSION_FILTER, DEFAULT_SPLIT_SIZE, DRIVES_IDS, DRIVES_NAMES, INDEX_URLS, SHORTENER_APIS, SHORTENERES
 from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_task
 from bot.helper.ext_utils.db_handler import DbManger
@@ -696,8 +696,7 @@ async def intialize_userbot(check=True):
             userbot = await Client('user', config_dict['TELEGRAM_API'],
                                    config_dict['TELEGRAM_HASH'],
                                    session_string=USER_SESSION_STRING,
-                                   parse_mode=enums.ParseMode.HTML,
-                                   no_updates=True).start()
+                                   no_updates=True, **kwargs).start()
             bot_dict['IS_PREMIUM'] = userbot.me.is_premium
             if bot_dict['IS_PREMIUM']:
                 bot_dict['USERBOT'] = userbot
@@ -742,8 +741,7 @@ async def intialize_savebot(session_string=None, check=True, user_id=None):
                                    config_dict['TELEGRAM_API'],
                                    config_dict['TELEGRAM_HASH'],
                                    session_string=session_string,
-                                   parse_mode=enums.ParseMode.HTML,
-                                   no_updates=True).start()
+                                   no_updates=True, **kwargs).start()
             if user_id:
                 bot_dict[user_id]['SAVEBOT'] = savebot
             else:

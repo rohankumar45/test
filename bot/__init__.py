@@ -6,7 +6,7 @@ from dotenv import load_dotenv, dotenv_values
 from logging import getLogger, FileHandler, StreamHandler, basicConfig, INFO, ERROR
 from os import remove as osremove, path as ospath, environ, getcwd
 from pymongo import MongoClient
-from pyrogram import Client as tgClient, enums
+from pyrogram import Client as tgClient, enums, __version__
 from qbittorrentapi import Client as qbClient
 from re import sub as resub
 from socket import setdefaulttimeout
@@ -748,10 +748,10 @@ else:
     qb_client.app_set_preferences(qb_opt)
 
 LOGGER.info('Creating client from BOT_TOKEN')
-bot = tgClient('bot', TELEGRAM_API,
-               TELEGRAM_HASH,
-               bot_token=BOT_TOKEN,
-               parse_mode=enums.ParseMode.HTML).start()
+kwargs = {'parse_mode': enums.ParseMode.HTML}
+if __version__ != '2.0.73':
+    kwargs.update({'max_concurrent_transmissions': 1000, 'worker': 1000})
+bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN, **kwargs).start()
 
 bot_loop = bot.loop
 bot_name = bot.me.username
