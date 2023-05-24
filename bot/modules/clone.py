@@ -41,10 +41,10 @@ async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, ta
         link = link.split('mrcc:', 1)[1]
         config_path = ospath.join('rclone', f'{user_id}.conf')
     elif is_gdlink:
-        config_path = None
+        config_path = ''
     else:
         config_path = 'rclone.conf'
-    if not await aiopath.exists(config_path):
+    if not is_gdlink and not await aiopath.exists(config_path):
         await editMessage(f'Rclone Config: {config_path} not Exists!', editable)
         return
     if dst_path == 'rcl' or config_dict['RCLONE_PATH'] == 'rcl':
