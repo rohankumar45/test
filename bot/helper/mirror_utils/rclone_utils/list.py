@@ -13,9 +13,71 @@ from time import time
 from bot import LOGGER
 from bot.helper.ext_utils.bot_utils import cmd_exec, new_thread, get_readable_file_size, new_task, get_readable_time
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.message_utils import sendMessage, editMessage
+from bot.helper.telegram_helper.message_utils import editMessage
 
 LIST_LIMIT = 6
+
+
+@new_task
+async def path_updates(_, query: CallbackQuery, obj):
+    await query.answer()
+    data = query.data.split()
+    if data[1] == 'cancel':
+        obj.remote = 'Task has been cancelled!'
+        obj.path = ''
+        obj.is_cancelled = True
+        obj.event.set()
+        return
+    if obj.query_proc:
+        return
+    obj.query_proc = True
+    if data[1] == 'pre':
+        obj.iter_start -= LIST_LIMIT * obj.page_step
+        await obj.get_path_buttons()
+    elif data[1] == 'nex':
+        obj.iter_start += LIST_LIMIT * obj.page_step
+        await obj.get_path_buttons()
+    elif data[1] == 'back':
+        if data[2] == 're':
+            await obj.list_config()
+        else:
+            await obj.back_from_path()
+    elif data[1] == 're':
+        # some remotes has space
+        data = query.data.split(maxsplit=2)
+        obj.remote = data[2]
+        await obj.get_path()
+    elif data[1] == 'pa':
+        index = int(data[3])
+        obj.path += f"/{obj.path_list[index]['Path']}" if obj.path else obj.path_list[index]['Path']
+        if data[2] == 'fo':
+            await obj.get_path()
+        else:
+            obj.event.set()
+    elif data[1] == 'ps':
+        if obj.page_step == int(data[2]):
+            return
+        obj.page_step = int(data[2])
+        await obj.get_path_buttons()
+    elif data[1] == 'root':
+        obj.path = ''
+        await obj.get_path()
+    elif data[1] == 'itype':
+        obj.item_type = data[2]
+        await obj.get_path()
+    elif data[1] == 'cur':
+        obj.event.set()
+    elif data[1] == 'owner':
+        obj.config_path = 'rclone.conf'
+        obj.path = ''
+        obj.remote = ''
+        await obj.list_remotes()
+    elif data[1] == 'user':
+        obj.config_path = obj.user_rcc_path
+        obj.path = ''
+        obj.remote = ''
+        await obj.list_remotes()
+    obj.query_proc = False
 
 
 class RcloneList:
@@ -204,65 +266,3 @@ class RcloneList:
         if self.config_path != 'rclone.conf' and not self.is_cancelled:
             return f'mrcc:{self.remote}{self.path}'
         return f'{self.remote}{self.path}'
-
-
-@new_task
-async def path_updates(_, query: CallbackQuery, obj: RcloneList):
-    await query.answer()
-    data = query.data.split()
-    if data[1] == 'cancel':
-        obj.remote = 'Task has been cancelled!'
-        obj.path = ''
-        obj.is_cancelled = True
-        obj.event.set()
-        return
-    if obj.query_proc:
-        return
-    obj.query_proc = True
-    if data[1] == 'pre':
-        obj.iter_start -= LIST_LIMIT * obj.page_step
-        await obj.get_path_buttons()
-    elif data[1] == 'nex':
-        obj.iter_start += LIST_LIMIT * obj.page_step
-        await obj.get_path_buttons()
-    elif data[1] == 'back':
-        if data[2] == 're':
-            await obj.list_config()
-        else:
-            await obj.back_from_path()
-    elif data[1] == 're':
-        # some remotes has space
-        data = query.data.split(maxsplit=2)
-        obj.remote = data[2]
-        await obj.get_path()
-    elif data[1] == 'pa':
-        index = int(data[3])
-        obj.path += f"/{obj.path_list[index]['Path']}" if obj.path else obj.path_list[index]['Path']
-        if data[2] == 'fo':
-            await obj.get_path()
-        else:
-            obj.event.set()
-    elif data[1] == 'ps':
-        if obj.page_step == int(data[2]):
-            return
-        obj.page_step = int(data[2])
-        await obj.get_path_buttons()
-    elif data[1] == 'root':
-        obj.path = ''
-        await obj.get_path()
-    elif data[1] == 'itype':
-        obj.item_type = data[2]
-        await obj.get_path()
-    elif data[1] == 'cur':
-        obj.event.set()
-    elif data[1] == 'owner':
-        obj.config_path = 'rclone.conf'
-        obj.path = ''
-        obj.remote = ''
-        await obj.list_remotes()
-    elif data[1] == 'user':
-        obj.config_path = obj.user_rcc_path
-        obj.path = ''
-        obj.remote = ''
-        await obj.list_remotes()
-    obj.query_proc = False
