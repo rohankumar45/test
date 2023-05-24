@@ -2,7 +2,7 @@ from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from asyncio import create_subprocess_exec, create_subprocess_shell
 from os import environ
-from pyrogram import Client, enums
+from pyrogram import Client
 
 from bot import bot_dict, aria2, aria2_options, config_dict, kwargs, user_data, download_dict, status_reply_dict_lock, images, Interval, drive_dict, \
                 LOGGER, GLOBAL_EXTENSION_FILTER, DEFAULT_SPLIT_SIZE, DRIVES_IDS, DRIVES_NAMES, INDEX_URLS, SHORTENER_APIS, SHORTENERES
