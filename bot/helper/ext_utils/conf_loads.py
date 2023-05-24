@@ -1,7 +1,6 @@
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from asyncio import create_subprocess_exec, create_subprocess_shell
-from megasdkrestclient import MegaSdkRestClient, errors as mega_err
 from os import environ
 from pyrogram import Client, enums
 
@@ -752,21 +751,3 @@ async def intialize_savebot(session_string=None, check=True, user_id=None):
             LOGGER.info('Save content mode enabled!')
         except Exception as e:
             LOGGER.error(e)
-
-
-@new_task
-async def megarest_client():
-    if MEGA_KEY := config_dict['MEGA_KEY']:
-        await (await create_subprocess_exec('megasdkrest', '--apikey', MEGA_KEY)).wait()
-        mega_client = await sync_to_async(MegaSdkRestClient, 'http://localhost:6090')
-        try:
-            if (MEGA_USERNAME := config_dict['MEGA_USERNAME']) and (MEGA_PASSWORD := config_dict['MEGA_PASSWORD']):
-                try:
-                    await sync_to_async(mega_client.login, MEGA_USERNAME, MEGA_PASSWORD)
-                except mega_err.MegaSdkRestClientException as e:
-                    LOGGER.error(e.message['message'])
-                    exit(0)
-            else:
-                LOGGER.warning('Mega API provided but credentials not provided. Starting mega in anonymous mode!')
-        except:
-            LOGGER.warning('Mega API provided but credentials not provided. Starting mega in anonymous mode!')
