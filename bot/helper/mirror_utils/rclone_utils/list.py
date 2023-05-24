@@ -91,7 +91,6 @@ class RcloneList:
         self.__client = client
         self.__message = message
         self.__sections = []
-        self.__reply_to = None
         self.__time = time()
         self.__timeout = 240
         self.remote = ''
@@ -124,10 +123,7 @@ class RcloneList:
 
     async def __send_list_message(self, msg, button):
         if not self.is_cancelled:
-            if self.__reply_to is None:
-                self.__reply_to = await sendMessage(msg, self.__message, button)
-            else:
-                await editMessage(msg, self.__reply_to, button)
+            await editMessage(msg, self.__message, button)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)
@@ -270,7 +266,6 @@ class RcloneList:
             self.config_path = config_path
             await self.list_remotes()
         await wrap_future(future)
-        await self.__reply_to.delete()
         if self.config_path != 'rclone.conf' and not self.is_cancelled:
             return f'mrcc:{self.remote}{self.path}'
         return f'{self.remote}{self.path}'
