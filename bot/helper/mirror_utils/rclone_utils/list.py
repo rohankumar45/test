@@ -184,6 +184,7 @@ class RcloneList:
             await self.list_config()
 
     async def get_rclone_path(self, status, config_path=None):
+        self.__reply_to = await self.__client.get_messages(self.__message.chat.id, self.__message.id)
         self.list_status = status
         future = self.__event_handler()
         if config_path:
