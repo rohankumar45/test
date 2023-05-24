@@ -28,6 +28,7 @@ class RcloneList:
         self.__sections = []
         self.__time = time()
         self.__timeout = 240
+        self.__reply_to = None
         self.remote = ''
         self.is_cancelled = False
         self.query_proc = False
