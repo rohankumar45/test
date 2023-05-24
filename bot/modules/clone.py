@@ -266,6 +266,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
         except DirectDownloadLinkException as e:
             await editMessage(f'{tag}, {e}', check_)
             return
+    LOGGER.info(link)
     if not is_url(link) and not is_rclone_path(link):
         if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(HelpString.CLONE)):
             await deleteMessage(check_)
