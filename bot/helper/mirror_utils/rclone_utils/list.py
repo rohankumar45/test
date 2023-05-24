@@ -13,7 +13,7 @@ from time import time
 from bot import LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_time, cmd_exec, new_thread, get_readable_file_size, new_task
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
+from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, deleteMessage
 
 LIST_LIMIT = 6
 
@@ -21,13 +21,14 @@ LIST_LIMIT = 6
 class RcloneList:
     def __init__(self, client: Client, message: Message, user_id: int):
         self.__client = client
+        self.__message = message
         self.__user_id = user_id
         self.__rc_user = False
         self.__rc_owner = False
         self.__sections = []
         self.__time = time()
         self.__timeout = 240
-        self.message = message
+        self.__reply_to = None
         self.remote = ''
         self.is_cancelled = False
         self.query_proc = False
@@ -55,12 +56,13 @@ class RcloneList:
         finally:
             self.__client.remove_handler(*handler)
 
-    async def __send_list_message(self, msg, button):
+    async def __send_list_message(self, msg, buttons):
         if not self.is_cancelled:
-            # if self.__reply_to is None:
-            #     self.__reply_to = await sendMessage(msg, self.message, button)
-            # else:
-                await editMessage(msg, self.message, button)
+            if not self.__reply_to:
+                await editMessage('<i>Waiting for rclone select...</i>', self.__message)
+                self.__reply_to = await sendMessage(msg, self.__message, buttons)
+            else:
+                await editMessage(msg, self.__reply_to, buttons)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)
@@ -193,6 +195,7 @@ class RcloneList:
                 return 'Rclone Config not Exists!'
             await self.list_config()
         await wrap_future(future)
+        await deleteMessage(self.__reply_to)
         if self.config_path != 'rclone.conf' and not self.is_cancelled:
             return f'mrcc:{self.remote}{self.path}'
         return f'{self.remote}{self.path}'
@@ -200,7 +203,6 @@ class RcloneList:
 
 @new_task
 async def path_updates(_, query: CallbackQuery, obj: RcloneList):
-    obj.message = query.message
     await query.answer()
     data = query.data.split()
     if data[1] == 'cancel':
