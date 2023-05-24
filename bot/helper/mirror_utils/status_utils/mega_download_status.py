@@ -1,6 +1,3 @@
-from os import path as ospath
-
-from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time, EngineStatus, presuf_remname_name
 
 
@@ -17,16 +14,12 @@ class MegaDownloadStatus:
         return self.__name
 
     def progress_raw(self):
-        if config_dict['ENABLE_MEGAREST']:
-            return self.__obj.progress
         try:
             return round(self.__obj.downloaded_bytes / self.__size * 100,2)
         except:
             return 0.0
 
     def progress(self):
-        if config_dict['ENABLE_MEGAREST']:
-            return f'{round(self.progress_raw(), 2)}%'
         return f'{self.progress_raw()}%'
 
     def status(self):
@@ -54,12 +47,7 @@ class MegaDownloadStatus:
         return self.__obj
 
     def eng(self):
-        engine = EngineStatus()
-        if config_dict['ENABLE_MEGAREST']:
-            engine.STATUS_MEGA = 'Megarest'
-        else:
-            engine.STATUS_MEGA = 'Megasdk'
-        return engine.STATUS_MEGA
+        return EngineStatus.STATUS_MEGA
 
     @property
     def sname(self):

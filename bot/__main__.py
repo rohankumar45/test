@@ -19,7 +19,7 @@ from time import time
 from bot import bot, bot_dict, bot_name, alive, botStartTime, Interval, QbInterval, user_data, config_dict, scheduler, LOGGER, DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, OWNER_ID
 from bot.helper import save_message
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time, cmd_exec, sync_to_async, new_task, get_progress_bar_string
-from bot.helper.ext_utils.conf_loads import megarest_client, intialize_userbot, intialize_savebot
+from bot.helper.ext_utils.conf_loads import intialize_userbot, intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up, clean_target
 from bot.helper.ext_utils.help_messages import HelpString, get_help_button
@@ -287,8 +287,6 @@ async def main():
     bot.add_handler(MessageHandler(leave_member, filters=left_chat_member))
     await gather(intialize_userbot(False), set_command(), start_cleanup(), torrent_search.initiate_search_tools(), return_exceptions=True)
     await gather(intialize_savebot(config_dict['SAVE_SESSION_STRING'], False), restart_notification(), return_exceptions=True)
-    if config_dict['ENABLE_MEGAREST']:
-        megarest_client()
     LOGGER.info(f'Bot @{bot_name} Started!')
     signal(SIGINT, exit_clean_up)
 

@@ -20,7 +20,6 @@ from bot.helper.ext_utils.multi import run_multi, run_bulk, MultiSelect
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.mirror_utils.download_utils.aria2_download import add_aria2c_download
 from bot.helper.mirror_utils.download_utils.gd_download import add_gd_download
-from bot.helper.mirror_utils.download_utils.megarest_download import MegaDownloader
 from bot.helper.mirror_utils.download_utils.megasdk_download import add_mega_download
 from bot.helper.mirror_utils.download_utils.qbit_download import add_qb_torrent
 from bot.helper.mirror_utils.download_utils.rclone_download import add_rclone_download
@@ -314,15 +313,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         await deleteMessage(check_)
         await add_gd_download(link, path, listener, name, gdrive_sharer)
     elif is_mega_link(link):
-        if config_dict['ENABLE_MEGAREST']:
-            if config_dict['MEGA_KEY']:
-                LOGGER.info('Download mega link using Megarest client!')
-                await MegaDownloader(listener).add_download(link, f'{path}/')
-            else:
-                await sendMessage('MEGA_API_KEY not Provided!', message)
-        else:
-            LOGGER.info('Download mega link using Megasdk client!')
-            await add_mega_download(link, f'{path}/', listener, name)
+        await add_mega_download(link, f'{path}/', listener, name)
     elif isQbit:
         await add_qb_torrent(link, path, listener, ratio, seed_time)
     else:

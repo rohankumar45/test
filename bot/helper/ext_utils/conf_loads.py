@@ -363,7 +363,6 @@ async def load_config():
 #=========================== ACCOUNTS =================================
     # Mega
     MEGA_KEY = environ.get('MEGA_KEY', '')
-    ENABLE_MEGAREST = environ.get('ENABLE_MEGAREST', 'False').lower() == 'true'
     MEGA_USERNAME = environ.get('MEGA_USERNAME', '')
     MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
     MEGA_STATUS = environ.get('MEGA_STATUS', '~')
@@ -629,7 +628,6 @@ async def load_config():
                         'IMAGE_YT': IMAGE_YT,
                         'IMAGE_ZIP': IMAGE_ZIP,
                         # ACCOUNTS
-                        'ENABLE_MEGAREST': ENABLE_MEGAREST,
                         'MEGA_KEY': MEGA_KEY,
                         'MEGA_USERNAME': MEGA_USERNAME,
                         'MEGA_PASSWORD': MEGA_PASSWORD,

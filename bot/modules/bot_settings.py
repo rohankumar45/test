@@ -14,7 +14,7 @@ from time import time
 from bot import bot, bot_loop, bot_dict, aria2, config_dict, drive_dict, status_reply_dict_lock, Interval, aria2_options, aria2c_global, download_dict, qbit_options, get_client, \
                 LOGGER, DATABASE_URL, DRIVES_IDS, DRIVES_NAMES, INDEX_URLS, GLOBAL_EXTENSION_FILTER, SHORTENERES, SHORTENER_APIS
 from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_thread
-from bot.helper.ext_utils.conf_loads import default_values, load_config, megarest_client, intialize_userbot, intialize_savebot
+from bot.helper.ext_utils.conf_loads import default_values, load_config, intialize_userbot, intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.fs_utils import clean_target, download_gclone
 from bot.helper.ext_utils.task_manager import start_from_queued
@@ -50,8 +50,6 @@ async def get_buttons(key=None, edit_type=None):
         else:
             buttons.button_data('View', 'botset view var')
             image = config_dict['IMAGE_CONEDIT']
-        if config_dict['ENABLE_MEGAREST'] and config_dict['MEGA_KEY']:
-            buttons.button_data('Reload Mega', 'botset reloadmega', 'header')
         if config_dict['USER_SESSION_STRING']:
             buttons.button_data('Restart Userbot', 'botset restartubot', 'header')
         if config_dict['SAVE_SESSION_STRING']:
@@ -150,12 +148,6 @@ async def update_buttons(message: Message, key: str=None, edit_type: str=None):
 async def edit_variable(_, message: Message, omsg: Message, key: str):
     handler_dict[message.chat.id] = False
     value = message.text
-    if key == 'ENABLE_MEGAREST':
-        if value.lower() == 'true':
-            megarest_client()
-        else:
-            await (await create_subprocess_exec('pkill', '-9', '-f', 'megasdkrest')).wait()
-            LOGGER.info('Megarest stopped! Switch to Megasdk client.')
     if value.lower() == 'true':
         value = True
     elif value.lower() == 'false':
@@ -412,11 +404,6 @@ async def edit_bot_settings(client: Client, query: CallbackQuery):
         if key is None:
             globals()['START'] = 0
         await update_buttons(message, key)
-    elif data[1] == 'reloadmega':
-        await query.answer('Relogin Megarest!', show_alert=True)
-        await (await create_subprocess_exec('pkill', '-9', '-f', 'megasdkrest')).wait()
-        await sleep(1.5)
-        megarest_client()
     elif data[1] == 'restartubot':
         await query.answer('Restarting Userbot!', show_alert=True)
         await intialize_userbot()

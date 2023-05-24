@@ -372,10 +372,6 @@ IMAGE_ZIP = environ.get('IMAGE_ZIP', 'https://telegra.ph/file/4a1a17589798bc405b
 
 #=========================== ACCOUNTS =================================
 # Mega
-MEGA_KEY = environ.get('MEGA_KEY', '')
-if not MEGA_KEY:
-    LOGGER.warning('MEGA KEY not provided!')
-ENABLE_MEGAREST = environ.get('ENABLE_MEGAREST', 'False').lower() == 'true'
 MEGA_USERNAME = environ.get('MEGA_USERNAME', '')
 MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
 MEGA_STATUS = environ.get('MEGA_STATUS', '~')
@@ -590,8 +586,6 @@ config_dict = {'BOT_TOKEN': BOT_TOKEN,
                'IMAGE_YT': IMAGE_YT,
                'IMAGE_ZIP': IMAGE_ZIP,
                # ACCOUNTS
-               'ENABLE_MEGAREST': ENABLE_MEGAREST,
-               'MEGA_KEY': MEGA_KEY,
                'MEGA_USERNAME': MEGA_USERNAME,
                'MEGA_PASSWORD': MEGA_PASSWORD,
                'MEGA_STATUS': MEGA_STATUS,
