@@ -226,7 +226,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
                 break
 
     if not (link:= await get_link(message)):
-        if len(args) > 1:
+        if args:
             link = args[0].strip()
             if not link.startswith(('up:', 'rcf:')):
                 link = re_split(r' up: | rcf: ', link)[0].strip()
