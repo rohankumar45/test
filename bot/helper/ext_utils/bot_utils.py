@@ -346,8 +346,8 @@ def get_date_time(message: Message):
 
 
 async def default_button(message: Message):
-    message = await bot.get_messages(message.chat.id, message.id)
     try:
+        message = await bot.get_messages(message.chat.id, message.id)
         del message.reply_markup.inline_keyboard[-1]
     except:
         pass
