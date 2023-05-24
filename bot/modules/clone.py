@@ -227,7 +227,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
 
     if not (link:= await get_link(message)):
         if len(args) > 1:
-            link = args[1].strip()
+            link = args[0].strip()
             if not link.startswith(('up:', 'rcf:')):
                 link = re_split(r' up: | rcf: ', link)[0].strip()
 
@@ -266,7 +266,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
         except DirectDownloadLinkException as e:
             await editMessage(f'{tag}, {e}', check_)
             return
-    if not link:
+    if not is_url(link) and not is_rclone_path(link):
         if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(HelpString.CLONE)):
             await deleteMessage(check_)
             check_ = fmsg
