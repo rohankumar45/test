@@ -292,6 +292,9 @@ class RcloneTransferHelper:
             cmd.extend(('--drive-random-pick-sa', '--drive-rolling-sa', '--drive-rolling-count=1'))
         self.__proc = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
         _, return_code = await gather(self.__progress(), self.__proc.wait())
+        LOGGER.info('===========================')
+        LOGGER.info(return_code)
+        LOGGER.info('===========================')
         if self.__is_cancelled:
             return None, None
         if return_code == -9:
