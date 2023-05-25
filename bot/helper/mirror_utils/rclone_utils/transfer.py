@@ -304,7 +304,13 @@ class RcloneTransferHelper:
         else:
             dst_remote, dst_path = destination.split(':', 1)
             link, destination = await self.__get_gdrive_link(config_path, dst_remote, dst_path, mime_type)
-            return (None, None) if self.__is_cancelled else (link, destination)
+            if link.endswith('err'):
+                await self.__listener.onUploadError('File not found or insufficient file permissions!', self.name, True)
+                return None, None
+            elif self.__is_cancelled:
+                return None, None
+            else:
+                return (None, None) if self.__is_cancelled else (link, destination)
 
     @staticmethod
     async def __getUpdatedCommand(config_path, source, destination, rcflags, method):
