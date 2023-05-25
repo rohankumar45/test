@@ -31,7 +31,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_me
 
 
 @new_task
-async def _mirror_leech(client: Client, message: Message, isZip=False, extract=False, isQbit=False, isLeech=False, sameDir={}, bulk=[]):
+async def _mirror_leech(client: Client, message: Message, isZip=False, extract=False, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     mesg = message.text.split('\n')
     message_args = mesg[0].split(maxsplit=1)
     if len(mesg) > 1 and mesg[1].startswith('Tag: '):

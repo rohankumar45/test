@@ -12,7 +12,7 @@ from time import time
 
 
 from bot import bot_loop, bot_dict, bot_name, download_dict, download_dict_lock, Interval, aria2, user_data, config_dict, status_reply_dict_lock, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, \
-                DOWNLOAD_DIR, LOGGER, DATABASE_URL, DEFAULT_SPLIT_SIZE
+                DOWNLOAD_DIR, LOGGER, DATABASE_URL, DEFAULT_SPLIT_SIZE, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_magnet, is_url, presuf_remname_name, is_premium_user, action, get_link, is_media, get_date_time, UserDaily, default_button, sync_to_async, get_readable_file_size
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
@@ -85,6 +85,9 @@ class MirrorLeechListener:
     async def __archive(self, m_path, path, size, mpart=False):
         LEECH_SPLIT_SIZE = config_dict['LEECH_SPLIT_SIZE']
         cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a", "-mx=0", f"-p{self.pswd}", path, m_path]
+        for ext in GLOBAL_EXTENSION_FILTER:
+            ex_ext = f'-x!*.{ext}'
+            cmd.append(ex_ext)
         if self.isLeech and int(size) > LEECH_SPLIT_SIZE or mpart and int(size) > LEECH_SPLIT_SIZE:
             if self.pswd is None:
                 del cmd[4]
@@ -110,7 +113,12 @@ class MirrorLeechListener:
 
     async def onDownloadComplete(self):
         if len(self.sameDir) > 0:
-            await sleep(8)
+            await sleep(3)
+            for _ in range(10):
+                if len(self.sameDir) > 1:
+                    break
+                else:
+                    await sleep(1)
         multi_links = False
         async with download_dict_lock:
             if len(self.sameDir) > 1:

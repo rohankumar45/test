@@ -10,8 +10,9 @@ from pyrogram.handlers import CallbackQueryHandler
 from pyrogram.types import Message, CallbackQuery
 from time import time
 
-from bot import LOGGER
+from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_time, cmd_exec, new_thread, get_readable_file_size, new_task
+from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, deleteMessage
 
@@ -94,6 +95,8 @@ class RcloneList:
                 buttons.button_data('Folders', 'rcq itype --dirs-only', 'footer')
         if self.list_status == 'rcu' or len(self.path_list) > 0:
             buttons.button_data('This Path', 'rcq cur', 'footer')
+        if self.list_status == 'rcu':
+            buttons.button_data('Set as Default Path', 'rcq def', position='footer')
         if self.path or len(self.__sections) > 1 or self.__rc_user and self.__rc_owner:
             buttons.button_data('<<', 'rcq back pa', 'footer')
         if self.path:
@@ -102,6 +105,9 @@ class RcloneList:
         msg = f'<b>Choose Path:</b>\n'
         if items_no > LIST_LIMIT:
             msg += f'Page: <b>{int(page)}/{pages}</b> | Steps: <b>{self.page_step}</b>\n\n'
+        if self.list_status == 'rcu':
+            default_path = config_dict['RCLONE_PATH']
+            msg += f'Default Path: {default_path}\n' if default_path else ''
         msg += f'Items: <b>{items_no}</b>\n'
         msg += f'Item Type: <b>{self.item_type}</b>\n'
         msg += f"Transfer Type: <b>{'Download' if self.list_status == 'rcd' else 'Upload' }</b>\n"
@@ -251,6 +257,13 @@ async def path_updates(_, query: CallbackQuery, obj: RcloneList):
         await obj.get_path()
     elif data[1] == 'cur':
         obj.event.set()
+    elif data[1] == 'def':
+        path = f'{obj.remote}{obj.path}' if obj.config_path == 'rclone.conf' else f'mrcc:{obj.remote}{obj.path}'
+        if path != config_dict['RCLONE_PATH']:
+            config_dict['RCLONE_PATH'] = path
+            await obj.get_path_buttons()
+            if config_dict['DATABASE_URL']:
+                await DbManger().update_config({'RCLONE_PATH': path})
     elif data[1] == 'owner':
         obj.config_path = 'rclone.conf'
         obj.path = ''

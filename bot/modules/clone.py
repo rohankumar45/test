@@ -235,15 +235,15 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
 
     if not (link:= await get_link(message)):
         if args:
-            link = args[0].strip()
-            if not link.startswith(('up:', 'rcf:')):
-                link = re_split(r' up: | rcf: ', link)[0].strip()
+            arg = args[0].strip()
+            if not arg.startswith(('up:', 'rcf:')):
+                link = re_split(r' up: | rcf: ', arg)[0].strip()
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
         return
 
-    if not link and reply_to and reply_to.text:
+    if not (is_url(link) or is_rclone_path(link)) and reply_to and reply_to.text:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
         link = reply_to.text.split('\n', 1)[0].strip()

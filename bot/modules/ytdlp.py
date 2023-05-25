@@ -234,7 +234,7 @@ async def _mdisk(link: str, name: str):
             return name, link
 
 @new_task
-async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sameDir={}, bulk=[]):
+async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sameDir=None, bulk=[]):
     mssg = message.text
     msplit = message.text.split('\n')
     if len(msplit) > 1 and msplit[1].startswith('Tag: '):
