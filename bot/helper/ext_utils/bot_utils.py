@@ -392,7 +392,7 @@ async def update_user_ldata(id_: int, key: str, value):
 
 async def get_link(message: Message):
     link = ''
-    pattern = r'[(http(s)?):\/\/(www\.)?\S+]{2,256}\.[a-z]{2,6}(\S*)|magnet:\?xt=urn:(btih|btmh):[-a-zA-Z0-9@:%_\+.~#?&//=]*\s*'
+    pattern = r'https?:\/\/(www.)?\S+\.[a-z]{2,6}\b(\S*)|magnet:\?xt=urn:(btih|btmh):[-a-zA-Z0-9@:%_\+.~#?&//=]*\s*'
     if match:= re_search(pattern, message.text.strip()):
         link = match.group()
     LOGGER.info(match)
