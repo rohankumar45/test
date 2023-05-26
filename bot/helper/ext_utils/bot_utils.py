@@ -395,6 +395,7 @@ async def get_link(message: Message):
     pattern = r'[(http(s)?):\/\/(www\.)?\S+]{2,256}\.[a-z]{2,6}\b(\S*)|magnet:\?xt=urn:(btih|btmh):[-a-zA-Z0-9@:%_\+.~#?&//=]*\s*'
     if match:= re_search(pattern, message.text.strip()):
         link = match.group()
+    LOGGER.info(match)
     if not link and (reply_to:= message.reply_to_message):
         if (media:= is_media(reply_to)):
             link = f'Source is media/file: {media.mime_type}' if not reply_to.photo else 'Source is image/photo'
