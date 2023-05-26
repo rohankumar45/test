@@ -236,6 +236,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     LOGGER.info(args)
 
     if not (link:= await get_link(message)):
+        LOGGER.info(link)
         if args:
             arg = args[0].strip()
             if not arg.startswith(('up:', 'rcf:', 'n:')):
