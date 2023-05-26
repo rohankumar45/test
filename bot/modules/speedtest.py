@@ -26,7 +26,6 @@ async def speedtest(_, message: Message):
 <b>├ ISP: </b>{result['client']['isp']}
 <b>├ Ping: </b>{int(result['ping'])} ms
 <b>├ ISP Rating: </b>{result['client']['isprating']}
-<b>├ ISP Rating: </b>{result['client']['isprating']}
 <b>├ Sponsor: </b>{result['server']['sponsor']}
 <b>├ Upload: </b>{get_readable_file_size(result['upload'] / 8)}
 <b>├ Download: </b>{get_readable_file_size(result['download'] / 8)}
