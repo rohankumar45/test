@@ -248,6 +248,8 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             tag = reply_to.from_user.mention
         link = reply_to.text.split('\n', 1)[0].strip()
 
+    LOGGER.info(link)
+
     if is_bulk:
         await run_bulk([client, message, index, bulk_start, bulk_end, bi], cloneNode, bulk)
         return
