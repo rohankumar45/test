@@ -236,7 +236,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     if not (link:= await get_link(message)):
         if args:
             arg = args[0].strip()
-            if not arg.startswith(('up:', 'rcf:')):
+            if not arg.startswith(('up:', 'rcf:', 'n:')):
                 link = re_split(r' up: | rcf: ', arg)[0].strip()
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
