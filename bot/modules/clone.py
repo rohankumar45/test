@@ -241,6 +241,8 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             if not arg.startswith(('up:', 'rcf:', 'n:')):
                 link = re_split(r' up: | rcf: ', arg)[0].strip()
 
+    LOGGER.info(link)
+
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
         return
