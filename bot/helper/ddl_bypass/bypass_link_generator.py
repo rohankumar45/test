@@ -461,9 +461,9 @@ def aio_one(url: str)-> str:
     domain, sleep_time = [shortner_dict[x] for x in tuple(shortner_dict.keys()) if x in url][0]
     client = create_scraper(allow_brotli=False)
     ref = f"{domain}{url.rstrip('/').split('/')[-1]}"
-    response = client.get(ref, headers={'referer': ref})
-    soup = BeautifulSoup(response.content, 'html.parser')
     try:
+        response = client.get(ref, headers={'referer': ref})
+        soup = BeautifulSoup(response.content, 'html.parser')
         inputs = soup.find(id='go-link').find_all('input')
         data = {input.get('name'): input.get('value') for input in inputs}
         sleep(sleep_time)
@@ -477,9 +477,9 @@ def aio_two(url: str):
     shortner_dict = SiteList().aio_bypass_dict()[1]
     domain, referer, sleep_time = [shortner_dict[x] for x in tuple(shortner_dict.keys()) if x in url][0]
     client = create_scraper(allow_brotli=False)
-    response = client.get(f"{domain}{url.rstrip('/').split('/')[-1]}", headers={'referer': referer})
-    soup = BeautifulSoup(response.content, 'html.parser')
     try:
+        response = client.get(f"{domain}{url.rstrip('/').split('/')[-1]}", headers={'referer': referer})
+        soup = BeautifulSoup(response.content, 'html.parser')
         inputs = soup.find(id='go-link').find_all('input')
         data = {input.get('name'): input.get('value') for input in inputs}
         sleep(sleep_time)
@@ -493,9 +493,9 @@ def aio_three(url: str):
     shortner_dict = SiteList().aio_bypass_dict()[2]
     domain, referer, sleep_time = [shortner_dict[x] for x in tuple(shortner_dict.keys()) if x in url][0]
     client = create_scraper(allow_brotli=False)
-    response = client.get(f"{domain}{url.rstrip('/').split('/')[-1]}", headers={'referer': referer})
-    soup = BeautifulSoup(response.content, 'html.parser')
     try:
+        response = client.get(f"{domain}{url.rstrip('/').split('/')[-1]}", headers={'referer': referer})
+        soup = BeautifulSoup(response.content, 'html.parser')
         inputs = soup.find_all('input')
         data = {input.get('name'): input.get('value') for input in inputs}
         sleep(sleep_time)
