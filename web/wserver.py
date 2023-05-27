@@ -11,6 +11,7 @@ from web.nodes import make_tree
 
 
 app = Flask(__name__)
+botStartTime = time()
 
 basicConfig(format='%(asctime)s: [%(levelname)s: %(filename)s - %(lineno)d] ~ %(message)s',
             handlers=[FileHandler('log.txt'), StreamHandler()],
@@ -21,7 +22,7 @@ aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
 
 LOGGER = getLogger(__name__)
 
-rawowners = "<h1 style='text-align: center'><a href='https://t.me/r4ndom_releases'>@R4ndom_Releases</a></h1>"
+rawowners = "<h1 style='text-align: center'><a href='https://t.me/AIOReleases'>@AIOReleases</a></h1>"
 
 pin_entry = '''
     <section>
@@ -88,7 +89,7 @@ rawindexpage = '''
         <h2 class="name">Qbittorrent Selection</h2>
         <div class="social">
             <a href="https://www.github.com/MyLastAcc"><i class="fab fa-github"></i></a>
-            <a href="https://t.me/r4ndom_releases"><i class="fab fa-telegram"></i></a>
+            <a href="https://t.me/AIOReleases"><i class="fab fa-telegram"></i></a>
         </div>
     </header>
     <!-- pin_entry -->
@@ -684,6 +685,7 @@ input[type="submit"]:hover, input[type="submit"]:focus {
 }
 '''
 
+
 def re_verfiy(paused, resumed, client, hash_id):
     paused = paused.strip()
     resumed = resumed.strip()
@@ -726,6 +728,7 @@ def re_verfiy(paused, resumed, client, hash_id):
     LOGGER.info(f"Verified! Hash: {hash_id}")
     return True
 
+
 @app.route('/app/files/<string:id_>', methods=['GET'])
 def list_torrent_contents(id_):
     if "pin_code" not in request.args.keys():
@@ -752,6 +755,7 @@ def list_torrent_contents(id_):
     return rawindexpage.replace("/* style2 */", stlye2).replace("<!-- files_list -->", files_list) \
         .replace("{form_url}", f"/app/files/{id_}?pin_code={pincode}") \
         .replace("<!-- {My_content} -->", cont[0])
+
 
 @app.route('/app/files/<string:id_>', methods=['POST'])
 def set_priority(id_):
@@ -799,11 +803,12 @@ def set_priority(id_):
             LOGGER.info(f"Verification Failed! Report! Gid: {id_}")
     return list_torrent_contents(id_)
 
-botStartTime = time()
+
 if path.exists('.git'):
     commit_date = check_output(["git log -1 --date=format:'%y/%m/%d %H:%M' --pretty=format:'%cd'"], shell=True).decode()
 else:
     commit_date = 'No UPSTREAM_REPO'
+
 
 @app.route('/status', methods=['GET'])
 def status():
@@ -822,13 +827,16 @@ def status():
             'recv': recv,
         },
     }
+
 @app.route('/')
 def homepage():
     return rawindexpage.replace("/* style1 */", stlye1).replace("<!-- Print -->", rawowners)
 
+
 @app.errorhandler(Exception)
 def page_not_found(e):
     return rawindexpage.replace("/* style1 */", stlye1).replace("<!-- Print -->", f"<h1 style='text-align: center;color: red;'>404: Torrent not found! Mostly wrong input. <br><br>Error: {e}</h1>"), 404
+
 
 if __name__ == "__main__":
     app.run()
