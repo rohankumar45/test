@@ -621,8 +621,9 @@ class MirrorLeechListener:
             if self.uid in download_dict:
                 del download_dict[self.uid]
             count = len(download_dict)
-            if self.uid in self.sameDir:
-                self.sameDir.remove(self.uid)
+            if self.sameDir and self.uid in self.sameDir['tasks']:
+                self.sameDir['tasks'].remove(self.uid)
+                self.sameDir['total'] -= 1
         if len(error) > (1000 if config_dict['ENABLE_IMAGE_MODE'] else 3800):
             err_msg = await sync_to_async(TelePost('Download Error').create_post, error.replace('\n', '<br>'))
             err_msg = f'<a href="{err_msg}"><b>Details</b></a>'
@@ -709,8 +710,6 @@ class MirrorLeechListener:
             if self.uid in download_dict:
                 del download_dict[self.uid]
             count = len(download_dict)
-            if self.uid in self.sameDir:
-                self.sameDir.remove(self.uid)
         if len(error) > (1000 if config_dict['ENABLE_IMAGE_MODE'] else 3800):
             err_msg = await sync_to_async(TelePost('Upload Error').create_post, error.replace('\n', '<br>'))
             err_msg = f'<a href="{err_msg}"><b>Details</b></a>'
