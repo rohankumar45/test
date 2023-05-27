@@ -33,7 +33,7 @@ async def run_multi(mlist, func, *args):
             nextmsg = await sendMessage(' '.join(msg) + auth, nextmsg)
         nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
         if folder_name and len(folder_name) > 0:
-            args[-2].add(nextmsg.id)
+            args[-2]['tasks'].add(nextmsg.id)
         nextmsg.from_user = message.from_user
         await sleep(4)
         func(client, nextmsg, *args)

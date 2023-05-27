@@ -147,8 +147,8 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             ratio = seed_time = None
             if not is_bulk:
                 if not sameDir:
-                    sameDir = set()
-                sameDir.add(message.id)
+                    sameDir = {'total': multi, 'tasks': set()}
+                sameDir['tasks'].add(message.id)
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
         await sendMessage(f'Upss {tag}, multi/bulk mode for premium user only', message)
