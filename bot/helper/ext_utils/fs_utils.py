@@ -1,6 +1,4 @@
-from aiofiles import open as aiopen
 from aiofiles.os import remove as aioremove, path as aiopath, listdir, makedirs, rename as aiorename
-from aiohttp import ClientSession
 from aioshutil import rmtree as aiormtree, disk_usage
 from asyncio import create_subprocess_exec
 from magic import Magic
@@ -11,7 +9,7 @@ from subprocess import run as srun
 from sys import exit as sexit
 
 from bot import aria2, config_dict, get_client, DOWNLOAD_DIR, LOGGER, GLOBAL_EXTENSION_FILTER
-from bot.helper.ext_utils.bot_utils import sync_to_async
+from bot.helper.ext_utils.bot_utils import sync_to_async, downlod_content
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 
 
@@ -41,21 +39,11 @@ async def download_gclone():
     LOGGER.info('Downloading GClone...')
     await clean_target('gclone')
     if GCLONE_URL:= config_dict['GCLONE_URL']:
-        try:
-            async with ClientSession() as session:
-                async with session.get(GCLONE_URL) as r:
-                    if r.status == 200:
-                        async for data in r.content.iter_chunked(1024):
-                            async with aiopen('gclone', 'ba') as f:
-                                await f.write(data)
-                    else:
-                        raise Exception(f'Failed to download GClone, got respons {r.status}!')
-        except Exception as e:
-            LOGGER.error(e)
-        finally:
-            if await aiopath.exists('gclone'):
-                await (await create_subprocess_exec('chmod', '-R', '777', 'gclone')).wait()
-                LOGGER.info('GClone sucessfully downloaded!')
+        if await downlod_content(GCLONE_URL, 'gclone'):
+            await (await create_subprocess_exec('chmod', '-R', '777', 'gclone')).wait()
+            LOGGER.info('GClone sucessfully downloaded.')
+        else:
+            LOGGER.info('GClone failed to download!')
 
 
 async def clean_target(path: str):

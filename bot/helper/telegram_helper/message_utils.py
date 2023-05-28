@@ -1,6 +1,3 @@
-from aiofiles import open as aiopen
-from aiofiles.os import path as aiopath
-from aiohttp import ClientSession
 from asyncio import sleep, gather
 from datetime import datetime, timedelta
 from pyrogram import Client
@@ -10,7 +7,7 @@ from re import match as re_match
 from time import time
 
 from bot import bot, bot_dict, bot_loop, Interval, status_reply_dict, status_reply_dict_lock, config_dict, download_dict_lock, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async
+from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async, downlod_content
 from bot.helper.ext_utils.fs_utils import clean_target
 from bot.helper.telegram_helper.bot_commands import BotCommands
 
@@ -143,15 +140,8 @@ async def deleteMessage(*args: Message):
 async def sendFile(message: Message, doc: str, caption: str ='', thumb=None):
     try:
         thumbnail = None
-        if thumb:
-            async with ClientSession() as session:
-                async with session.get(thumb) as r:
-                    if r.status == 200:
-                        async for data in r.content.iter_chunked(1024):
-                            async with aiopen('thumb.png', 'ba') as f:
-                                await f.write(data)
-            if await aiopath.exists('thumb.png'):
-                thumbnail = 'thumb.png'
+        if thumb and await downlod_content(thumb, 'thumb.png'):
+            thumbnail = 'thumb.png'
         await message.reply_document(doc, caption=caption, quote=True, thumb=thumbnail)
         await gather(*[clean_target(file) for file in [doc, 'thumb.png'] if file != 'log.txt'])
     except FloodWait as f:

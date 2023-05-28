@@ -1,3 +1,5 @@
+from aiofiles import open as aiopen
+from aiohttp import ClientSession
 from asyncio import create_subprocess_shell, create_subprocess_exec, sleep, run_coroutine_threadsafe
 from asyncio.subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor
@@ -370,6 +372,7 @@ def get_multiid(user_id: int):
     return multiid
 
 
+
 def get_content_type(link: str):
     try:
         res = rhead(link, allow_redirects=True, timeout=5, headers={'user-agent': 'Wget/1.12'})
@@ -381,6 +384,21 @@ def get_content_type(link: str):
         except:
             content_type = None
     return content_type
+
+
+async def downlod_content(url: str, name: str):
+    try:
+        async with ClientSession() as session:
+            async with session.get(url) as r:
+                if r.status == 200:
+                    async for data in r.content.iter_chunked(1024):
+                        async with aiopen(name, 'ba') as f:
+                            await f.write(data)
+                    return True
+                else:
+                    LOGGER.error(f'Failed to download {name}, got respons {r.status}.')
+    except Exception as e:
+        LOGGER.error(e)
 
 
 async def update_user_ldata(id_: int, key: str, value):

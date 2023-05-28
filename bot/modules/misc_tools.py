@@ -1,4 +1,3 @@
-from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath, makedirs
 from aiohttp import ClientSession
 from asyncio import sleep
@@ -12,7 +11,7 @@ from telegraph import upload_file
 from urllib.parse import quote_plus
 
 from bot import bot, config_dict, LOGGER
-from bot.helper.ext_utils.bot_utils import ButtonMaker, is_premium_user, is_url, sync_to_async, new_task
+from bot.helper.ext_utils.bot_utils import ButtonMaker, is_premium_user, is_url, sync_to_async, new_task, downlod_content
 from bot.helper.ext_utils.fs_utils import clean_target
 from bot.helper.ext_utils.genss import GenSS
 from bot.helper.ext_utils.help_messages import HelpString
@@ -49,15 +48,9 @@ class miscTool:
             LOGGER.info(f'Generated Screemshot: {url}')
             url = f'https://webss.yasirapi.eu.org/api?url={url}&width=1080&height=720'
             self.__file = f'Webss_{self.__message.id}.png'
-        async with ClientSession() as session:
-            async with session.get(url) as r:
-                if r.status == 200:
-                    async for data in r.content.iter_chunked(1024):
-                        async with aiopen(self.__file, 'ba') as f:
-                            await f.write(data)
-                else:
-                    self.__error = f'Got respons {r.status}'
-                    return
+        if not await downlod_content(url, self.__file):
+            self.__error = f'Failed to download {self.__file}'
+            return
         return self.__file
 
     async def vidss(self, url):
