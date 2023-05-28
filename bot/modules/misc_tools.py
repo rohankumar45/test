@@ -284,7 +284,7 @@ async def misc_callback(_, query: CallbackQuery):
             await editMessage(f'Failed getting thumbnail for <b>{text.title()}</b>!', message, buttons.build_menu(2))
             return
         msg = f'Sucsesfully generating thumbnail poster for <b>{text.title()}</b>.'
-        await editMessage(f'{msg}\n<i>Sending the files...</i>', message)
+        await editMessage(f'{msg} <i>Sending the files...</i>', message)
         for png in pngs:
             await sendPhoto(f'<code>{ospath.basename(png)}</code>', omsg, png)
             if len(pngs) > 1:
