@@ -49,7 +49,7 @@ class MirrorStatus:
 class EngineStatus:
     STATUS_ARIA = 'Aria2'
     STATUS_GD = 'Google API'
-    STATUS_MEGA = 'Negasdk'
+    STATUS_MEGA = 'Megasdk'
     STATUS_GFILE = 'GoFile'
     STATUS_QB = 'qBittorrent'
     STATUS_TG = 'Pyrogram'
