@@ -100,9 +100,9 @@ async def status_pages(_, query: CallbackQuery):
             if data[1] == 'refresh':
                 await editMessage(f'<i>{query.from_user.mention} refreshing status...</i>', message)
                 await sleep(1.5)
-                await update_all_messages(True)
             else:
                 await turn_page(data)
+            await update_all_messages(True)
     except Exception as e:
         LOGGER.error(e)
 
