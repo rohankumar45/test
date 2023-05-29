@@ -236,12 +236,12 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     if not is_mega_link(link) and not isQbit and not is_magnet(link) and not is_rclone_path(link) \
         and not is_gdrive_link(link) and not link.endswith('.torrent') and not file_:
         content_type = await sync_to_async(get_content_type, link)
-        host = urlparse(link).netloc
         gdrive_sharer = is_sharar(link)
         if not content_type or re_match(r'text/html|text/plain', content_type):
+            host = urlparse(link).netloc
             try:
                 await editMessage(f'<i>Generating direct link from {host}, please wait...</i>', check_)
-                if 'gofile.io' in host:
+                if link.startswith('https://gofile.io'):
                     link, _headers = await sync_to_async(direct_link_generator, link)
                 else:
                     link = await sync_to_async(direct_link_generator, link)
