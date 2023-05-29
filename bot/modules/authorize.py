@@ -17,7 +17,7 @@ async def authorize(_, message: Message):
         id_ = reply_to.from_user.id
     else:
         id_ = message.chat.id
-    if id_ in user_data and user_data[id_].get('is_auth'):
+    if id_ in user_data and user_data.get(id_, {}).get('is_auth'):
         msg = 'Already Authorized!'
     else:
         await update_user_ldata(id_, 'is_auth', True)
@@ -34,7 +34,7 @@ async def unauthorize(_, message: Message):
         id_ = reply_to.from_user.id
     else:
         id_ = message.chat.id
-    if id_ not in user_data or user_data[id_].get('is_auth'):
+    if id_ not in user_data or user_data.get(id_, {}).get('is_auth'):
         await update_user_ldata(id_, 'is_auth', False)
         msg = 'Unauthorized Successfully.'
     else:
@@ -51,7 +51,7 @@ async def addSudo(_, message: Message):
     elif reply_to := message.reply_to_message:
         id_ = reply_to.from_user.id
     if id_:
-        if id_ in user_data and user_data[id_].get('is_sudo'):
+        if id_ in user_data and user_data.get(id_, {}).get('is_sudo'):
             msg = 'Already Sudo!'
         else:
             await update_user_ldata(id_, 'is_sudo', True)
@@ -69,7 +69,7 @@ async def removeSudo(_, message: Message):
         id_ = int(msg[1].strip())
     elif reply_to := message.reply_to_message:
         id_ = reply_to.from_user.id
-    if id_ and id_ not in user_data or user_data[id_].get('is_sudo'):
+    if id_ and id_ not in user_data or user_data.get(id_, {}).get('is_sudo'):
         await update_user_ldata(id_, 'is_sudo', False)
         msg = 'Demoted!'
     else:
