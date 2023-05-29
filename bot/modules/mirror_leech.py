@@ -239,11 +239,12 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         gdrive_sharer = is_sharar(link)
         if not content_type or re_match(r'text/html|text/plain', content_type):
             host = urlparse(link).netloc
+            headers = None
             try:
                 await editMessage(f'<i>Generating direct link from {host}, please wait...</i>', check_)
                 if 'gofile.io' in host:
                     if link.startswith('https://gofile.io'):
-                        link, _headers = await sync_to_async(direct_link_generator, link)
+                        link, headers = await sync_to_async(direct_link_generator, link)
                 else:
                     link = await sync_to_async(direct_link_generator, link)
                 LOGGER.info(f'Generated link: {link}')
@@ -325,10 +326,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             auth = 'Basic ' + b64encode(auth.encode()).decode('ascii')
         else:
             auth = ''
-        headers = None
-        if 'gofile.io' in link:
-            headers = _headers
-        elif 'static.romsget.io' in link:
+        if 'static.romsget.io' in link:
             headers = 'Referer: https://www.romsget.io/'
         await add_aria2c_download(link, path, listener, name, auth, ratio, seed_time, headers)
 
