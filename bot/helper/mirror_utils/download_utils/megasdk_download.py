@@ -134,8 +134,9 @@ async def add_mega_download(mega_link, path, listener, name):
         folder_api.addListener(mega_listener)
         await executor.do(folder_api.loginToFolder, (mega_link,))
         node = await sync_to_async(folder_api.authorizeNode, mega_listener.node)
-    if mega_listener.error is not None:
-        await sendMessage(str(mega_listener.error), listener.message)
+    if mega_listener.error:
+        if not mega_listener.is_cancelled:
+            await sendMessage(str(mega_listener.error), listener.message)
         await executor.do(api.logout, ())
         if folder_api:
             await executor.do(folder_api.logout, ())
