@@ -64,7 +64,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     mi = index = 1
     link = folder_name = ''
     multi = bulk_start = bulk_end = 0
-    file_ = tg_client = ratio = seed_time = None
+    file_ = tg_client = ratio = seed_time = headers = None
     select = seed = is_bulk = isGofile = gdrive_sharer = False
     multiid = get_multiid(user_id)
 
@@ -239,7 +239,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         gdrive_sharer = is_sharar(link)
         if not content_type or re_match(r'text/html|text/plain', content_type):
             host = urlparse(link).netloc
-            headers = None
             try:
                 await editMessage(f'<i>Generating direct link from {host}, please wait...</i>', check_)
                 if 'gofile.io' in host:
