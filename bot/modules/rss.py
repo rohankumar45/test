@@ -424,7 +424,7 @@ async def rssListener(client: Client, query: CallbackQuery):
             buttons = ButtonMaker()
             buttons.button_data('<<', f'rss back {user_id}')
             buttons.button_data('Close', f'rss close {user_id}')
-            await editMessage('Send one title with vlaue separated by space get last X items.\nTitle Value\n\n<i>Timeout: 60s.</i>', message, buttons.build_menu(2))
+            await editMessage('Send one title with value separated by space get last X items.\nTitle Value\n\n<i>Timeout: 60s.</i>', message, buttons.build_menu(2))
             pfunc = partial(rssGet, query=query)
             await event_handler(client, query, pfunc)
     elif data[1] in ['unsubscribe', 'pause', 'resume']:

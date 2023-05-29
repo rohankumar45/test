@@ -178,14 +178,14 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     up = mesg[0].split(' up: ', 1)
     up = re_split(' n: | pswd: | rcf: ', up[1])[0].strip() if len(up) > 1 else None
 
-    check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
+    editable = await sendMessage('<i>Checking request, please wait...</i>', message)
 
     if link and is_tele_link(link):
         try:
             await intialize_savebot(user_dict.get('user_string'), True, user_id)
             tg_client, reply_to = await get_tg_link_content(link, user_id)
         except Exception as e:
-            await editMessage(f'ERROR: {e}', check_)
+            await editMessage(f'ERROR: {e}', editable)
             return
     elif not link and reply_to and reply_to.text:
         reply_text = reply_to.text.split('\n', 1)[0].strip()
@@ -194,7 +194,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                 await intialize_savebot(user_dict.get('user_string'), True, user_id)
                 tg_client, reply_to = await get_tg_link_content(reply_text, user_id)
             except Exception as e:
-                await editMessage(f'ERROR: {e}', check_)
+                await editMessage(f'ERROR: {e}', editable)
                 return
 
     if reply_to:
@@ -213,24 +213,24 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and not file_:
         help_msg = f'Invalid argument, type /{BotCommands.HelpCommand} for more details.'
         if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(help_msg)):
-            await deleteMessage(check_)
+            await deleteMessage(editable)
             await auto_delete_message(message, fmsg, reply_to)
             return
-        msg = await editMessage(help_msg, check_)
+        msg = await editMessage(help_msg, editable)
         await auto_delete_message(message, msg)
         return
 
     if (not up or up != 'rcl') and config_dict['MULTI_GDID'] and not isLeech and multi == 0 and not user_dict.get('cus_gdrive'):
-        multiid, isGofile = await MultiSelect(client, check_, message.from_user, isGofile).get_buttons()
+        multiid, isGofile = await MultiSelect(client, editable, message.from_user, isGofile).get_buttons()
     if not multiid:
-        await editMessage('Task has been cancelled!', check_)
+        await editMessage('Task has been cancelled!', editable)
         return
 
     if link:
         LOGGER.info(link)
 
     if isGofile:
-        await editMessage('<i>GoFile upload has been enabled!</i>', check_)
+        await editMessage('<i>GoFile upload has been enabled!</i>', editable)
         await sleep(1)
 
     if not is_mega_link(link) and not isQbit and not is_magnet(link) and not is_rclone_path(link) \
@@ -240,18 +240,18 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         if not content_type or re_match(r'text/html|text/plain', content_type):
             host = urlparse(link).netloc
             try:
-                await editMessage(f'<i>Generating direct link from {host}, please wait...</i>', check_)
+                await editMessage(f'<i>Generating direct link from {host}, please wait...</i>', editable)
                 if 'gofile.io' in host:
                     if link.startswith('https://gofile.io'):
                         link, headers = await sync_to_async(direct_link_generator, link)
                 else:
                     link = await sync_to_async(direct_link_generator, link)
                 LOGGER.info(f'Generated link: {link}')
-                await editMessage(f"<i>Found {'drive' if 'drive.google.com' in link else 'direct'} link:</i>\n<code>{link}</code>", check_)
+                await editMessage(f"<i>Found {'drive' if 'drive.google.com' in link else 'direct'} link:</i>\n<code>{link}</code>", editable)
                 await sleep(1)
             except DirectDownloadLinkException as e:
                 if str(e).startswith('ERROR:'):
-                    await editMessage(f'{tag}, {e}', check_)
+                    await editMessage(f'{tag}, {e}', editable)
                     return
 
     if not isLeech:
@@ -260,10 +260,10 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         if up is None and config_dict['DEFAULT_UPLOAD'] == 'gd':
             up = 'gd'
         if up == 'gd' and not config_dict['GDRIVE_ID'] and not user_dict.get('cus_gdrive'):
-            await editMessage('GDRIVE_ID not provided!', check_)
+            await editMessage('GDRIVE_ID not provided!', editable)
             return
         elif not up:
-            await editMessage('No RClone destination!', check_)
+            await editMessage('No RClone destination!', editable)
             return
         elif up not in ['rcl', 'gd']:
             if up.startswith('mrcc:'):
@@ -271,22 +271,26 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             else:
                 config_path = 'rclone.conf'
             if not await aiopath.exists(config_path):
-                await editMessage(f'RClone config: {config_path} not exists!', check_)
+                await editMessage(f'RClone config: {config_path} not exists!', editable)
                 return
+        if up != 'gd' and not is_rclone_path(up):
+            await editMessage('Wrong Rclone Upload Destination!', editable)
+            return
 
     if link == 'rcl':
-        link = await RcloneList(client, check_, user_id).get_rclone_path('rcd')
+        link = await RcloneList(client, editable, user_id).get_rclone_path('rcd')
         if not is_rclone_path(link):
-            await editMessage(link, check_)
+            await editMessage(link, editable)
             return
     if up == 'rcl' and not isLeech:
-        up = await RcloneList(client, check_, user_id).get_rclone_path('rcu')
+        up = await RcloneList(client, editable, user_id).get_rclone_path('rcu')
         if not is_rclone_path(up):
-            await editMessage(up, check_)
+            await editMessage(up, editable)
             return
 
+
     if not is_rclone_path(link) and not is_gdrive_link(link):
-        await deleteMessage(check_)
+        await deleteMessage(editable)
 
     listener = MirrorLeechListener(message, isZip, extract, isQbit, isLeech, isGofile, pswd, tag, select, seed, name, multiid, sameDir, rcf, up)
 
@@ -299,19 +303,19 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         else:
             config_path = 'rclone.conf'
         if not await aiopath.exists(config_path):
-            await editMessage(f'Rclone Config: {config_path} not Exists!', check_)
+            await editMessage(f'Rclone Config: {config_path} not Exists!', editable)
             return
-        await deleteMessage(check_)
+        await deleteMessage(editable)
         await add_rclone_download(link, config_path, f'{path}/', name, listener)
     elif is_gdrive_link(link):
         if not isZip and not extract and not isLeech and up == 'gd':
             gmsg = f'Use /{BotCommands.CloneCommand} to clone Google Drive file/folder\n\n'
             gmsg += f'Use /{BotCommands.ZipMirrorCommand[0]} to make zip of Google Drive folder\n\n'
             gmsg += f'Use /{BotCommands.UnzipMirrorCommand[0]} to extracts Google Drive archive folder/file'
-            await editMessage(gmsg, check_)
-            await auto_delete_message(message, check_, reply_to)
+            await editMessage(gmsg, editable)
+            await auto_delete_message(message, editable, reply_to)
             return
-        await deleteMessage(check_)
+        await deleteMessage(editable)
         await add_gd_download(link, path, listener, name, gdrive_sharer)
     elif is_mega_link(link):
         await add_mega_download(link, f'{path}/', listener, name)

@@ -390,12 +390,12 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
         await auto_delete_message(message, msg)
         return
 
-    check_ = await sendMessage(f'<i>Checking for <b>YT-DLP</b> link, please wait...</i>', message)
+    editable = await sendMessage(f'<i>Checking for <b>YT-DLP</b> link, please wait...</i>', message)
 
     if (not up or up != 'rcl') and config_dict['MULTI_GDID'] and not isLeech and multi == 0 and not user_dict.get('cus_gdrive'):
-        multiid, isGofile = await MultiSelect(client, check_, message.from_user, isGofile).get_buttons()
+        multiid, isGofile = await MultiSelect(client, editable, message.from_user, isGofile).get_buttons()
     if not multiid:
-        await editMessage('Task has been cancelled!', check_)
+        await editMessage('Task has been cancelled!', editable)
         return
 
     if not isLeech:
@@ -404,10 +404,10 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
         if up is None and config_dict['DEFAULT_UPLOAD'] == 'gd':
             up = 'gd'
         if up == 'gd' and not config_dict['GDRIVE_ID'] and not user_dict.get('cus_gdrive'):
-            await editMessage('GDRIVE_ID not provided!', check_)
+            await editMessage('GDRIVE_ID not provided!', editable)
             return
         elif not up:
-            await editMessage('No RClone destination!', check_)
+            await editMessage('No RClone destination!', editable)
             return
         elif up not in ['rcl', 'gd']:
             if up.startswith('mrcc:'):
@@ -415,13 +415,16 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             else:
                 config_path = 'rclone.conf'
             if not await aiopath.exists(config_path):
-                await editMessage(f'RClone config: {config_path} not exists!', check_)
+                await editMessage(f'RClone config: {config_path} not exists!', editable)
                 return
+        if up != 'gd' and not is_rclone_path(up):
+            await editMessage('Wrong Rclone Upload Destination!', editable)
+            return
 
     if up == 'rcl' and not isLeech:
         up = await RcloneList(client, message).get_rclone_path('rcu')
         if not is_rclone_path(up):
-            await editMessage(up, check_)
+            await editMessage(up, editable)
             return
 
     listener = MirrorLeechListener(message, isZip, isLeech=isLeech, isGofile=isGofile, pswd=pswd, tag=tag, newname=name, multiId=multiid, sameDir=sameDir, rcFlags=rcf, upPath=up)
@@ -449,7 +452,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
         result = await sync_to_async(extract_info, link, options)
     except Exception as e:
         e = str(e).replace('<', ' ').replace('>', ' ')
-        await editMessage(f'{tag} {e}', check_)
+        await editMessage(f'{tag} {e}', editable)
         run_multi(mlist, _ytdl, isZip, isLeech, sameDir, bulk)
         return
     run_multi(mlist, _ytdl, isZip, isLeech, sameDir, bulk)
@@ -461,10 +464,10 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             qual = user_dict['yt_opt']
 
     if not qual:
-        qual = await YtSelection(client, check_, user_id).get_quality(result)
+        qual = await YtSelection(client, editable, user_id).get_quality(result)
         if not qual:
             return
-    await deleteMessage(check_)
+    await deleteMessage(editable)
     LOGGER.info(f'Downloading with YT-DLP: {link}')
     playlist = 'entries' in result
     ydl = YoutubeDLHelper(listener)

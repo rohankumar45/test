@@ -19,7 +19,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
     res1, res2 = await gather(cmd_exec(cmd1), cmd_exec(cmd2))
     if res1[2] or res2[2]:
         if res1[2] != -9:
-            msg = f'Error: While getting rclone stat/size. Path: {rc_path}. Stderr: {res1[1]}'
+            msg = f'Error: While getting rclone stat/size. Path: {rc_path}. Stderr: {res1[1] or res2[1]}'
             await listener.onDownloadError(msg, ename=name)
         return
     remote, rc_path = rc_path.split(':', 1)
