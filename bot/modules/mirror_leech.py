@@ -335,7 +335,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
 
 async def mirror(client, message):
-    _mirror_leech(client, message)
+    await _mirror_leech(client, message)
 
 
 async def unzip_mirror(client, message):
