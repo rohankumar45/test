@@ -241,8 +241,9 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             host = urlparse(link).netloc
             try:
                 await editMessage(f'<i>Generating direct link from {host}, please wait...</i>', check_)
-                if link.startswith('https://gofile.io'):
-                    link, _headers = await sync_to_async(direct_link_generator, link)
+                if 'gofile.io' in host:
+                    if link.startswith('https://gofile.io'):
+                        link, _headers = await sync_to_async(direct_link_generator, link)
                 else:
                     link = await sync_to_async(direct_link_generator, link)
                 LOGGER.info(f'Generated link: {link}')
