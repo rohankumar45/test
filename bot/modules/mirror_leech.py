@@ -30,7 +30,7 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message, deleteMessage, editMessage, sendingMessage, get_tg_link_content
 
 
-# @new_task
+@new_task
 async def _mirror_leech(client: Client, message: Message, isZip=False, extract=False, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     mesg = message.text.split('\n')
     message_args = mesg[0].split(maxsplit=1)
@@ -335,7 +335,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
 
 async def mirror(client, message):
-    await _mirror_leech(client, message)
+    _mirror_leech(client, message)
 
 
 async def unzip_mirror(client, message):
