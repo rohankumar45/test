@@ -627,6 +627,7 @@ async def set_premium_users(_, message: Message):
     else:
         await sendMessage(text, message)
         return
+    user_text = ''
     if args[1] == 'add':
         duartion = int(time() + (86400 * day))
         text = f'😘 Yeay, <b>{premi_id}</b> has been added as <b>Premium User</b> for {day} day(s).'
@@ -639,8 +640,8 @@ async def set_premium_users(_, message: Message):
         await update_user_ldata(premi_id, 'premium_left', -1)
         await update_user_ldata(premi_id, 'is_premium', False)
     msg = await sendMessage(text, message)
-    await copyMessage(premi_id, msg)
-    await sendCustom(user_text, premi_id)
+    if user_text:
+        await sendCustom(user_text, premi_id)
     await auto_delete_message(message, msg)
 
 
