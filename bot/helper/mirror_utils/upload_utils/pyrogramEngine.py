@@ -222,7 +222,8 @@ class TgUploader:
                                                        reply_to_message_id=self.__send_msg.id,
                                                        reply_markup=buttons)
 
-            if self.__listener.isSuperGroup and self.__leech_log and self.__enable_pm or self.__listener.isSuperGroup and self.__enable_pm:
+            if self.__listener.isSuperGroup and self.__leech_log and self.__enable_pm or self.__listener.isSuperGroup and self.__enable_pm or \
+                self.__leech_log and self.__enable_pm:
                 await self.__copy_Leech(key, self.__user_id, self.__send_msg)
             if self.__user_dump:
                 await self.__copy_Leech(key, self.__user_dump, self.__send_msg)
