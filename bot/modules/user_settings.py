@@ -636,7 +636,7 @@ async def set_premium_users(_, message: Message):
         await update_user_ldata(premi_id, 'is_premium', True)
     elif args[1] == 'del':
         text = f'😑 Hmm, <b>{premi_id}</b> has been remove as <b>Premium User</b>!'
-        user_text = f'Huhu 😑, you have been leased as <b>Premium User</b>!'
+        user_text = f'Huhu 😑, you have been deleted as <b>Premium User</b>!'
         await update_user_ldata(premi_id, 'premium_left', -1)
         await update_user_ldata(premi_id, 'is_premium', False)
     msg = await sendMessage(text, message)
