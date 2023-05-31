@@ -612,7 +612,7 @@ async def set_premium_users(_, message: Message):
         return
     reply_to = message.reply_to_message
     args = message.text.split()
-    text = 'Reply to a user or send user ID with duration time in day(s)'
+    text = 'Reply to a user or send user ID with options (add/del) and duration time in day(s)'
     if not reply_to and len(args) == 1:
         await sendMessage(text, message)
         return
@@ -633,7 +633,7 @@ async def set_premium_users(_, message: Message):
         user_text = f'Yeay 😘, you have been added as <b>Premium User</b> for {day}(s).'
         await update_user_ldata(premi_id, 'premium_left', duartion)
         await update_user_ldata(premi_id, 'is_premium', True)
-    elif args[0] == 'del':
+    elif args[1] == 'del':
         text = f'😑 Hmm, <b>{premi_id}</b> has been remove as <b>Premium User</b>!'
         user_text = f'Huhu 😑, you have been leased as <b>Premium User</b>!'
         await update_user_ldata(premi_id, 'premium_left', -1)
