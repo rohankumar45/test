@@ -11,7 +11,7 @@ from pyrogram.types import CallbackQuery, Message
 from time import time
 
 from bot import bot, bot_loop, user_data, config_dict, DATABASE_URL
-from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread, new_task
+from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread, new_task, is_premium_user
 from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.force_mode import ForceMode
@@ -94,11 +94,10 @@ async def get_user_settings(from_user, data: str, uset_data: str):
         capmode = user_dict.get('user_cap', 'mono')
         custom_cap = 'ENABLE ✅' if user_dict.get('user_caption') else 'NOT SET'
         if config_dict['PREMIUM_MODE']:
-            user_premi = user_dict.get('is_premium')
-            if (time_data := user_dict.get('premium_left')) and user_premi and user_id != config_dict['OWNER_ID']:
-                if time_data  - time() <= 0:
-                    await update_user_ldata(user_id, 'premium_left', -1)
+            if (user_premi:= is_premium_user(user_id)) and (time_data:= user_dict.get('premium_left')):
+                if time_data - time() <= 0:
                     await update_user_ldata(user_id, 'is_premium', False)
+                    await update_user_ldata(user_id, 'premium_left', 0)
                 else:
                     premium_left = f'<b>├ </b>Premium Left: <b>{get_readable_time(time_data - time())}</b>\n'
             if user_id != config_dict['OWNER_ID']:
@@ -637,7 +636,7 @@ async def set_premium_users(_, message: Message):
     elif args[1] == 'del':
         text = f'😑 Hmm, <b>{premi_id}</b> has been remove as <b>Premium User</b>!'
         user_text = f'Huhu 😑, you have been deleted as <b>Premium User</b>!'
-        await update_user_ldata(premi_id, 'premium_left', -1)
+        await update_user_ldata(premi_id, 'premium_left', 0)
         await update_user_ldata(premi_id, 'is_premium', False)
     msg = await sendMessage(text, message)
     if user_text:

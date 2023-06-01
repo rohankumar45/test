@@ -288,7 +288,6 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             await editMessage(up, editable)
             return
 
-
     if not is_rclone_path(link) and not is_gdrive_link(link):
         await deleteMessage(editable)
 
