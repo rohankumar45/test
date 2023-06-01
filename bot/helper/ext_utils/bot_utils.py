@@ -339,7 +339,8 @@ def is_rclone_path(path):
 
 
 def is_premium_user(user_id: int):
-    return user_data.get(user_id, {}).get('is_premium') or user_id == config_dict['OWNER_ID']
+    user_dict = user_data.get(user_id, {})
+    return user_id == config_dict['OWNER_ID'] or user_dict.get('is_premium') or user_dict.get('is_sudo')
 
 
 def get_date_time(message: Message):
