@@ -272,6 +272,7 @@ async def misc_callback(_, query: CallbackQuery):
         if not misc:
             await editMessage(text, message, buttons.build_menu(2))
             return
+        text = text.replace('.', ' ').replace('  ', ' ')
         pngs, dirpath = await misc.thumb(text)
         if not pngs:
             await editMessage(f'Failed getting thumbnail for <b>{text.title()}</b>!', message, buttons.build_menu(2))
