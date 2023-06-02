@@ -35,7 +35,7 @@ async def run_multi(mlist, func, *args):
         if folder_name and len(folder_name) > 0:
             args[-2]['tasks'].add(nextmsg.id)
         nextmsg.from_user = message.from_user
-        await sleep(4)
+        await sleep(5)
         func(client, nextmsg, *args)
 
 

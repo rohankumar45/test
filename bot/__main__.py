@@ -33,19 +33,6 @@ from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, s
 from bot.modules import authorize, bot_settings, clone, gd_count, gd_delete, gd_list, cancel_mirror, gdtot_serach, heroku_sleep, mirror_leech, status, torrent_search, torrent_select, user_settings, ytdlp, shell, eval, rss, speedtest, wayback, hash, bypass, scrapper, purge, broadcase, info, misc_tools, backup, join_chat
 
 
-start_aria2_listener()
-
-
-def progress_bar(percentage):
-    if isinstance(percentage, str):
-        return 'NaN'
-    try:
-        percentage=int(percentage)
-    except:
-        percentage = 0
-    return ''.join(config_dict['PROG_FINISH'] if i <= percentage // 10 else config_dict['PROG_UNFINISH'] for i in range(1, 11))
-
-
 @new_task
 async def stats(_, message: Message):
     if await aiopath.exists('.git'):
@@ -276,6 +263,7 @@ async def restart_notification():
 
 
 async def main():
+    await sync_to_async(start_aria2_listener, wait=False)
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(BotCommands.LogCommand) & CustomFilters.owner))
     bot.add_handler(MessageHandler(restart, filters=command(BotCommands.RestartCommand) & CustomFilters.sudo))
