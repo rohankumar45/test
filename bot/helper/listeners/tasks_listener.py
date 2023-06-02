@@ -668,7 +668,7 @@ class MirrorLeechListener:
                 non_queued_up.remove(self.uid)
 
         await start_from_queued()
-        await sleep(3)
+        await sleep(1)
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
@@ -755,7 +755,7 @@ class MirrorLeechListener:
                 non_queued_up.remove(self.uid)
 
         await start_from_queued()
-        await sleep(3)
+        await sleep(1)
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
