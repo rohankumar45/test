@@ -17,7 +17,7 @@ def start_up_from_queued(uid):
     del queued_up[uid]
 
 
-async def stop_duplicate_check(name: str, listener):
+async def stop_duplicate_check(name: str, listener, mega_type='folder'):
     if config_dict['STOP_DUPLICATE'] and not listener.isLeech and not listener.user_dict.get('cus_gdrive') and listener.upPath == 'gd':
         LOGGER.info(f'Checking File/Folder if already in Drive: {name}')
         if listener.isZip:
@@ -28,7 +28,7 @@ async def stop_duplicate_check(name: str, listener):
             except:
                 name = None
         if name:
-            if not listener.newname and await aiopath.isfile(f'{listener.dir}/{name}'):
+            if not listener.newname and (await aiopath.isfile(f'{listener.dir}/{name}' or mega_type == 'file')):
                 name = presuf_remname_name(listener.user_dict, name)
             count, file = await sync_to_async(GoogleDriveHelper().drive_list, name, stopDup=True)
             if count:

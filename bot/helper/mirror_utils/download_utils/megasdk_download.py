@@ -143,7 +143,7 @@ async def add_mega_download(mega_link, path, listener, name):
         return
     name = name or node.getName()
     megadl, zuzdl, leechdl, storage = config_dict['MEGA_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
-    file, sname = await stop_duplicate_check(name, listener)
+    file, sname = await stop_duplicate_check(name, listener, mega_listener.type)
     if file:
         LOGGER.info("File/folder already in Drive!")
         await listener.onDownloadError('File/folder already in Drive!', file, sname)
