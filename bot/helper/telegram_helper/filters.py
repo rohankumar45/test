@@ -16,8 +16,7 @@ class CustomFilters:
         uid = user.id
         chat_id = message.chat.id
         user_dict = user_data.get(uid, {})
-        return bool(uid == OWNER_ID or uid == config_dict['RSS_CHAT_ID'] or
-                    (user_dict.get('is_auth') or user_dict.get('is_sudo') or
+        return bool(uid == OWNER_ID or (user_dict.get('is_auth') or user_dict.get('is_sudo') or
                     user_dict.get('is_premium')) or user_data.get(chat_id, {}).get('is_auth'))
 
     authorized = create(authorized_user)
