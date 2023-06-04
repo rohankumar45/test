@@ -1,7 +1,7 @@
 from aiofiles.os import path as aiopath
 from asyncio import Event
 
-from bot import LOGGER, config_dict, queued_dl, queued_up, non_queued_up, non_queued_dl, queue_dict_lock
+from bot import config_dict, queued_dl, queued_up, non_queued_up, non_queued_dl, queue_dict_lock, LOGGER
 from bot.helper.ext_utils.bot_utils import sync_to_async, presuf_remname_name
 from bot.helper.ext_utils.fs_utils import get_base_name
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
@@ -28,6 +28,7 @@ async def stop_duplicate_check(name: str, listener, mega_type='folder'):
             except:
                 name = None
         if name:
+            LOGGER.info(mega_type)
             if not listener.newname and (await aiopath.isfile(f'{listener.dir}/{name}' or mega_type == 'file')):
                 name = presuf_remname_name(listener.user_dict, name)
             count, file = await sync_to_async(GoogleDriveHelper().drive_list, name, stopDup=True)
