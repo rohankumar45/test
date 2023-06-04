@@ -93,6 +93,7 @@ Join @{config_dict['CHANNEL_USERNAME']} for more info...
     await auto_delete_message(message, starmsg)
 
 
+@new_task
 async def restart(_, message: Message):
     cmd = message.text.split(maxsplit=1)
     hrestart = hkill = False
