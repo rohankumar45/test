@@ -28,8 +28,8 @@ async def stop_duplicate_check(name: str, listener, mega_type='folder'):
             except:
                 name = None
         if name:
-            LOGGER.info(mega_type)
-            LOGGER.info(bool(await aiopath.isfile(f'{listener.dir}/{name}' or mega_type == 'file')))
+            LOGGER.info(mega_type == 'file')
+            LOGGER.info(await aiopath.isfile(f'{listener.dir}/{name}'))
             if not listener.newname and (await aiopath.isfile(f'{listener.dir}/{name}' or mega_type == 'file')):
                 LOGGER.info('================================================')
                 name = presuf_remname_name(listener.user_dict, name)
