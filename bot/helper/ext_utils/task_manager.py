@@ -33,7 +33,7 @@ async def stop_duplicate_check(name: str, listener, mega_type='folder'):
             LOGGER.info(mega_file)
             LOGGER.info(is_file)
             LOGGER.info(not listener.newname and (is_file or mega_file))
-            if not listener.newname and (await aiopath.isfile(f'{listener.dir}/{name}' or mega_type == 'file')):
+            if not listener.newname and (is_file or mega_file):
                 LOGGER.info('================================================')
                 name = presuf_remname_name(listener.user_dict, name)
             count, file = await sync_to_async(GoogleDriveHelper().drive_list, name, stopDup=True)
