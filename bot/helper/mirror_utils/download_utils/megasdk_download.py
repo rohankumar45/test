@@ -4,7 +4,7 @@ from mega import (MegaApi, MegaListener, MegaRequest, MegaTransfer, MegaError)
 from random import SystemRandom
 from string import ascii_letters, digits
 
-from bot import config_dict, download_dict_lock, download_dict, non_queued_dl, queue_dict_lock, LOGGER
+from bot import bot_loop, config_dict, download_dict_lock, download_dict, non_queued_dl, queue_dict_lock, LOGGER
 from bot.helper.ext_utils.bot_utils import get_mega_link_type, async_to_sync, sync_to_async, is_premium_user, get_readable_file_size
 from bot.helper.ext_utils.fs_utils import check_storage_threshold
 from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check
@@ -146,7 +146,7 @@ async def add_mega_download(mega_link, path, listener, name):
     file, sname = await stop_duplicate_check(name, listener, mega_listener.type)
     if file:
         LOGGER.info("File/folder already in Drive!")
-        await listener.onDownloadError('File/folder already in Drive!', file, sname)
+        bot_loop.create_task(listener.onDownloadError('File/folder already in Drive!', file, sname))
         await executor.do(api.logout, ())
         if folder_api:
             await executor.do(folder_api.logout, ())
@@ -170,7 +170,7 @@ async def add_mega_download(mega_link, path, listener, name):
         msgerr = f'Need {storage}GB free storage'
     if msgerr:
         LOGGER.info('File/folder size over the limit size!')
-        await listener.onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(size)}.', ename=name)
+        bot_loop.create_task(listener.onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(size)}.', ename=name))
         if folder_api:
             await sync_to_async(folder_api.removeListener, mega_listener)
         return
