@@ -110,7 +110,10 @@ class AsyncExecutor:
 
     async def do(self, function, args):
         self.continue_event.clear()
-        await sync_to_async(function, *args)
+        try:
+            await sync_to_async(function, *args)
+        except Exception as e:
+            raise Exception(e)
         await self.continue_event.wait()
 
 
