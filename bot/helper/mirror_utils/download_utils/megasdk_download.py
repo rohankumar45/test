@@ -123,9 +123,7 @@ async def add_mega_download(mega_link, path, listener, name):
     mega_listener = MegaAppListener(executor.continue_event, listener)
     api.addListener(mega_listener)
     if MEGA_USERNAME and MEGA_PASSWORD:
-        LOGGER.info('================= Trying to Login ====================')
         await executor.do(api.login, (MEGA_USERNAME, MEGA_PASSWORD))
-        LOGGER.info('=============== Sucessfully Login ====================')
     mega_listener.is_rename = name
     mega_listener.type = get_mega_link_type(mega_link)
     if mega_listener.type == 'file':
