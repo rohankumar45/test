@@ -112,9 +112,9 @@ class AsyncExecutor:
         self.continue_event.clear()
         try:
             await sync_to_async(function, *args)
+            await self.continue_event.wait()
         except Exception as e:
             raise Exception(e)
-        await self.continue_event.wait()
 
 
 async def add_mega_download(mega_link, path, listener, name):
