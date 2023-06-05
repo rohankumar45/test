@@ -80,7 +80,6 @@ class MegaAppListener(MegaListener):
                 self.continue_event.set()
             elif transfer.isFinished() and (transfer.isFolderTransfer() or transfer.getFileName() == self.__name or self.is_rename):
                 async_to_sync(self.listener.onDownloadComplete)
-                self.error = None
                 self.continue_event.set()
         except Exception as e:
             LOGGER.error(e)
