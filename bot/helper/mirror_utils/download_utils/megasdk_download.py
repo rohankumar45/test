@@ -126,21 +126,27 @@ async def add_mega_download(mega_link, path, listener, name):
         await executor.do(api.login, (MEGA_USERNAME, MEGA_PASSWORD))
     mega_listener.is_rename = name
     mega_listener.type = get_mega_link_type(mega_link)
+    LOGGER.info('================================')
     if mega_listener.type == 'file':
         await executor.do(api.getPublicNode, (mega_link,))
+        LOGGER.info('================================')
         node = mega_listener.public_node
     else:
         folder_api = MegaApi(None, None, None, 'MLTB')
         folder_api.addListener(mega_listener)
         await executor.do(folder_api.loginToFolder, (mega_link,))
+        LOGGER.info('================================')
         node = await sync_to_async(folder_api.authorizeNode, mega_listener.node)
     if mega_listener.error:
         if not mega_listener.is_cancelled:
             await sendMessage(str(mega_listener.error), listener.message)
         await executor.do(api.logout, ())
+        LOGGER.info('================================')
         if folder_api:
             await executor.do(folder_api.logout, ())
+        LOGGER.info('================================')
         return
+    LOGGER.info('================================')
     name = name or node.getName()
     megadl, zuzdl, leechdl, storage = config_dict['MEGA_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
     file, sname = await stop_duplicate_check(name, listener, mega_listener.type)
