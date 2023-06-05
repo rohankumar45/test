@@ -80,6 +80,7 @@ class MegaAppListener(MegaListener):
                 self.continue_event.set()
             elif transfer.isFinished() and (transfer.isFolderTransfer() or transfer.getFileName() == self.__name or self.is_rename):
                 async_to_sync(self.listener.onDownloadComplete)
+                self.error = None
                 self.continue_event.set()
         except Exception as e:
             LOGGER.error(e)
@@ -114,7 +115,7 @@ class AsyncExecutor:
             await sync_to_async(function, *args)
             await self.continue_event.wait()
         except Exception as e:
-            raise Exception(e)
+            LOGGER.error('EEEEEEEEEEEEEEERRRRRRRRRRRRRRRROOOOOOOOOORRRRRRRRRRR')
 
 
 async def add_mega_download(mega_link, path, listener, name):
@@ -126,11 +127,7 @@ async def add_mega_download(mega_link, path, listener, name):
     mega_listener = MegaAppListener(executor.continue_event, listener)
     api.addListener(mega_listener)
     if MEGA_USERNAME and MEGA_PASSWORD:
-        try:
-            await executor.do(api.login, (MEGA_USERNAME, MEGA_PASSWORD))
-        except Exception as e:
-            LOGGER.error('EEEERRRROOOOORRRRR')
-            return
+        await executor.do(api.login, (MEGA_USERNAME, MEGA_PASSWORD))
     mega_listener.is_rename = name
     mega_listener.type = get_mega_link_type(mega_link)
     LOGGER.info('111111111111111111111')
