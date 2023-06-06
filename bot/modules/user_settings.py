@@ -21,7 +21,7 @@ from bot.helper.ext_utils.telegram_helper import content_dict, TeleContent
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, copyMessage, auto_delete_message, sendPhoto, editPhoto, deleteMessage, editMessage, sendCustom
+from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message, sendPhoto, editPhoto, deleteMessage, editMessage, sendCustom
 
 
 handler_dict = {}
