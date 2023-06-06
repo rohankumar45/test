@@ -426,8 +426,6 @@ async def load_config():
 
     RSS_DELAY = environ.get('RSS_DELAY', '')
     RSS_DELAY = int(RSS_DELAY) if RSS_DELAY else 900
-
-    RSS_USER_SESSION_STRING = environ.get('RSS_USER_SESSION_STRING', '')
 #======================================================================
 
 
@@ -664,7 +662,6 @@ async def load_config():
                         'BASE_URL': BASE_URL,
                         'WEB_PINCODE': WEB_PINCODE,
                         # RSS
-                        'RSS_USER_SESSION_STRING': RSS_USER_SESSION_STRING,
                         'RSS_CHAT_ID': RSS_CHAT_ID,
                         'RSS_DELAY': RSS_DELAY,
                         # TORSEARCH
