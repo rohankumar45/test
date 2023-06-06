@@ -749,5 +749,3 @@ async def intialize_savebot(session_string=None, check=True, user_id=None):
             LOGGER.info('Save content mode enabled!')
         except Exception as e:
             LOGGER.error(e)
-            if user_id:
-                await update_user_ldata(user_id, 'user_string', '')
