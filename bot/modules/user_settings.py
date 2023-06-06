@@ -332,6 +332,7 @@ async def set_user_settings(_, message: Message, query: CallbackQuery, key: str)
             await intialize_savebot(value, True, user_id)
             if not bot_dict[user_id]['SAVEBOT']:
                 msg = await sendMessage('Something went wrong, or invalid string!', message)
+                await update_user_ldata(user_id, key, '')
                 await auto_delete_message(message, msg, stime=5)
     else:
         await update_user_settings(query, 'setdata', 'dumpid')
