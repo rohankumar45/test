@@ -327,12 +327,12 @@ async def set_user_settings(_, message: Message, query: CallbackQuery, key: str)
             await update_user_settings(query, 'setdata', 'dumpid')
         else:
             data = 'capmode' if key == 'user_caption' else None
-        if key == 'user_string':
-            await intialize_savebot(value, True, user_id)
-            if not bot_dict[user_id]['SAVEBOT']:
-                msg = await sendMessage('Something went wrong, or invalid string!', message)
-                await update_user_ldata(user_id, key, '')
-                await auto_delete_message(message, msg, stime=5)
+            if key == 'user_string':
+                await intialize_savebot(value, True, user_id)
+                if not bot_dict[user_id]['SAVEBOT']:
+                    msg = await sendMessage('Something went wrong, or invalid string!', message)
+                    await update_user_ldata(user_id, key, '')
+                    await auto_delete_message(message, msg, stime=5)
             await update_user_settings(query, data)
     else:
         await update_user_settings(query, 'setdata', 'dumpid')
