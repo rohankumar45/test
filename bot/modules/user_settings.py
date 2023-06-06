@@ -10,7 +10,7 @@ from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
 from time import time
 
-from bot import bot, bot_dict, user_data, config_dict, DATABASE_URL
+from bot import bot, bot_loop, bot_dict, user_data, config_dict, DATABASE_URL
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_time, is_premium_user, get_readable_file_size, UserDaily, sync_to_async, new_thread, new_task, is_premium_user
 from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.db_handler import DbManger
@@ -332,7 +332,7 @@ async def set_user_settings(_, message: Message, query: CallbackQuery, key: str)
                 if not bot_dict[user_id]['SAVEBOT']:
                     msg = await sendMessage('Something went wrong, or invalid string!', message)
                     await update_user_ldata(user_id, key, '')
-                    await auto_delete_message(message, msg, stime=5)
+                    bot_loop.create_task(auto_delete_message(message, msg, stime=5))
             await update_user_settings(query, data)
     else:
         await update_user_settings(query, 'setdata', 'dumpid')
