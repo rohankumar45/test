@@ -6,7 +6,7 @@ from pyrogram import Client
 
 from bot import bot_dict, aria2, aria2_options, config_dict, kwargs, user_data, download_dict, status_reply_dict_lock, images, Interval, drive_dict, \
                 LOGGER, GLOBAL_EXTENSION_FILTER, DEFAULT_SPLIT_SIZE, DRIVES_IDS, DRIVES_NAMES, INDEX_URLS, SHORTENER_APIS, SHORTENERES
-from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_task
+from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, update_user_ldata
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
@@ -749,3 +749,5 @@ async def intialize_savebot(session_string=None, check=True, user_id=None):
             LOGGER.info('Save content mode enabled!')
         except Exception as e:
             LOGGER.error(e)
+            if user_id:
+                await update_user_ldata(user_id, 'user_string', '')
