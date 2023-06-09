@@ -8,6 +8,7 @@ from time import time
 
 from bot import bot, bot_dict, bot_loop, Interval, status_reply_dict, status_reply_dict_lock, config_dict, download_dict_lock, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async, downlod_content
+from bot.helper.ext_utils.exceptions import TgLinkException
 from bot.helper.ext_utils.fs_utils import clean_target
 from bot.helper.telegram_helper.bot_commands import BotCommands
 
@@ -181,21 +182,21 @@ async def get_tg_link_content(link: str, user_id: int):
         chat = int(chat) if private else int(f'-100{chat}')
     try:
         await bot.get_chat(chat)
-    except Exception as e:
+    except:
         private = True
         if not userbot:
-            raise Exception(f'User session required for this private link! Try add user session /{BotCommands.UserSetCommand}')
+            raise TgLinkException(f'User session required for this private link! Try add user session /{BotCommands.UserSetCommand}')
     if private:
         if (message:= await userbot.get_messages(chat, msg_id)) and not message.empty:
             return userbot, message
         else:
-            raise Exception('Mostly message has been deleted!')
+            raise TgLinkException('Mostly message has been deleted!')
     elif not userbot and (message:= await bot.get_messages(chat, msg_id)) and not message.empty:
         return bot, message
     elif userbot and (message:= await userbot.get_messages(chat, msg_id)) and not message.empty:
         return userbot, message
     else:
-        raise Exception(f'Failed getting data from link. Mostly message has been deleted or member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
+        raise TgLinkException(f'Failed getting data from link. Mostly message has been deleted or member chat required' + f' try /{BotCommands.JoinChatCommand}!' if userbot == bot_dict['SAVEBOT'] else '!')
 
 
 async def update_all_messages(force=False):

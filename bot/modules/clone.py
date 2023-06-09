@@ -1,4 +1,5 @@
 from aiofiles.os import path as aiopath
+from argparse import ArgumentParser
 from asyncio import gather
 from json import loads
 from os import path as ospath
@@ -7,7 +8,6 @@ from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 from random import SystemRandom
-from re import split as re_split
 from string import ascii_letters, digits
 from urllib.parse import urlparse
 
@@ -193,9 +193,19 @@ async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSu
 
 @new_task
 async def cloneNode(client: Client, message: Message, bulk=[]):
+    input_list = message.text.split()
+    try:
+        args = parser.parse_args(input_list[1:])
+    except:
+        await sendMessage(HelpString.CLONE, message)
+        return
+
+    reply_to = message.reply_to_message
+    tag = message.from_user.mention
     user_id = message.from_user.id
     user_dict = user_data.get(user_id, {})
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
+
     fmode = ForceMode(message)
     if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
         await auto_delete_message(message, fmsg, reply_to)
@@ -208,41 +218,25 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted()):
         await auto_delete_message(message, fmsg, reply_to)
         return
-    reply_to = message.reply_to_message
-    tag = message.from_user.mention
-    multi = bulk_start = bulk_end = 0
-    index, link, is_bulk = 1, '', False
-    text = message.text
-    args = text.split(maxsplit=2)
-    args.pop(0)
-    if len(args) > 0:
-        for x in args:
-            x = x.strip()
-            if x.strip().isdigit():
-                multi = int(x)
-                index += 1
-            elif x == 'b':
-                is_bulk = True
-                bi = index
-                index += 1
-            elif x.startswith('b:'):
-                is_bulk = True
-                bi = index
-                index += 1
-                dargs = x.split(':')
-                bulk_start = dargs[1] or 0
-                if len(dargs) == 3:
-                    bulk_end = dargs[2] or 0
-            else:
-                break
 
-    if not (link:= await get_link(message)):
-        if args:
-            arg = args[0].strip()
-            if not arg.startswith(('up:', 'rcf:', 'n:')):
-                link = re_split(r' up: | rcf: ', arg)[0].strip()
+    link, newname, dst_path, rcf = ' '.join(args.link), ' '.join(args.newName), ' '.join(args.upload), ' '.join(args.rcloneFlags)
+    multi, isBulk = args.multi, args.bulk
+    bulk_start = bulk_end = 0
 
-    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
+    if isinstance(multi, list):
+        multi = multi[0]
+
+    if isBulk:
+        dargs = isBulk.split(':')
+        bulk_start = dargs[0] or None
+        if len(dargs) == 2:
+            bulk_end = dargs[1] or None
+        isBulk = True
+    elif isBulk is None:
+        isBulk = True
+
+
+    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or isBulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
         return
 
@@ -252,22 +246,14 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
         link = reply_to.text.split('\n', 1)[0].strip()
 
 
-    if is_bulk:
-        await run_bulk([client, message, index, bulk_start, bulk_end, bi], cloneNode, bulk)
+    if isBulk:
+        await run_bulk(cloneNode, client, message, input_list, bulk_start, bulk_end, bulk)
         return
 
     if bulk:
         del bulk[0]
 
-    newname = text.split(' n: ', 1)
-    newname = re_split(' rcf: | up: ', newname[1])[0].strip() if len(newname) > 1 else ''
-    newname = newname.replace('/', '.')
-    rcf = text.split(' rcf: ', 1)
-    rcf = re_split(' up: ', rcf[1])[0].strip() if len(rcf) > 1 else None
-    dst_path = text.split(' up: ', 1)
-    dst_path = re_split(' rcf: ', dst_path[1])[0].strip() if len(dst_path) > 1 else None
-
-    run_multi([client, message, multi, index, 1, ''], cloneNode, bulk)
+    run_multi(cloneNode, client, message, input_list, '', bulk)
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
     gdrive_sharer = is_sharar(link)
@@ -302,5 +288,14 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
         else:
             await gdcloneNode(client, message, check_, newname, multi, link, tag, isSuperGroup, gdrive_sharer)
 
+
+parser = ArgumentParser(description='Clone args usage:')
+
+parser.add_argument('link', nargs='*', default='')
+parser.add_argument('-n', nargs='+', dest='newName')
+parser.add_argument('-b', nargs='?', default=False, dest='bulk')
+parser.add_argument('-i', nargs='+', default=0, dest='multi', type=int)
+parser.add_argument('-up', nargs='+', default='', dest='upload')
+parser.add_argument('-rcf', nargs='+', default='', dest='rcloneFlags')
 
 bot.add_handler(MessageHandler(cloneNode, filters=command(BotCommands.CloneCommand) & CustomFilters.authorized))

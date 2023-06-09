@@ -1,5 +1,6 @@
 from aiofiles.os import path as aiopath
 from aiohttp import ClientSession
+from argparse import ArgumentParser
 from asyncio import wait_for, Event, wrap_future
 from functools import partial
 from os import path as ospath
@@ -7,7 +8,6 @@ from pyrogram import Client
 from pyrogram.filters import command, regex, user
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from pyrogram.types import CallbackQuery, Message
-from re import split as re_split
 from time import time
 from yt_dlp import YoutubeDL
 
@@ -234,43 +234,28 @@ async def _mdisk(link: str, name: str):
             return name, link
 
 @new_task
-async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sameDir=None, bulk=[]):
-    mssg = message.text
-    msplit = message.text.split('\n')
-    if len(msplit) > 1 and msplit[1].startswith('Tag: '):
+async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, bulk=[]):
+    text = message.text.split('\n')
+    input_list = text[0].split()
+    try:
+        args = parser.parse_args(input_list[1:])
+    except:
+        await sendMessage(f'Invalid argument, type /{BotCommands.HelpCommand} for more details.', message)
+        return
+
+    if len(text) > 1 and text[1].startswith('Tag: '):
         try:
-            id_ = int(msplit[1].split()[-1])
+            id_ = int(text[1].split()[-1])
             message.from_user = await client.get_users(id_)
             await message.unpin()
         except:
             pass
+
     reply_to = message.reply_to_message
     user_id = message.from_user.id
     user_dict = user_data.get(user_id, {})
-    if mode:= str(config_dict['DISABLE_MIRROR_LEECH']):
-        msg = None
-        if mode == 'mirror' and not isLeech:
-            msg = await sendMessage('Mirror mode has been disabled!', message)
-        elif mode == 'leech' and isLeech:
-            msg = await sendMessage('Leech mode has been disabled!', message)
-        if msg:
-            await auto_delete_message(message, msg, reply_to)
-            return
-    if isLeech and (ucid:= user_dict.get('dump_id')):
-        try:
-            await client.get_chat(ucid)
-        except:
-            msg = await sendMessage('U have enable leech dump feature but didn\'t add me to chat!', message)
-            await auto_delete_message(message, msg, reply_to)
-            return
-    msg_id = message.id
     tag = message.from_user.mention
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
-    mi = index = 1
-    qual = link = folder_name = ''
-    multi = bulk_start = bulk_end = 0
-    select = isGofile = is_bulk = False
-    multiid = get_multiid(user_id)
 
     fmode = ForceMode(message)
     if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
@@ -291,87 +276,46 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             await auto_delete_message(message, msg, reply_to)
             return
 
-    args = mssg.split(maxsplit=5)
-    args.pop(0)
-    if len(args) > 0:
-        for x in args:
-            x = x.strip()
-            if x == 's':
-                select = True
-                index += 1
-            elif x == 'go':
-                index += 1
-                if not isLeech:
-                    isGofile = True
-            elif x.strip().isdigit():
-                multi = int(x)
-                mi = index
-                index += 1
-            elif x.startswith('m:'):
-                marg = x.split('m:', 1)
-                index += 1
-                if len(marg) > 1:
-                    folder_name = f'/{marg[1]}'
-            elif x == 'b':
-                is_bulk = True
-                bi = index
-                index += 1
-            elif x.startswith('b:'):
-                is_bulk = True
-                bi = index
-                index += 1
-                dargs = x.split(':')
-                bulk_start = dargs[1] or 0
-                if len(dargs) == 3:
-                    bulk_end = dargs[2] or 0
-            else:
-                break
-        if multi == 0 or bulk:
-            args = mssg.split(maxsplit=index)
-            if len(args) > index:
-                x = args[index].strip()
-                if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:', 'opt:')):
-                    link = re_split(r' opt: | pswd: | n: | rcf: | up: ', x)[0].strip()
+    if mode:= str(config_dict['DISABLE_MIRROR_LEECH']):
+        msg = None
+        if mode == 'mirror' and not isLeech:
+            msg = await sendMessage('Mirror mode has been disabled!', message)
+        elif mode == 'leech' and isLeech:
+            msg = await sendMessage('Leech mode has been disabled!', message)
+        if msg:
+            await auto_delete_message(message, msg, reply_to)
+            return
+    if isLeech and (ucid:= user_dict.get('dump_id')):
+        try:
+            await client.get_chat(ucid)
+        except:
+            msg = await sendMessage('U have enable leech dump feature but didn\'t add me to chat!', message)
+            await auto_delete_message(message, msg, reply_to)
+            return
 
-        if len(folder_name) > 0 and not is_bulk:
-            if not sameDir:
-                sameDir = {'total': multi, 'tasks': set()}
-            sameDir['tasks'].add(message.id)
+    multi, isBulk, isGofile, select, compress = args.multi, args.bulk, args.goFile, args.select, args.zipPswd
+    link, name, folder_name, up, rcf, opt = ' '.join(args.link), ' '.join(args.newName), ' '.join(args.sameDir), ' '.join(args.upload), ' '.join(args.rcloneFlags), ' '.join(args.options)
+    multiid = get_multiid(user_id)
+    bulk_start = bulk_end = 0
+    qual = ''
 
-    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
+    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or isBulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
         return
 
-    if is_bulk:
-        await run_bulk([client, message, index, bulk_start, bulk_end, bi], _ytdl, isZip, isLeech, sameDir, bulk)
+    if isBulk:
+        await run_bulk(_ytdl, client, message, input_list, bulk_start, bulk_end, isLeech, sameDir, bulk)
         return
 
     if bulk:
         del bulk[0]
 
-    mlist = [client, message, multi, index, mi, folder_name]
-    path = f'{DOWNLOAD_DIR}{msg_id}{folder_name}'
+    path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
 
     if config_dict['AUTO_MUTE'] and isSuperGroup:
         if fmsg:= await fmode.auto_muted():
             await auto_delete_message(message, fmsg, reply_to)
             return
-
-    name = mssg.split(' n: ', 1)
-    name = re_split(' pswd: | opt: | up: | rcf: ', name[1])[0].strip() if len(name) > 1 else ''
-    name = name.replace('/', '.')
-
-    pswd = mssg.split(' pswd: ', 1)
-    pswd = re_split(' n: | opt: | up: | rcf: ', pswd[1])[0] if len(pswd) > 1 else None
-
-    opt = mssg.split(' opt: ', 1)
-    opt = re_split(' n: | pswd: | up: | rcf: ', opt[1])[0].strip() if len(opt) > 1 else ''
-
-    rcf = mssg.split(' rcf: ', 1)
-    rcf = re_split(' n: | pswd: | up: | opt: ', rcf[1])[0].strip() if len(rcf) > 1 else None
-
-    up = mssg.split(' up: ', 1)
-    up = re_split(' n: | pswd: | rcf: | opt: ', up[1])[0].strip() if len(up) > 1 else None
 
     opt = opt or config_dict['YT_DLP_OPTIONS']
 
@@ -399,9 +343,9 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
         return
 
     if not isLeech:
-        if config_dict['DEFAULT_UPLOAD'] == 'rc' and up is None or up == 'rc':
+        if config_dict['DEFAULT_UPLOAD'] == 'rc' and not up or up == 'rc':
             up = config_dict['RCLONE_PATH']
-        if up is None and config_dict['DEFAULT_UPLOAD'] == 'gd':
+        if not up and config_dict['DEFAULT_UPLOAD'] == 'gd':
             up = 'gd'
         if up == 'gd' and not config_dict['GDRIVE_ID'] and not user_dict.get('cus_gdrive'):
             await editMessage('GDRIVE_ID not provided!', editable)
@@ -427,7 +371,7 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
             await editMessage(up, editable)
             return
 
-    listener = MirrorLeechListener(message, isZip, isLeech=isLeech, isGofile=isGofile, pswd=pswd, tag=tag, newname=name, multiId=multiid, sameDir=sameDir, rcFlags=rcf, upPath=up)
+    listener = MirrorLeechListener(message, compress, isLeech=isLeech, isGofile=isGofile, tag=tag, newname=name, multiId=multiid, sameDir=sameDir, rcFlags=rcf, upPath=up)
     if 'mdisk.me' in link:
         name, link = await _mdisk(link, name)
     options = {'usenetrc': True, 'cookiefile': 'cookies.txt'}
@@ -453,9 +397,9 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     except Exception as e:
         e = str(e).replace('<', ' ').replace('>', ' ')
         await editMessage(f'{tag} {e}', editable)
-        run_multi(mlist, _ytdl, isZip, isLeech, sameDir, bulk)
+        run_multi(ytdl, client, message, multi, input_list, folder_name, isLeech, sameDir, bulk)
         return
-    run_multi(mlist, _ytdl, isZip, isLeech, sameDir, bulk)
+    run_multi(ytdl, client, message, multi, input_list, folder_name, isLeech, sameDir, bulk)
     if not select:
         user_dict = user_data.get(user_id, {})
         if 'format' in options:
@@ -474,23 +418,28 @@ async def _ytdl(client: Client, message: Message, isZip=False, isLeech=False, sa
     await ydl.add_download(link, path, name, qual, playlist, opt)
 
 
+parser = ArgumentParser(description='YT-DLP args usage:', argument_default='')
+
+parser.add_argument('link', nargs='*')
+parser.add_argument('-s', action='store_true', default=False, dest='select')
+parser.add_argument('-o', nargs='+', dest='options')
+parser.add_argument('-m', nargs='+', dest='sameDir')
+parser.add_argument('-i', nargs='+', default=0, dest='multi', type=int)
+parser.add_argument('-b', nargs='?', default=False, dest='bulk')
+parser.add_argument('-n', nargs='+', dest='newName')
+parser.add_argument('-z', nargs='*', default=None, dest='zipPswd')
+parser.add_argument('-gf', action='store_true', default=False, dest='goFile')
+parser.add_argument('-up', nargs='+', dest='upload')
+parser.add_argument('-rcf', nargs='+', dest='rcloneFlags')
+
+
 async def ytdl(client, message):
     _ytdl(client, message)
-
-
-async def ytdlZip(client, message):
-    _ytdl(client, message, True)
 
 
 async def ytdlleech(client, message):
     _ytdl(client, message, isLeech=True)
 
 
-async def ytdlZipleech(client, message):
-    _ytdl(client, message, True, True)
-
-
 bot.add_handler(MessageHandler(ytdl, filters=command(BotCommands.YtdlCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(ytdlZip, filters=command(BotCommands.YtdlZipCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(ytdlleech, filters=command(BotCommands.YtdlLeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(ytdlZipleech, filters=command(BotCommands.YtdlZipLeechCommand) & CustomFilters.authorized))

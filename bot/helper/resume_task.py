@@ -38,49 +38,30 @@ async def set_incomplte_task(cid, link):
 async def start_resume_task(client: Client, tasks: list):
     for msg in tasks:
         cmd = action(msg)[1:] + str(config_dict['CMD_SUFFIX'])
-        isZip = extract = isQbit = isLeech = isYt = False
+        isQbit = isLeech = isYt = False
         def _check_cmd(cmds):
             if any(x == cmd for x in cmds):
                 return True
-        if _check_cmd(BotCommands.UnzipMirrorCommand):
-            extract = True
-        elif _check_cmd(BotCommands.ZipMirrorCommand):
-            isZip = True
-        elif _check_cmd(BotCommands.QbMirrorCommand):
+        if _check_cmd(BotCommands.QbMirrorCommand):
             isQbit = True
-        elif _check_cmd(BotCommands.QbUnzipMirrorCommand):
-            extract = isQbit = True
-        elif _check_cmd(BotCommands.QbZipMirrorCommand):
-            isZip = isQbit = True
         elif _check_cmd(BotCommands.LeechCommand):
             isLeech = True
-        elif _check_cmd(BotCommands.UnzipLeechCommand):
-            extract = isLeech = True
-        elif _check_cmd(BotCommands.ZipLeechCommand):
-            isZip = isLeech = True
         elif _check_cmd(BotCommands.QbLeechCommand):
             isQbit = isLeech = True
-        elif _check_cmd(BotCommands.QbUnzipLeechCommand):
-            extract = isQbit = isLeech = True
-        elif _check_cmd(BotCommands.QbZipLeechCommand):
-            isZip = isQbit = isLeech = True
         elif _check_cmd(BotCommands.YtdlCommand):
             isYt = True
-        elif _check_cmd(BotCommands.YtdlZipCommand):
-            isZip = isYt = True
         elif _check_cmd(BotCommands.YtdlLeechCommand):
             isLeech = isYt = True
-        elif _check_cmd(BotCommands.YtdlZipLeechCommand):
-            isLeech = isZip = isYt = True
 
         message = await sendMessage(msg.text, msg.reply_to_message or msg)
         message.from_user = msg.from_user
         if isYt:
-            _ytdl(client, message, isZip, isLeech)
+            _ytdl(client, message, isLeech)
         else:
-            _mirror_leech(client, message, isZip, extract, isQbit, isLeech)
+            _mirror_leech(client, message, isQbit, isLeech)
         await sleep(6)
     del incompte_dict[msg.from_user.id]
+
 
 async def resume_task(client: Client, query: CallbackQuery):
     user_id = query.from_user.id

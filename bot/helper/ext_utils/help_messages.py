@@ -76,26 +76,16 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
 
 class HelpString:
     ARIA = [f'/{BotCommands.MirrorCommand[0]} or /{BotCommands.MirrorCommand[1]}: Start mirroring to Google Drive.',
-            f'/{BotCommands.ZipMirrorCommand[0]} or /{BotCommands.ZipMirrorCommand[1]}: Start mirroring and upload the file/folder compressed with zip extension.',
-            f'/{BotCommands.UnzipMirrorCommand[0]} or /{BotCommands.UnzipMirrorCommand[1]}: Start mirroring and upload the file/folder extracted from any archive extension.',
-            f'/{BotCommands.LeechCommand[0]} or /{BotCommands.LeechCommand[1]}: Start leeching to Telegram.',
-            f'/{BotCommands.ZipLeechCommand[0]} or /{BotCommands.ZipLeechCommand[1]}: Start leeching and upload the file/folder compressed with zip extension.',
-            f'/{BotCommands.UnzipLeechCommand[0]} or /{BotCommands.UnzipLeechCommand[1]}: Start leeching and upload the file/folder extracted from any archive extension.']
+            f'/{BotCommands.LeechCommand[0]} or /{BotCommands.LeechCommand[1]}: Start leeching to Telegram.']
 
     QBIT = [f'/{BotCommands.QbMirrorCommand[0]} or /{BotCommands.QbMirrorCommand[1]}: Start Mirroring to Google Drive using qBittorrent.',
-            f'/{BotCommands.QbZipMirrorCommand[0]} or /{BotCommands.QbZipMirrorCommand[1]}: Start mirroring using qBittorrent and upload the file/folder compressed with zip extension.',
-            f'/{BotCommands.QbUnzipMirrorCommand[0]} or /{BotCommands.QbUnzipMirrorCommand[1]}: Start mirroring using qBittorrent and upload the file/folder extracted from any archive extension.',
-            f'/{BotCommands.QbLeechCommand[0]} or /{BotCommands.QbLeechCommand[1]}: Start leeching using qBittorrent.',
-            f'/{BotCommands.QbZipLeechCommand[0]} or /{BotCommands.QbZipLeechCommand[1]}: Start leeching using qBittorrent and upload the file/folder compressed with zip extension.',
-            f'/{BotCommands.QbUnzipLeechCommand[0]} or /{BotCommands.QbUnzipLeechCommand[1]}: Start leeching using qBittorrent and upload the file/folder extracted from any archive extension.']
+            f'/{BotCommands.QbLeechCommand[0]} or /{BotCommands.QbLeechCommand[1]}: Start leeching using qBittorrent.']
 
     EXTRAML = [f'/{BotCommands.BtSelectCommand}: Select files from torrents by gid or reply.',
                f'/{BotCommands.CancelMirror}: Cancel task by gid or reply.']
 
     YTDL = [f'/{BotCommands.YtdlCommand[0]} or /{BotCommands.YtdlCommand[1]}: Mirror yt-dlp supported link.',
-            f'/{BotCommands.YtdlZipCommand[0]} or /{BotCommands.YtdlZipCommand[1]}: Mirror yt-dlp supported link as zip.',
-            f'/{BotCommands.YtdlLeechCommand[0]} or /{BotCommands.YtdlLeechCommand[1]}: Leech yt-dlp supported link.',
-            f'/{BotCommands.YtdlZipLeechCommand[0]} or /{BotCommands.YtdlZipLeechCommand[1]}: Leech yt-dlp supported link as zip.']
+            f'/{BotCommands.YtdlLeechCommand[0]} or /{BotCommands.YtdlLeechCommand[1]}: Leech yt-dlp supported link.']
 
     DRIVE = [f'/{BotCommands.CloneCommand} [drive_url]: Copy file/folder to Google Drive.',
              f'/{BotCommands.CountCommand} [drive_url]: Count file/folder of Google Drive.',
@@ -138,12 +128,23 @@ class HelpString:
              f'/{BotCommands.ClearLocalsCommand}: Clear {BotCommands.EvalCommand} or {BotCommands.ExecCommand} locals (Only Owner).']
 
     MLNOTE = '''
-<b>NOTES:</b>
-1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
-2. Options (<b>n: and pswd:</b>) should be added randomly after the link if link along with the cmd and after any other option
-3. Options (<b>d, s, m:, b and multi</b>) should be added randomly before the link and before any other option.
-4. Commands that start with <b>qb</b> are <b>ONLY</b> for torrents.
-5. (n:) option doesn't work with torrents.
+Available Arguments:
+<code>-n</code>: New Name
+<code>-z</code>: Zip to Archive
+<code>-e</code>: Extract Archive
+<code>-i</code>: Multi Link
+<code>-s</code>: Select (Torrent)
+<code>-d</code>: Seed (Torrent)
+<code>-m</code>: Same Directory
+<code>-b</code>: Bulk Download
+<code>-j</code>: Join
+<code>-gf</code>: GoFile Upload
+<code>-up</code>: Upload (RClone or GD)
+<code>-rcf</code>: RClone Flags
+<code>-au</code>: Auth Username
+<code>-ap</code>: Auth Password
+
+Note: <i><b>QB</b> commands ONLY for torrents!</i>
 '''
 
     MTG = '''
@@ -156,26 +157,43 @@ Super: <code>https://t.me/c/channel_id/message_id</code>
 '''
 
     MLDL = '''
-<b>Send link along with command line:</b>
-<code>/cmd</code> link n: newname pswd: xx(zip/unzip)
+<code>/cmd</code> link -n new name
 
-<b>By replying to link/file:</b>
-<code>/cmd</code> n: newname pswd: xx(zip/unzip)
+<b>By replying to link/file</b>:
+<code>/cmd</code> -n new name -z -e -up upload destination
 
-<b>Direct link authorization:</b>
-<code>/cmd</code> link n: newname pswd: xx(zip/unzip)
-<b>username</b>
-<b>password</b>
+<b>Direct link authorization</b>: -au -ap
+<code>/cmd</code> link -au username -ap password
+'''
+
+    MLZUZ = '''
+<code>/cmd</code> link -e password (extract password protected)
+<code>/cmd</code> link -z password (zip password protected)
+<code>/cmd</code> link -z password -e (extract and zip password protected)
+<code>/cmd</code> link -e password -z password (extract password protected and zip password protected)
+Note: When both extract and zip added with cmd it will extract first and then zip, so always extract first
+'''
+
+    MLJOIN = '''
+This option will only work before extract and zip, so mostly it will be used with -m argument (samedir)
+By Reply:
+<code>/cmd</code> -i 3 -j -m folder name
+<code>/cmd</code> -b -j -m folder name
+if u have link have splitted files:
+<code>/cmd</code> link -j
 '''
 
     MLBULK = '''
 Bulk can be used by text message and by replying to text file contains links seperated by new line.
-You can use it only by reply to message(text/file). Options that came after link should be added along with and after link and not with cmd.
+You can use it only by reply to message(text/file).
+All options should be along with link!
 Example:
-link n: newname up: remote1:path1
-link pswd: pass(zip/unzip) \\nusername\\npassword(authentication) up: remote2:path2
-link pswd: pass(zip/unzip) up: remote2:path2 \\n{username}\\n{password}(authentication)(last option)
-You can set start and end of the links from the bulk with b:start:end or only end by b::end or only start by b:start. The default start is from zero(first link) to inf.
+link1 -n new name -up remote1:path1 -rcf |key:value|key:value
+link2 -z -n new name -up remote2:path2
+link3 -e -n new name -up remote2:path2
+Note: You can't add -m arg for some links only, do it for all links or use multi without bulk!
+Reply to this example by this cmd for example <code>/cmd</code> -b(bulk)
+You can set start and end of the links from the bulk like seed, with -b start:end or only end by -b :end or only start by -b start. The default start is from zero(first link) to inf.
 '''
 
     MISC = f'''
@@ -204,17 +222,18 @@ You can set start and end of the links from the bulk with b:start:end or only en
 
 Send support sites or rclone path along with command or by replying to the link/rc_path by command
 
-<b>Multi links only by replying to first gdlink or rclone_path:</b>
-<code>/cmd</code> 10 (number of links/pathies)
+<b>Multi links only by replying to first link or rclone_path:</b>
+<code>/cmd</code> -i 10(number of links/pathies)
 
 <b>Gdrive:</b>
 <code>/cmd</code> gdrivelink
 
 <b>RClone:</b>
-<code>/cmd</code> rcl or rclone_path up: rcl or rclone_path rcf: flagkey:flagvalue|flagkey|flagkey:flagvalue
+<code>/cmd</code> (rcl or rclone_path) -up (rcl or rclone_path) -rcf |flagkey:flagvalue|flagkey|flagkey:flagvalue
 
-<b>Notes:</b>
-if up: not specified then rclone destination will be the RCLONE_PATH from config.env
+Notes:
+1. If -up not specified then rclone destination will be the RCLONE_PATH from config.env
+2. When use -rcf start it with `|` to avoid reading it as bot argument.
 '''
 
     RCLONE = '''
@@ -225,108 +244,128 @@ Users can add their own rclone from user settings
 If you want to add path manually from your config add <code>mrcc:</code> before the path without space
 <code>/cmd</code> <code>mrcc:</code>main:/dump/ubuntu.iso
 
-<b>Upload</b>:
-<code>/cmd</code> link up: <code>rcl</code> (To select rclone config, remote and path)
-You can directly add the upload path. up: remote:dir/subdir
+<b>Upload</b>: -up
+<code>/cmd</code> link -up <code>rcl</code> (To select rclone config, remote and path)
+You can directly add the upload path: -up remote:dir/subdir
 If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
 If DEFAULT_UPLOAD is `gd` then you can pass up: `rc` to upload to RCLONE_PATH.
 If you want to add path manually from your config (uploaded from usetting) add <code>mrcc:</code> before the path without space
-<code>/cmd</code> link up: <code>mrcc:</code>main:dump
+<code>/cmd</code> link -up <code>mrcc:</code>main:dump
 
-<b>Rclone Flags</b>:
-<code>/cmd</code> link|path|rcl up: path|rcl rcf: --buffer-size:8M|--drive-starred-only|key|key:value
+<b>Rclone Flags</b>: -rcf
+<code>/cmd</code> link -up path|rcl -rcf |--buffer-size:8M|--drive-starred-only|key|key:value
 This will override all other flags except --exclude
+Note: When use -rcf start it with `|` to avoid reading it as bot argument.
 Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
 '''
 
     BTSEL = '''
-<code>/cmd</code> <b>s</b> link or by replying to file/link
-This option should be always before n: or pswd:
+<code>/cmd</code> link -s or by replying to file/link
 '''
 
     BTSEED = '''
-<code>/cmd</code> <b>d</b> link or by replying to file/link
-To specify ratio and seed time add d:ratio:time. Ex: d:0.7:10 (ratio and time) or d:0.7 (only ratio) or d::10 (only time) where time in minutes.
-Those options should be always before n: or pswd:
+<code>/cmd</code> link -d ratio:seed_time or by replying to file/link
+To specify ratio and seed time add -d ratio:time. Ex: -d 0.7:10 (ratio and time) or -d 0.7 (only ratio) or -d :10 (only time) where time in minutes.
 '''
 
     GOFILE = '''
-<code>/cmd go</code> link or reply to a message
+<code>/cmd</code> link or reply to a message
 <i>*GoFile upload only for cmd mirror not leech</i>
 '''
 
     MLMULTI = '''
-<b>Multi links only by replying to first link/file:</b>
-<code>/cmd</code> 10 (number of links/files)
-Number should be always before n: or pswd:
+<b>Multi links only by replying to first link/file</b>:
+<code>/cmd</code> -i 10(number of links/files)
 
-<b>Multi links within same upload directory only by replying to first link/file:</b>
-<code>/cmd</code> 10 (number of links/files) m:folder_name
-Number and m:folder_name (folder_name without space) should be always before n: or pswd:
+<b>Multi links within same upload directory only by replying to first link/file</b>: -m
+<code>/cmd</code> -i 10(number of links/files) -m folder name (multi message)
+<code>/cmd</code> -b -m folder name (bulk-message/file)
 '''
 
     YLNOTE = '''
+Available Arguments:
+<code>-n</code>: New Name
+<code>-z</code>: Zip to Archive
+<code>-i</code>: Multi Link
+<code>-s</code>: Quality Select
+<code>-m</code>: Same Directory
+<code>-b</code>: Bulk Download
+<code>-o</code>: BYTDL Options
+<code>-gf</code>: GoFile Upload
+<code>-up</code>: Upload (RClone or GD)
+<code>-rcf</code>: RClone Flags
+
+<b>Note</b>
 1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
 2. Options (<b>b, s, m: and multi</b>) should be added randomly before link and before any other option.
 3. Options (<b>n:, pswd: and opt:</b>) should be added randomly after the link if link along with the cmd or after cmd if by reply.
 4. You can always add video quality from yt-dlp api options.
 5. Don't add file extension while rename using `n:`
-
-<b>Options Note:</b> Add `^` before integer or float, some values must be numeric and some string.
-Like playlist_items:10 works with string, so no need to add `^` before the number but playlistend works only with integer so you must add `^` before the number like example above.
-You can add tuple and dict also. Use double quotes inside dict.
-
-Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a> or use this <a href='https://t.me/mltb_official_channel/177'>script</a> to convert cli arguments to api options.
 '''
 
     YLDL = '''
-<b>Send link along with command line:</b>
-<code>/cmd</code> s link n: newname pswd: xx(zip) opt: x:y|x1:y1
+<b>Send link along with command line</b>:
+<code>/cmd</code> link -s -n new name -opt x:y|x1:y1
 
-<b>By replying to link:</b>
-<code>/cmd</code> n: newname pswd: xx(zip) opt: x:y|x1:y1
+<b>By replying to link</b>:
+<code>/cmd</code> -n  new name -z password -opt x:y|x1:y1
+
+<b>New Name</b>: -n
+<code>/cmd</code> link -n new name
+Note: Don't add file extension
+
+<b>Zip</b>: -z password
+<code>/cmd</code> link -z (zip)
+<code>/cmd</code> link -z password (zip password protected)
 '''
 
     YLBULK = '''
 Bulk can be used by text message and by replying to text file contains links seperated by new line.
-You can use it only by reply to message(text/file). Options that came after link should be added along with and after link and not with cmd.
+You can use it only by reply to message(text/file).
+All options should be along with link!
 Example:
-link n: newname up: remote1:path1
+link1 -n new name -up remote1:path1 -rcf |key:value|key:value
+link2 -z -n new name -up remote2:path2
+link3 -e -n new name -opt ytdlpoptions
+Note: You can't add -m arg for some links only, do it for all links or use multi without bulk!
 link pswd: pass(zip/unzip) opt: ytdlpoptions up: remote2:path2
 Reply to this example by this cmd for example <code>/cmd</code> b(bulk) m:folder_name(same dir)
 You can set start and end of the links from the bulk with b:start:end or only end by b::end or only start by b:start. The default start is from zero(first link) to inf.
 '''
 
-    YLQUAL = '''
+    YTOPT = '''
 Incase default quality added from yt-dlp options using format option and you need to select quality for specific link or links with multi links feature.
-<code>/cmd</code> s link
-This option should be always before n:, pswd: and opt:
+<code>/cmd</code> link -s
 
-<b>Options Example:</b> opt: playliststart:^10|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{'ffmpeg': ['-threads', '4']}|wait_for_video:(5, 100)
+<code>/cmd</code> link -opt playliststart:^10|fragment_retries:^inf|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{"ffmpeg": ["-threads", "4"]}|wait_for_video:(5, 100)
+Note: Add `^` before integer or float, some values must be numeric and some string.
+Like playlist_items:10 works with string, so no need to add `^` before the number but playlistend works only with integer so you must add `^` before the number like example above.
+You can add tuple and dict also. Use double quotes inside dict.
 '''
 
     YLMULTI = '''
-<b>Multi links only by replying to first link:</b>
-<code>/cmd</code> 10 (number of links)
-Number should be always before n:, pswd: and opt:
+<b>Multi links only by replying to first link</b>:
+<code>/cmd</code> -i 10(number of links)
 
-<b>Multi links within same upload directory only by replying to first link:</b>
-<code>/cmd</code> 10 (number of links) m:folder_name
-Number and m:folder_name should be always before n:, pswd: and opt:
+<b>Multi links within same upload directory only by replying to first link</b>: -m
+<code>/cmd</code> -i 10(number of links) -m folder name
 '''
 
     RSSHELP = '''
 Use this format to add feed url:
 Title1 link (required)
-Title2 link c: cmd inf: xx exf: xx opt: options like(up, rcf, pswd) (optional)
-Title3 link c: cmd d:ratio:time opt: up: gd
-c: command + any mirror option before link like seed option.
-opt: any option after link like up, rcf and pswd(zip).
-inf: For included words filter.
-exf: For excluded words filter.
+Title2 link -c cmd -inf xx -exf xx
+Title3 link -c cmd -d ratio:time -z password
+
+-c command + any arg
+-inf For included words filter.
+-exf For excluded words filter.
+
 Example: Title https://www.rss-url.com inf: 1080 or 720 or 144p|mkv or mp4|hevc exf: flv or web|xxx opt: up: mrcc:remote:path/subdir rcf: --buffer-size:8M|key|key:value
 This filter will parse links that it's titles contains `(1080 or 720 or 144p) and (mkv or mp4) and hevc` and doesn't conyain (flv or web) and xxx` words. You can add whatever you want.
+
 Another example: inf:  1080  or 720p|.web. or .webrip.|hvec or x264. This will parse titles that contains ( 1080  or 720p) and (.web. or .webrip.) and (hvec or x264). I have added space before and after 1080 to avoid wrong matching. If this `10805695` number in title it will match 1080 if added 1080 without spaces after it.
+
 Filter Notes:
 1. | means and.
 2. Add `or` between similar keys, you can add it between qualities or between extensions, so don't add filter like this f: 1080|mp4 or 720|web because this will parse 1080 and (mp4 or 720) and web ... not (1080 and mp4) or (720 and web)."
@@ -343,89 +382,104 @@ Filter Notes:
 
 def get_help_button(from_user: int, data: str=None):
     buttons = ButtonMaker()
-    image = config_dict['IMAGE_HELP']
+    image, menu = config_dict['IMAGE_HELP'], 'ml'
     def _build_button(*args, back=True):
         for x in args:
-            buttons.button_data(x.split()[0], f'help {from_user.id} {x.lower()}')
+            buttons.button_data(x.split()[0], f'help {from_user.id} {x.lower()}', 'header' if x.lower().startswith(('mirror', 'youtube')) else None)
         if back:
             buttons.button_data('<<', f'help {from_user.id} back', 'footer')
+    home_menu = ['Aria', 'qBit', 'YTdl', 'Drive', 'User', 'Owner', 'Mirror/Leech', 'YouTube/Leech']
+    ml_menu = ['Basic ML', 'Zip/Unzip', 'Join', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML']
+    ytdl_menu = ['Basic YL', 'Options', 'GoFile YL', 'Multi YL', 'Bulk YL']
     if not data or data == 'back':
-        text = f'{from_user.mention}, Choose Options Below.'
-        _build_button('Aria', 'qBit', 'Ytdl', 'Drive', 'User', 'Owner', 'Mirror/Leech', 'YouTube/Leech', back=False)
+        text, menu = f'{from_user.mention}, Choose Options Below.', None
+        _build_button(*home_menu, back=False)
     elif data == 'aria':
-        image = config_dict['IMAGE_ARIA']
+        image, menu = config_dict['IMAGE_ARIA'], 'home'
         ariahelp ='\n'.join(x for x in HelpString.ARIA + HelpString.EXTRAML)
-        text = f'<b>ARIA COMMANDS</b>\n\n{ariahelp}'
-        _build_button('qBit', 'Ytdl', 'Drive', 'User', 'Owner')
+        text = f'<b>ARIA COMMANDS</b>\n{ariahelp}'
+        del home_menu[0]
     elif data == 'qbit':
-        image = config_dict['IMAGE_QBIT']
-        text = '<b>QBITTORRENT COMMANDS</b>\n\n'
+        image, menu = config_dict['IMAGE_QBIT'], 'home'
+        text = '<b>QBITTORRENT COMMANDS</b>\n'
         text += '\n'.join(x for x in HelpString.QBIT + HelpString.EXTRAML)
-        _build_button('Aria', 'Ytdl', 'Drive', 'User', 'Owner')
+        del home_menu[1]
     elif data == 'ytdl':
-        image = config_dict['IMAGE_YT']
-        text = '<b>YTDL COMMANDS</b>\n\n'
+        image, menu = config_dict['IMAGE_YT'], 'home'
+        text = '<b>YTDL COMMANDS</b>\n'
         text += '\n'.join(x for x in HelpString.YTDL)
-        _build_button('Aria', 'qBit', 'Drive', 'User', 'Owner')
+        del home_menu[2]
     elif data == 'drive':
-        image = config_dict['IMAGE_GD']
-        text = '<b>GDRIVE COMMANDS</b>\n\n'
+        image, menu = config_dict['IMAGE_GD'], 'home'
+        text = '<b>GDRIVE COMMANDS</b>\n'
         text += '\n'.join(x for x in HelpString.DRIVE)
-        _build_button('Aria', 'qBit', 'Ytdl', 'User', 'Owner')
+        del home_menu[3]
     elif data == 'user':
-        image = config_dict['IMAGE_USER']
-        text = '<b>USER COMMANDS</b>\n\n'
+        image, menu = config_dict['IMAGE_USER'], 'home'
+        text = '<b>USER COMMANDS</b>\n'
         text += '\n'.join(x for x in HelpString.USER)
-        _build_button('Aria', 'qBit', 'Ytdl', 'Drive', 'Owner')
+        del home_menu[4]
     elif data == 'owner':
-        image = config_dict['IMAGE_OWNER']
-        text = '<b>OWNER COMMANDS</b>\n\n'
+        image, menu = config_dict['IMAGE_OWNER'], 'home'
+        text = '<b>OWNER COMMANDS</b>\n'
         text += '\n'.join(x for x in HelpString.OWNER)
-        _build_button('Aria', 'qBit', 'Ytdl', 'Drive', 'User')
+        del home_menu[5]
     elif data.startswith('mirror'):
-        text = f'<b>MIRROR/LEECH NOTES</b>\n{HelpString.MLNOTE}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
+        text = f'<b>MIRROR/LEECH</b>{HelpString.MLNOTE}'
     elif data == 'basic ml':
-        text = f'<b>BASIC COMMAND</b>\n{HelpString.MLDL}'
-        _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
-    elif data == 'bulk ml':
-        text = f'<b>BULK DOWNLOAD</b>\n{HelpString.MLBULK}'
-        _build_button('Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link')
+        text = f'<b>BASIC COMMAND</b>{HelpString.MLDL}'
+        del ml_menu[0]
+    elif data.startswith('zip'):
+        text = f'<b>ZIP/UNZIP (-z -e)</b>{HelpString.BTSEED}'
+        del ml_menu[1]
+    elif data == 'join':
+        text = f'<b>ZIP/UNZIP (-z -e)</b>{HelpString.BTSEED}'
+        del ml_menu[2]
     elif data == 'selection':
-        text = f'<b>TORRENT SELECTION</b>\n{HelpString.BTSEL}'
-        _build_button('Basic ML', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
+        text = f'<b>TORRENT SELECTION (-s)</b>{HelpString.BTSEL}'
+        del ml_menu[3]
     elif data == 'seed':
-        text = f'<b>TORRENT SEED</b>\n{HelpString.BTSEED}'
-        _build_button('Basic ML', 'Selection', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
+        text = f'<b>TORRENT SEED (-d)</b>{HelpString.BTSEED}'
+        del ml_menu[4]
     elif data == 'rclone':
-        text = f'<b>RCLONE DOWNLOAD</b>\n{HelpString.RCLONE}'
-        _build_button('Basic ML', 'Selection', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML')
-    elif data == 'tg link':
-        text = f'<b>TG LINK DOWNLOAD</b>\n{HelpString.MTG}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML', 'Bulk ML')
+        text = f'<b>RCLONE DOWNLOAD</b>{HelpString.RCLONE}'
+        del ml_menu[5]
     elif data == 'gofile ml':
-        text = f'<b>GOFILE UPLOAD</b>\n{HelpString.GOFILE}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'Multi ML', 'TG Link', 'Bulk ML')
+        text = f'<b>GOFILE UPLOAD (-gf)</b>{HelpString.GOFILE}'
+        del ml_menu[6]
     elif data == 'multi ml':
-        text = f'<b>MULTI LINK</b>\n{HelpString.MLMULTI}'
-        _build_button('Basic ML', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'TG Link', 'Bulk ML')
+        text = f'<b>MULTI LINK (-i)</b>{HelpString.MLMULTI}'
+        del ml_menu[7]
+    elif data == 'tg link':
+        text = f'<b>TG LINK DOWNLOAD</b>{HelpString.MTG}'
+        del ml_menu[8]
+    elif data == 'bulk ml':
+        text = f'<b>BULK DOWNLOAD (-b)</b>{HelpString.MLBULK}'
+        del ml_menu[9]
     elif data.startswith('youtube'):
-        text = f'<b>YOUTUBE/LEECH NOTES</b>\n{HelpString.YLNOTE}'
-        _build_button('Basic YL', 'Quality', 'GoFile YL', 'Multi YL', 'Bulk YL')
+        text, menu = f'<b>YOUTUBE/YLEECH</b>{HelpString.YLNOTE}', 'ytdl'
     elif data == 'basic yl':
-        text = f'<b>BASIC COMMAND</b>\n{HelpString.YLDL}'
-        _build_button('Quality', 'GoFile YL', 'Multi YL', 'Bulk YL')
-    elif data == 'bulk yl':
-        text = f'<b>BULK DOWNLOAD</b>\n{HelpString.YLBULK}'
-        _build_button('Quality', 'GoFile YL', 'Multi YL')
-    elif data == 'quality':
-        text = f'<b>YOUTUBE QUALITY</b>\n{HelpString.YLQUAL}'
-        _build_button('Basic YL', 'GoFile YL', 'Multi YL', 'Bulk YL')
+        text, menu = f'<b>BASIC COMMAND</b>{HelpString.YLDL}', 'ytdl'
+        del ytdl_menu[0]
+    elif data == 'options':
+        text, menu = f'<b>YOUTUBE OPSTIONS (-opt)</b>{HelpString.YTOPT}', 'ytdl'
+        del ytdl_menu[1]
     elif data == 'gofile yl':
-        text = f'<b>GOFILE UPLOAD</b>\n{HelpString.GOFILE}'
-        _build_button('Basic YL', 'Quality', 'Multi YL', 'Bulk YL')
+        text, menu = f'<b>GOFILE UPLOAD (-gf)</b>{HelpString.GOFILE}', 'ytdl'
+        del ytdl_menu[2]
     elif data == 'multi yl':
-        text = f'<b>MULTI LINK</b>\n{HelpString.YLMULTI}'
-        _build_button('Basic YL', 'Quality', 'GoFile YL', 'Bulk YL')
+        text, menu = f'<b>MULTI LINK (-i)</b>{HelpString.YLMULTI}', 'ytdl'
+        del ytdl_menu[3]
+    elif data == 'bulk yl':
+        text, menu = f'<b>BULK DOWNLOAD (-b)</b>{HelpString.YLBULK}', 'ytdl'
+        del ytdl_menu[4]
+
+    if menu == 'home':
+        _build_button(*home_menu)
+    elif menu == 'ml':
+        _build_button(*ml_menu)
+    elif menu == 'ytdl':
+        _build_button(*ytdl_menu)
+
     buttons.button_data('Close', f'help {from_user.id} close', 'footer')
     return text, image, buttons.build_menu(3)

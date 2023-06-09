@@ -67,7 +67,7 @@ class YoutubeDLHelper:
                      'allow_playlist_files': True,
                      'overwrites': True,
                      'writethumbnail': True,
-                     'trim_file_name': 230,
+                     'trim_file_name': 220,
                      'retry_sleep_functions': {'http': lambda x: 2,
                                                'fragment': lambda x: 2,
                                                'file_access': lambda x: 2,
@@ -249,14 +249,15 @@ class YoutubeDLHelper:
             await self.__listener.onDownloadError('File/folder already in Drive!', file, sname)
             return
         msgerr = None
-        arch = any([self.__listener.isZip, self.__listener.isLeech])
+        compress = self.__listener.compress is not None
+        arch = any([compress, self.__listener.isLeech])
         ytdl, zuzdl, leechdl, storage, max_pyt = config_dict['YTDL_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD'], config_dict['MAX_YTPLAYLIST']
         if config_dict['PREMIUM_MODE'] and not is_premium_user(self.__listener.user_id):
             ytdl = zuzdl = leechdl = config_dict['NONPREMIUM_LIMIT']
             max_pyt = 10
         if ytdl and not arch and self.__size >= ytdl * 1024**3:
             msgerr = f"Ytdl {'playlist' if self.is_playlist else 'video'} limit is {ytdl}GB"
-        elif zuzdl and self.__listener.isZip and self.__size >= zuzdl * 1024**3:
+        elif zuzdl and compress and self.__size >= zuzdl * 1024**3:
             msgerr = f'Ytdlzip limit is {zuzdl}GB'
         elif leechdl and self.__listener.isLeech and self.__size >= leechdl * 1024**3:
             msgerr = f'Ytdl leech limit is {leechdl}GB'

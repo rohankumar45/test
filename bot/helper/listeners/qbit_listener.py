@@ -61,12 +61,13 @@ async def __download_limits(tor, limits):
         listener = download.listener()
         msgerr = None
         torddl, zuzdl, leechdl, storage = limits
-        arch = any([listener.isZip, listener.isLeech, listener.extract])
+        compress, extract = listener.compress is not None, listener.extract is not None
+        arch = any([compress, listener.isLeech, extract])
         if config_dict['PREMIUM_MODE'] and not is_premium_user(listener.user_id):
             torddl = zuzdl = leechdl = config_dict['NONPREMIUM_LIMIT']
         if torddl and not arch and tor.size >= torddl * 1024**3:
             msgerr = f'Torrent/direct limit is {torddl}GB'
-        elif zuzdl and any([listener.isZip, listener.extract]) and tor.size >= zuzdl * 1024**3:
+        elif zuzdl and any([compress, extract]) and tor.size >= zuzdl * 1024**3:
             msgerr = f'Zip/Unzip limit is {zuzdl}GB'
         elif leechdl and listener.isLeech and tor.size >= leechdl * 1024**3:
             msgerr = f'Leech limit is {leechdl}GB'

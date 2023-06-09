@@ -750,6 +750,7 @@ else:
     qb_client.app_set_preferences(qb_opt)
 
 LOGGER.info('Creating client...')
+LOGGER.info(f'Running on Pyrogram V{__version__}')
 kwargs = {'parse_mode': enums.ParseMode.HTML}
 if __version__ != '2.0.73':
     kwargs.update({'max_concurrent_transmissions': 1000, 'workers': 1000})

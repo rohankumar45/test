@@ -1,4 +1,5 @@
 from aiofiles.os import path as aiopath
+from argparse import ArgumentParser
 from asyncio import sleep
 from base64 import b64encode
 from os import path as ospath
@@ -6,7 +7,7 @@ from pyrogram import Client
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
-from re import match as re_match, split as re_split
+from re import match as re_match
 from urllib.parse import urlparse
 
 from bot import bot, config_dict, user_data, LOGGER, DOWNLOAD_DIR
@@ -31,42 +32,28 @@ from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_me
 
 
 @new_task
-async def _mirror_leech(client: Client, message: Message, isZip=False, extract=False, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
-    mesg = message.text.split('\n')
-    message_args = mesg[0].split(maxsplit=1)
-    if len(mesg) > 1 and mesg[1].startswith('Tag: '):
+async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
+    text = message.text.split('\n')
+    input_list = text[0].split()
+    try:
+        args = parser.parse_args(input_list[1:])
+    except:
+        await sendMessage(f'Invalid argument, type /{BotCommands.HelpCommand} for more details.', message)
+        return
+
+    if len(text) > 1 and text[1].startswith('Tag: '):
         try:
-            id_ = int(mesg[1].split()[-1])
+            id_ = int(text[1].split()[-1])
             message.from_user = await client.get_users(id_)
             await message.unpin()
         except:
             pass
+
     tag = message.from_user.mention
     reply_to = message.reply_to_message
     user_id = message.from_user.id
     user_dict = user_data.get(user_id, {})
-    if mode:= str(config_dict['DISABLE_MIRROR_LEECH']):
-        msg = None
-        if mode == 'mirror' and not isLeech:
-            msg = await sendMessage('Mirror mode has been disabled!', message)
-        elif mode == 'leech' and isLeech:
-            msg = await sendMessage('Leech mode has been disabled!', message)
-        if msg:
-            await auto_delete_message(message, msg, reply_to)
-            return
-    if isLeech and (ucid:= user_dict.get('dump_id')):
-        try:
-            await client.get_chat(ucid)
-        except:
-            msg = await sendMessage('U have enable leech dump feature but didn\'t add me to chat!', message)
-
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
-    mi = index = 1
-    link = folder_name = ''
-    multi = bulk_start = bulk_end = 0
-    file_ = tg_client = ratio = seed_time = headers = None
-    select = seed = is_bulk = isGofile = gdrive_sharer = False
-    multiid = get_multiid(user_id)
 
     fmode = ForceMode(message)
     if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
@@ -90,93 +77,78 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
             await auto_delete_message(message, msg, reply_to)
             return
 
-    if len(message_args) > 1:
-        args = mesg[0].split(maxsplit=6)
-        args.pop(0)
-        for x in args:
-            x = x.strip()
-            if x == 's':
-                select = True
-                index += 1
-            elif x == 'd':
-                seed = True
-                index += 1
-            elif x == 'go':
-                index += 1
-                if not isLeech:
-                    isGofile = True
-            elif x.startswith('d:'):
-                seed = True
-                index += 1
-                dargs = x.split(':')
-                ratio = dargs[1] or None
-                if len(dargs) == 3:
-                    seed_time = dargs[2] or None
-            elif x.isdigit():
-                multi = int(x)
-                mi = index
-                index += 1
-            elif x.startswith('m:'):
-                marg = x.split('m:', 1)
-                index += 1
-                if len(marg) > 1:
-                    folder_name = f"/{marg[1]}"
-            elif x == 'b':
-                is_bulk = True
-                bi = index
-                index += 1
-            elif x.startswith('b:'):
-                is_bulk = True
-                bi = index
-                index += 1
-                dargs = x.split(':')
-                bulk_start = dargs[1] or 0
-                if len(dargs) == 3:
-                    bulk_end = dargs[2] or 0
-            else:
-                break
-        if multi == 0 or bulk:
-            message_args = mesg[0].split(maxsplit=index)
-            if len(message_args) > index:
-                x = message_args[index].strip()
-                if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:')):
-                    link = re_split(r' pswd: | n: | up: | rcf: ', x)[0].strip()
+    if mode:= str(config_dict['DISABLE_MIRROR_LEECH']):
+        msg = None
+        if mode == 'mirror' and not isLeech:
+            msg = await sendMessage('Mirror mode has been disabled!', message)
+        elif mode == 'leech' and isLeech:
+            msg = await sendMessage('Leech mode has been disabled!', message)
+        if msg:
+            await auto_delete_message(message, msg, reply_to)
+            return
+    if isLeech and (ucid:= user_dict.get('dump_id')):
+        try:
+            await client.get_chat(ucid)
+        except:
+            msg = await sendMessage('U have enable leech dump feature but didn\'t add me to chat!', message)
+            await auto_delete_message(message, msg, reply_to)
+            return
 
-        if len(folder_name) > 0:
-            seed = False
-            ratio = seed_time = None
-            if not is_bulk:
-                if not sameDir:
-                    sameDir = {'total': multi, 'tasks': set()}
-                sameDir['tasks'].add(message.id)
+    select, seed, multi, isBulk, isGofile, compress, extract, join = args.select, args.seed, args.multi, args.bulk, args.goFile, args.zipPswd, args.extractPswd, args.join
+    link, name, folder_name, up, rcf = ' '.join(args.link), ' '.join(args.newName), ' '.join(args.sameDir), ' '.join(args.upload), ' '.join(args.rcloneFlags)
+    file_ = tg_client = ratio = seed_time = headers = None
+    multiid = get_multiid(user_id)
+    bulk_start = bulk_end = 0
+    gdrive_sharer = False
 
-    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or is_bulk):
+    if isinstance(multi, list):
+        multi = multi[0]
+
+    if compress is not None:
+        compress = ' '.join(compress)
+    if extract is not None:
+        extract = ' '.join(extract)
+
+    if seed:
+        dargs = seed.split(':')
+        ratio = dargs[0] or None
+        if len(dargs) == 2:
+            seed_time = dargs[1] or None
+        seed = True
+    elif seed is None:
+        seed = True
+
+    if isBulk:
+        dargs = isBulk.split(':')
+        bulk_start = dargs[0] or None
+        if len(dargs) == 2:
+            bulk_end = dargs[1] or None
+        isBulk = True
+    elif isBulk is None:
+        isBulk = True
+
+    if folder_name and not isBulk:
+        seed = False
+        ratio = seed_time = None
+        folder_name = f'/{folder_name}'
+        if sameDir is None:
+            sameDir = {'total': multi, 'tasks': set(), 'name': folder_name}
+        sameDir['tasks'].add(message.id)
+
+    if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or isBulk):
         await sendMessage(f'Upss {tag}, multi/bulk mode for premium user only', message)
         return
 
-    if is_bulk:
-        await run_bulk([client, message, index, bulk_start, bulk_end, bi], _mirror_leech, isZip, extract, isQbit, isLeech, sameDir, bulk)
+    if isBulk:
+        await run_bulk(_mirror_leech, client, message, input_list, bulk_start, bulk_end, isQbit, isLeech, sameDir, bulk)
         return
 
     if bulk:
         del bulk[0]
 
-    run_multi([client, message, multi, index, mi, folder_name], _mirror_leech, isZip, extract, isQbit, isLeech, sameDir, bulk)
+    run_multi(_mirror_leech, client, message, multi, input_list, folder_name, isQbit, isLeech, sameDir, bulk)
 
     path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
-
-    name = mesg[0].split(' n: ', 1)
-    name = re_split(' pswd: | rcf: | up: ', name[1])[0].strip() if len(name) > 1 else ''
-    name = name.replace('/', '.')
-
-    pswd = mesg[0].split(' pswd: ', 1)
-    pswd = re_split(' n: | rcf: | up: ', pswd[1])[0] if len(pswd) > 1 else None
-
-    rcf = mesg[0].split(' rcf: ', 1)
-    rcf = re_split(' n: | pswd: | up: ', rcf[1])[0].strip() if len(rcf) > 1 else None
-
-    up = mesg[0].split(' up: ', 1)
-    up = re_split(' n: | pswd: | rcf: ', up[1])[0].strip() if len(up) > 1 else None
 
     editable = await sendMessage('<i>Checking request, please wait...</i>', message)
 
@@ -201,14 +173,13 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
         file_ = is_media(reply_to)
-        if not is_url(link) and not is_magnet(link):
-            if not file_:
-                reply_text = reply_to.text.split('\n', 1)[0].strip()
-                if is_url(reply_text) or is_magnet(reply_text):
-                    link = reply_text
-            elif reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
-                link = await reply_to.download()
-                file_ = None
+        if not file_:
+            reply_text = reply_to.text.split('\n', 1)[0].strip()
+            if is_url(reply_text) or is_magnet(reply_text):
+                link = reply_text
+        elif reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
+            link = await reply_to.download()
+            file_ = None
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and not file_:
         help_msg = f'Invalid argument, type /{BotCommands.HelpCommand} for more details.'
@@ -235,8 +206,8 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
 
     if not is_mega_link(link) and not isQbit and not is_magnet(link) and not is_rclone_path(link) \
         and not is_gdrive_link(link) and not link.endswith('.torrent') and not file_:
-        content_type = await sync_to_async(get_content_type, link)
         gdrive_sharer = is_sharar(link)
+        content_type = await get_content_type(link)
         if not content_type or re_match(r'text/html|text/plain', content_type):
             host = urlparse(link).netloc
             try:
@@ -255,9 +226,9 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
                     return
 
     if not isLeech:
-        if config_dict['DEFAULT_UPLOAD'] == 'rc' and up is None or up == 'rc':
+        if config_dict['DEFAULT_UPLOAD'] == 'rc' and not up or up == 'rc':
             up = config_dict['RCLONE_PATH']
-        if up is None and config_dict['DEFAULT_UPLOAD'] == 'gd':
+        if not up and config_dict['DEFAULT_UPLOAD'] == 'gd':
             up = 'gd'
         if up == 'gd' and not config_dict['GDRIVE_ID'] and not user_dict.get('cus_gdrive'):
             await editMessage('GDRIVE_ID not provided!', editable)
@@ -291,7 +262,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     if not is_rclone_path(link) and not is_gdrive_link(link):
         await deleteMessage(editable)
 
-    listener = MirrorLeechListener(message, isZip, extract, isQbit, isLeech, isGofile, pswd, tag, select, seed, name, multiid, sameDir, rcf, up)
+    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, isGofile, tag, select, seed, name, multiid, sameDir, rcf, up, join)
 
     if file_:
         await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', name, tg_client)
@@ -307,7 +278,7 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         await deleteMessage(editable)
         await add_rclone_download(link, config_path, f'{path}/', name, listener)
     elif is_gdrive_link(link):
-        if not isZip and not extract and not isLeech and up == 'gd':
+        if compress is not None and not extract and not isLeech and up == 'gd':
             gmsg = f'Use /{BotCommands.CloneCommand} to clone Google Drive file/folder\n\n'
             gmsg += f'Use /{BotCommands.ZipMirrorCommand[0]} to make zip of Google Drive folder\n\n'
             gmsg += f'Use /{BotCommands.UnzipMirrorCommand[0]} to extracts Google Drive archive folder/file'
@@ -321,9 +292,9 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
     elif isQbit:
         await add_qb_torrent(link, path, listener, ratio, seed_time)
     else:
-        if len(mesg) > 1 and not mesg[1].startswith('Tag:'):
-            ussr = mesg[1]
-            pssw = mesg[2] if len(mesg) > 2 else ''
+        ussr = ' '.join(args.auth_user)
+        pssw = ' '.join(args.auth_pswd)
+        if ussr or pssw:
             auth = f'{ussr}:{pssw}'
             auth = 'Basic ' + b64encode(auth.encode()).decode('ascii')
         else:
@@ -333,63 +304,42 @@ async def _mirror_leech(client: Client, message: Message, isZip=False, extract=F
         await add_aria2c_download(link, path, listener, name, auth, ratio, seed_time, headers)
 
 
+parser = ArgumentParser(description='Mirror-Leech args usage:', argument_default='')
+
+parser.add_argument('link', nargs='*')
+parser.add_argument('-s', action='store_true', default=False, dest='select')
+parser.add_argument('-d', nargs='?', default=False, dest='seed')
+parser.add_argument('-m', nargs='+', dest='sameDir')
+parser.add_argument('-i', nargs='+', default=0, dest='multi', type=int)
+parser.add_argument('-b', nargs='?', default=False, dest='bulk')
+parser.add_argument('-n', nargs='+', dest='newName')
+parser.add_argument('-e', nargs='*', default=None, dest='extractPswd')
+parser.add_argument('-z', nargs='*', default=None, dest='zipPswd')
+parser.add_argument('-j', action='store_true', default=False, dest='join')
+parser.add_argument('-up', nargs='+', dest='upload')
+parser.add_argument('-gf', action='store_true', default=False, dest='goFile')
+parser.add_argument('-rcf', nargs='+', dest='rcloneFlags')
+parser.add_argument('-au', nargs='+', dest='auth_user')
+parser.add_argument('-ap', nargs='+', dest='auth_pswd')
+
+
 async def mirror(client, message):
     _mirror_leech(client, message)
-
-
-async def unzip_mirror(client, message):
-    _mirror_leech(client, message, extract=True)
-
-
-async def zip_mirror(client, message):
-    _mirror_leech(client, message, True)
 
 
 async def qb_mirror(client, message):
     _mirror_leech(client, message, isQbit=True)
 
 
-async def qb_unzip_mirror(client, message):
-    _mirror_leech(client, message, extract=True, isQbit=True)
-
-
-async def qb_zip_mirror(client, message):
-    _mirror_leech(client, message, True, isQbit=True)
-
-
 async def leech(client, message):
     _mirror_leech(client, message, isLeech=True)
-
-
-async def unzip_leech(client, message):
-    _mirror_leech(client, message, extract=True, isLeech=True)
-
-
-async def zip_leech(client, message):
-    _mirror_leech(client, message, True, isLeech=True)
 
 
 async def qb_leech(client, message):
     _mirror_leech(client, message, isQbit=True, isLeech=True)
 
 
-async def qb_unzip_leech(client, message):
-    _mirror_leech(client, message, extract=True, isQbit=True, isLeech=True)
-
-
-async def qb_zip_leech(client, message):
-    _mirror_leech(client, message, True, isQbit=True, isLeech=True)
-
-
 bot.add_handler(MessageHandler(mirror, filters=command(BotCommands.MirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(unzip_mirror, filters=command(BotCommands.UnzipMirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(zip_mirror, filters=command(BotCommands.ZipMirrorCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(qb_mirror, filters=command(BotCommands.QbMirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_unzip_mirror, filters=command(BotCommands.QbUnzipMirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_zip_mirror, filters=command(BotCommands.QbZipMirrorCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(leech, filters=command(BotCommands.LeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(unzip_leech, filters=command(BotCommands.UnzipLeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(zip_leech, filters=command(BotCommands.ZipLeechCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(qb_leech, filters=command(BotCommands.QbLeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_unzip_leech, filters=command(BotCommands.QbUnzipLeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_zip_leech, filters=command(BotCommands.QbZipLeechCommand) & CustomFilters.authorized))

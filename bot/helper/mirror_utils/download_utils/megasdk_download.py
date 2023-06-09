@@ -162,11 +162,12 @@ async def add_mega_download(mega_link, path, listener, name):
     if megadl and size >= megadl * 1024**3:
         msgerr = f'Mega limit is {megadl}GB'
     if not msgerr:
-        if zuzdl and any([listener.isZip, listener.extract]) and size >= zuzdl * 1024**3:
+        compress, extract = listener.compress is not None, listener.extract is not None
+        if zuzdl and any([compress, extract]) and size >= zuzdl * 1024**3:
             msgerr = f'Zip/Unzip limit is {zuzdl}GB'
         elif leechdl and listener.isLeech and size >= leechdl * 1024**3:
             msgerr = f'Leech limit is {leechdl}GB'
-    if storage and not await check_storage_threshold(size, any([listener.isZip, listener.isLeech, listener.extract])):
+    if storage and not await check_storage_threshold(size, any([compress, listener.isLeech, extract])):
         msgerr = f'Need {storage}GB free storage'
     if msgerr:
         LOGGER.info('File/folder size over the limit size!')

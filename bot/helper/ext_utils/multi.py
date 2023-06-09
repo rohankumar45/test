@@ -13,41 +13,38 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 
 
 @new_task
-async def run_multi(mlist, func, *args):
-    client, message, multi, index, mi, folder_name = mlist
+async def run_multi(func, client: Client, message: Message, multi: int, input_list: list, folder_name, *args):
     if multi > 1:
         await sleep(config_dict['MULTI_TIMEGAP'])
         if args and (bulk:= args[-1]):
-            msg = message.text.split(' ', maxsplit=index)
-            msg[mi] = f'{multi - 1}'
-            msg[index] = bulk[0]
+            msg = input_list[:1]
+            msg.append(f'{bulk[0]} -i {multi - 1}')
             nextmsg = await sendMessage(' '.join(msg), message)
         else:
-            msg = message.text.split(' ', maxsplit=mi+1)
-            msg[mi] = f'{multi - 1}'
-            if len(msg) == 2 and len(msgauth:= message.text.split('\n')) > 1:
-                auth = '\n{}'.format('\n'.join(msgauth[1:]))
-            else:
-                auth = ''
+            msg = [s.strip() for s in input_list]
+            index = msg.index('-i')
+            msg[index+1] = f'{multi - 1}'
             nextmsg = await client.get_messages(message.chat.id, message.reply_to_message_id + 1)
-            nextmsg = await sendMessage(' '.join(msg) + auth, nextmsg)
+            nextmsg = await sendMessage(' '.join(msg), nextmsg)
         nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
-        if folder_name and len(folder_name) > 0:
+        if folder_name:
             args[-2]['tasks'].add(nextmsg.id)
         nextmsg.from_user = message.from_user
         await sleep(5)
         func(client, nextmsg, *args)
 
 
-async def run_bulk(blist, func, *args):
-    client, message, index, bulk_start, bulk_end, bi = blist
+async def run_bulk(func, client: Client, message: Message, input_list: list, bulk_start: int, bulk_end: int, *args):
     bulk = await extract_bulk_links(message, bulk_start, bulk_end)
-    if not bulk:
+    try:
+        bulk = await extract_bulk_links(message, bulk_start, bulk_end)
+        if len(bulk) == 0:
+            raise ValueError('Bulk Empty!')
+    except:
         await sendMessage('Reply to text file or to tg message that have links seperated by new line!', message)
         return
-    b_msg = message.text.split(maxsplit=index)
-    b_msg[bi] = f'{len(bulk)}'
-    b_msg.insert(index, bulk[0].replace('\\n', '\n'))
+    b_msg = input_list[:1]
+    b_msg.append(f'{bulk[0]} -i {len(bulk)}')
     nextmsg = await sendMessage(' '.join(b_msg), message)
     nextmsg = await client.get_messages(message.chat.id, nextmsg.id)
     nextmsg.from_user = message.from_user

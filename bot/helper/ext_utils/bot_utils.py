@@ -374,17 +374,10 @@ def get_multiid(user_id: int):
 
 
 
-def get_content_type(link: str):
-    try:
-        res = rhead(link, allow_redirects=True, timeout=5, headers={'user-agent': 'Wget/1.12'})
-        content_type = res.headers.get('content-type')
-    except:
-        try:
-            res = urlopen(link, timeout=5)
-            content_type = res.info().get_content_type()
-        except:
-            content_type = None
-    return content_type
+async def get_content_type(url):
+    async with ClientSession(trust_env=True) as session:
+        async with session.get(url) as response:
+            return response.headers.get('Content-Type')
 
 
 async def downlod_content(url: str, name: str):

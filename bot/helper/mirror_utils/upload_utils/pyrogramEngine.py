@@ -261,7 +261,7 @@ class TgUploader:
 
     async def __user_settings(self):
         user_dict = user_data.get(self.__user_id, {})
-        self.__as_doc = user_dict.get('as_doc', False) or ('as_doc' not in user_dict and config_dict['AS_DOCUMENT']) or self.__listener.isZip
+        self.__as_doc = user_dict.get('as_doc', False) or ('as_doc' not in user_dict and config_dict['AS_DOCUMENT']) or self.__listener.compress is not None
         self.__media_group = user_dict.get('media_group', False) or ('media_group' not in user_dict and config_dict['MEDIA_GROUP'])
         self.__cap_mode = user_dict.get('user_cap', 'mono')
         self.__enable_pm = user_dict.get('enable_pm', False)

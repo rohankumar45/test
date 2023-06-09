@@ -6,7 +6,7 @@ from bot.helper.ext_utils.fs_utils import clean_target
 
 async def get_links_from_message(text, bulk_start, bulk_end):
     links_list = text.split('\n')
-    links_list = [item for item in links_list if len(item) != 0]
+    links_list = [item.strip() for item in links_list if len(item) != 0]
     if bulk_start != 0 and bulk_end != 0:
         links_list = links_list[bulk_start:bulk_end]
     elif bulk_start != 0:
@@ -21,7 +21,7 @@ async def get_links_from_file(message, bulk_start, bulk_end):
     text_file_dir = await message.download()
     async with aiopen(text_file_dir, 'r+') as f:
         lines = await f.readlines()
-        links_list.extend(line for line in lines if len(line) != 0)
+        links_list.extend(line.strip() for line in lines if len(line) != 0)
     if bulk_start != 0 and bulk_end != 0:
         links_list = links_list[bulk_start:bulk_end]
     elif bulk_start != 0:
