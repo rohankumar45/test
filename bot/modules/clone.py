@@ -253,7 +253,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     if bulk:
         del bulk[0]
 
-    run_multi(cloneNode, client, message, input_list, '', bulk)
+    run_multi(cloneNode, client, message, multi, input_list, '', bulk)
 
     check_ = await sendMessage('<i>Checking request, please wait...</i>', message)
     gdrive_sharer = is_sharar(link)
@@ -289,7 +289,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             await gdcloneNode(client, message, check_, newname, multi, link, tag, isSuperGroup, gdrive_sharer)
 
 
-parser = ArgumentParser(description='Clone args usage:')
+parser = ArgumentParser(description='Clone args usage:', argument_default='')
 
 parser.add_argument('link', nargs='*', default='')
 parser.add_argument('-n', nargs='+', dest='newName')
