@@ -278,7 +278,7 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
         await deleteMessage(editable)
         await add_rclone_download(link, config_path, f'{path}/', name, listener)
     elif is_gdrive_link(link):
-        if compress is not None and not extract and not isLeech and up == 'gd':
+        if compress is None and extract is None and not isLeech and up == 'gd':
             gmsg = f'Use /{BotCommands.CloneCommand} to clone Google Drive file/folder\n\n'
             gmsg += f'Use /{BotCommands.ZipMirrorCommand[0]} to make zip of Google Drive folder\n\n'
             gmsg += f'Use /{BotCommands.UnzipMirrorCommand[0]} to extracts Google Drive archive folder/file'
