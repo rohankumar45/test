@@ -129,20 +129,20 @@ class HelpString:
 
     MLNOTE = '''
 Available Arguments:
-<code>-n</code>: New Name
-<code>-z</code>: Zip to Archive
-<code>-e</code>: Extract Archive
-<code>-i</code>: Multi Link
-<code>-s</code>: Select (Torrent)
-<code>-d</code>: Seed (Torrent)
-<code>-m</code>: Same Directory
-<code>-b</code>: Bulk Download
-<code>-j</code>: Join
-<code>-gf</code>: GoFile Upload
-<code>-up</code>: Upload (RClone or GD)
-<code>-rcf</code>: RClone Flags
-<code>-au</code>: Auth Username
-<code>-ap</code>: Auth Password
+⁍ New Name: <code>-n</code>
+⁍ Zip to Archive: <code>-z</code>
+⁍ Extract Archive: <code>-e</code>
+⁍ Join: <code>-j</code>
+⁍ Multi Link: <code>-i</code>
+⁍ Seed (Torrent): <code>-d</code>
+⁍ Select (Torrent) <code>-s</code>
+⁍ Same Directory: <code>-m</code>
+⁍ Bulk Download: <code>-b</code>
+⁍ GoFile Upload: <code>-gf</code>
+⁍ Upload (RClone or GD):<code>-up</code>
+⁍ RClone Flags: <code>-rcf</code>
+⁍ Auth Username: <code>-au</code>
+⁍ Auth Password: <code>-ap</code>
 
 Note: <i><b>QB</b> commands ONLY for torrents!</i>
 '''
@@ -284,16 +284,16 @@ To specify ratio and seed time add -d ratio:time. Ex: -d 0.7:10 (ratio and time)
 
     YLNOTE = '''
 Available Arguments:
-<code>-n</code>: New Name
-<code>-z</code>: Zip to Archive
-<code>-i</code>: Multi Link
-<code>-s</code>: Quality Select
-<code>-m</code>: Same Directory
-<code>-b</code>: Bulk Download
-<code>-o</code>: BYTDL Options
-<code>-gf</code>: GoFile Upload
-<code>-up</code>: Upload (RClone or GD)
-<code>-rcf</code>: RClone Flags
+⁍ New Name: <code>-n</code>
+⁍ Zip to Archive: <code>-z</code>
+⁍ Multi Link: <code>-i</code>
+⁍ Quality Select: <code>-s</code>
+⁍ Same Directory: <code>-m</code>
+⁍ Bulk Download: <code>-b</code>
+⁍ YTDL Options: <code>-o</code>
+⁍ GoFile Upload: <code>-gf</code>
+⁍ Upload (RClone or GD):<code>-up</code>
+⁍ RClone Flags: <code>-rcf</code>
 '''
 
     YLDL = '''
@@ -384,7 +384,7 @@ def get_help_button(from_user: int, data: str=None):
             buttons.button_data(x.split()[0], f'help {from_user.id} {x.lower()}', 'header' if x.lower().startswith(('mirror', 'youtube')) else None)
         if back:
             buttons.button_data('<<', f'help {from_user.id} back', 'footer')
-    home_menu = ['Aria', 'qBit', 'YTdl', 'Drive', 'User', 'Owner', 'Mirror/Leech', 'YouTube/Leech']
+    home_menu = ['Aria', 'qBit', 'YTDL', 'Drive', 'User', 'Owner', 'Mirror/Leech', 'YouTube/YLeech']
     ml_menu = ['Basic ML', 'Zip/Unzip', 'Join', 'Selection', 'Seed', 'RClone', 'GoFile ML', 'Multi ML', 'TG Link', 'Bulk ML']
     ytdl_menu = ['Basic YL', 'Options', 'GoFile YL', 'Multi YL', 'Bulk YL']
     if not data or data == 'back':
