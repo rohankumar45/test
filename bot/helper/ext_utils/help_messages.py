@@ -294,13 +294,6 @@ Available Arguments:
 <code>-gf</code>: GoFile Upload
 <code>-up</code>: Upload (RClone or GD)
 <code>-rcf</code>: RClone Flags
-
-<b>Note</b>
-1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
-2. Options (<b>b, s, m: and multi</b>) should be added randomly before link and before any other option.
-3. Options (<b>n:, pswd: and opt:</b>) should be added randomly after the link if link along with the cmd or after cmd if by reply.
-4. You can always add video quality from yt-dlp api options.
-5. Don't add file extension while rename using `n:`
 '''
 
     YLDL = '''
@@ -327,6 +320,7 @@ Example:
 link1 -n new name -up remote1:path1 -rcf |key:value|key:value
 link2 -z -n new name -up remote2:path2
 link3 -e -n new name -opt ytdlpoptions
+
 Note: You can't add -m arg for some links only, do it for all links or use multi without bulk!
 link pswd: pass(zip/unzip) opt: ytdlpoptions up: remote2:path2
 Reply to this example by this cmd for example <code>/cmd</code> b(bulk) m:folder_name(same dir)
@@ -341,6 +335,8 @@ Incase default quality added from yt-dlp options using format option and you nee
 Note: Add `^` before integer or float, some values must be numeric and some string.
 Like playlist_items:10 works with string, so no need to add `^` before the number but playlistend works only with integer so you must add `^` before the number like example above.
 You can add tuple and dict also. Use double quotes inside dict.
+
+Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a> or use this <a href='https://t.me/mltb_official_channel/177'>script</a> to convert cli arguments to api options.
 '''
 
     YLMULTI = '''
