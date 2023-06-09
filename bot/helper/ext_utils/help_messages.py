@@ -426,10 +426,10 @@ def get_help_button(from_user: int, data: str=None):
         text = f'<b>BASIC COMMAND</b>{HelpString.MLDL}'
         del ml_menu[0]
     elif data.startswith('zip'):
-        text = f'<b>ZIP/UNZIP (-z -e)</b>{HelpString.BTSEED}'
+        text = f'<b>ZIP/UNZIP (-z -e)</b>{HelpString.MLZUZ}'
         del ml_menu[1]
     elif data == 'join':
-        text = f'<b>ZIP/UNZIP (-z -e)</b>{HelpString.BTSEED}'
+        text = f'<b>ZIP/UNZIP (-z -e)</b>{HelpString.MLJOIN}'
         del ml_menu[2]
     elif data == 'selection':
         text = f'<b>TORRENT SELECTION (-s)</b>{HelpString.BTSEL}'
