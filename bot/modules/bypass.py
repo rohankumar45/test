@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 from bot import bot, config_dict, user_data, LOGGER
 from bot.helper.ddl_bypass.addon import SiteList
 from bot.helper.ddl_bypass.bypass_link_generator import bypass_link
-from bot.helper.ext_utils.bot_utils import get_readable_time, is_url, is_premium_user, get_link, action, get_date_time, sync_to_async, new_task
+from bot.helper.ext_utils.bot_utils import get_readable_time, is_url, is_premium_user, get_link, action, get_date_time, sync_to_async, new_task, is_media
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.multi import run_multi
@@ -54,7 +54,7 @@ async def bypass(client: Client, message: Message):
     run_multi(bypass, client, message, multi, input_list, '')
 
     sites = SiteList()
-    if not (url:= get_link(message)) and not is_url(url):
+    if not (url:= get_link(message)) and not is_url(url) and not is_media(reply_to):
         text = '<b>Send link along with command or by replying to the link by command\n'
         text += f"GDSharer List:</b>\n{' ~ '.join(sites.gd_sharer)}\n\n"
         text += f"<b>DDL List:</b>\n{' ~ '.join(sites.ddl_list)}\n\n"

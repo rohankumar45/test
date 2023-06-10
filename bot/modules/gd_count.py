@@ -5,7 +5,7 @@ from random import choice
 from time import time
 
 from bot import bot, config_dict, user_data
-from bot.helper.ext_utils.bot_utils import get_readable_time, is_gdrive_link, is_media, get_date_time, action, get_link, sync_to_async, new_task, get_readable_file_size
+from bot.helper.ext_utils.bot_utils import get_readable_time, is_gdrive_link, get_date_time, action, get_link, sync_to_async, new_task, get_readable_file_size, is_media
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -36,7 +36,7 @@ async def countNode(_, message: Message):
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
 
-    if (link:= get_link(message)) and is_gdrive_link(link):
+    if (link:= get_link(message)) and is_gdrive_link(link) and not is_media(reply_to):
         TIME_ZONE_TITLE = config_dict['TIME_ZONE_TITLE']
         dt_date, dt_time = get_date_time(message)
         msg = await sendMessage(f'<i>Counting:</i> <code>{link}</code>', message)

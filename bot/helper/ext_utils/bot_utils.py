@@ -302,8 +302,9 @@ def get_readable_time(seconds):
 
 
 def is_media(message: Message):
-    return message.document or message.photo or message.video or message.audio or \
-            message.voice or message.video_note or message.sticker or message.animation or None
+    if message:
+        return message.document or message.photo or message.video or message.audio or \
+                message.voice or message.video_note or message.sticker or message.animation or None
 
 
 def is_magnet(url):
