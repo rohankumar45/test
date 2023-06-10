@@ -292,8 +292,7 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
     elif isQbit:
         await add_qb_torrent(link, path, listener, ratio, seed_time)
     else:
-        ussr = ' '.join(args.auth_user)
-        pssw = ' '.join(args.auth_pswd)
+        ussr, pssw = ' '.join(args.auth_user), ' '.join(args.auth_pswd)
         if ussr or pssw:
             auth = f'{ussr}:{pssw}'
             auth = 'Basic ' + b64encode(auth.encode()).decode('ascii')

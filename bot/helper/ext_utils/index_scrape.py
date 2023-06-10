@@ -52,7 +52,7 @@ async def func(payload_input, url, username, password):
     return result
 
 
-async def index_scrap(url, username='none', password='none'):
+async def index_scrapper(url, username='none', password='none'):
     x = 0
     payload = {'page_token':next_page_token, 'page_index': x}
     res = await func(payload, url, username, password)
@@ -66,29 +66,3 @@ async def index_scrap(url, username='none', password='none'):
             results.extend(res)
         x += 1
     return res if 'wrong' in res else results
-
-
-async def index_scrapper(listener):
-    msg = listener.message.text
-    reply_to = listener.reply_to
-    pswd = usr = ''
-    mesg = msg.split('\n')
-    pswd_arg = mesg[0].split(' pswd: ')
-    if reply_to:
-        if len(pswd_arg) > 1:
-            pswd = pswd_arg[1]
-        if len(mesg) > 2:
-            msg = msg.split()
-            usr = msg[1]
-            pswd = msg[2]
-    if not reply_to and len(pswd_arg) > 1:
-        pswd = pswd_arg[1]
-    if not reply_to and len(mesg) > 2:
-        try:
-            msg = msg.split()
-            usr = msg[2]
-            pswd = msg[3]
-        except:
-            await listener.OnScrapError()
-            return
-    return await index_scrap(listener.link, usr, pswd)

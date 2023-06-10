@@ -1,5 +1,6 @@
 from aiofiles import open as aiopen
 from aiohttp import ClientSession
+from argparse import ArgumentParser
 from asyncio import sleep
 from bs4 import BeautifulSoup
 from functools import partial
@@ -169,7 +170,7 @@ class ScrapeHelper():
         else:
             await self.OnScrapError('ERROR: Can\'t find any link!')
 
-    async def manget(self):
+    async def manget(self, args: ArgumentParser):
         self.__event_handler()
         soup = BeautifulSoup(await self.__resp(self.link), 'html.parser').select("a[href^='magnet:?xt=urn:btih:']")
         links = [link['href'] for link in soup]
@@ -186,7 +187,8 @@ class ScrapeHelper():
                 await sleep(5)
             await self.__OnScrapSuccess(len(links), mode)
         else:
-            links = await index_scrapper(self)
+            ussr, pssw = ' '.join(args.auth_user), ' '.join(args.auth_pswd)
+            links = await index_scrapper(self.link, ussr, pssw)
             if 'wrong' in links:
                 await self.OnScrapError(links)
                 return
@@ -235,14 +237,22 @@ class ScrapeHelper():
 
 @new_task
 async def scrapper(_, message: Message):
+    try:
+        args = parser.parse_args(message.text.split('\n')[0].split()[1:])
+    except:
+        await sendMessage('Invalid argument, reply to link or .txt file.', message)
+        return
+
     user_id = message.from_user.id
-    reply_to = message.reply_to_message
     user_dict = user_data.get(user_id, {})
-    isFile, link = False, ''
     if config_dict['PREMIUM_MODE']:
         if not is_premium_user(message.from_user.id):
             await sendMessage(f'{message.from_user.mention}, This feature only for <b>Premium User</b>!', message)
             return
+
+    isFile = False
+    reply_to = message.reply_to_message
+
     fmode = ForceMode(message)
     if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
         await auto_delete_message(message, fmsg, reply_to)
@@ -268,7 +278,7 @@ async def scrapper(_, message: Message):
         elif 'cinevood' in link:
             await scrape.cinevood()
         else:
-            await scrape.manget()
+            await scrape.manget(args)
     else:
         await scrape.OnScrapError()
 
@@ -276,6 +286,13 @@ async def scrapper(_, message: Message):
 async def stop_scrapper(_, query: CallbackQuery, obj: ScrapeHelper):
     await query.answer('Trying to stop...')
     obj.is_cancelled = True
+
+
+parser = ArgumentParser(description='Scrape args usage:', argument_default='')
+
+parser.add_argument('link', nargs='*')
+parser.add_argument('-au', nargs='+', dest='auth_user')
+parser.add_argument('-ap', nargs='+', dest='auth_pswd')
 
 
 bot.add_handler(MessageHandler(scrapper, filters=command(BotCommands.ScrapperCommand) & CustomFilters.authorized))
