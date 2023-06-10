@@ -84,7 +84,7 @@ async def bypass(client: Client, message: Message):
         bp_mesg += f'<b>├ Action: </b>{action(message)}\n'
         bp_mesg += f'<b>├ Add: </b>{get_date_time(message)[0]}\n'
         bp_mesg += f"<b>├ At: </b>{get_date_time(message)[1]} ({config_dict['TIME_ZONE_TITLE']})\n"
-        bp_mesg += f'<b>├ Elapsed: </b>{get_readable_time(time() - start_time)}\n'
+        bp_mesg += f'<b>├ Elapsed: </b>{get_readable_time(time() - start_time) or "1s"}\n'
         bp_mesg += '<b>└ Bypass Result:</b>\n'
         if config_dict['ENABLE_IMAGE_MODE']:
             pmsg = await sendPhoto(bp_mesg + result, message, choice(config_dict['IMAGE_COMPLETE'].split()), buttons.build_menu(1))
