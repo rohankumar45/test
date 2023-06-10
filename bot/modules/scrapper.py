@@ -74,11 +74,10 @@ class ScrapeHelper():
         if not error:
             error = f'''
 <b>Send link along with command line:</b>
-<code>/{BotCommands.ScrapperCommand}</code> (Link) pswd: xx\n
+<code>/{BotCommands.ScrapperCommand}</code> (Link) -au username -ap password\n
 <b>By replying to link/txt file:</b>
-<code>/{BotCommands.ScrapperCommand}</code> pswd: xx\n
-<b>Index link authorization:</b>
-<code>/{BotCommands.ScrapperCommand}</code> (Index Link)\nusername\npassword\n
+<code>/{BotCommands.ScrapperCommand}</code> -au username -ap password\n
+
 <b>Current Support:
 ┌ Index link
 ├ TXT file (.txt)
@@ -86,6 +85,8 @@ class ScrapeHelper():
 ├ <a href='https://www.animeremux.xyz/'>Animeremux</a>
 ├ <a href='https://atishmkv.bond/'>Atishmkv</a>
 └ <a href='https://cinevood.bio/'>Cinevood</a>
+
+None: Auth and pass ONLY for index link
 '''
         await editMessage(error, self.__editabale)
         await auto_delete_message(self.message, self.__editabale, self.reply_to)
