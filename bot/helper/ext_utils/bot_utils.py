@@ -9,9 +9,7 @@ from psutil import virtual_memory, cpu_percent, disk_usage, net_io_counters
 from pyrogram.types import Message
 from pytz import timezone
 from re import match as re_match, search as re_search
-from requests import head as rhead
 from time import time
-from urllib.request import urlopen
 
 from bot import bot, bot_name, bot_loop, download_dict, download_dict_lock, botStartTime, user_data, config_dict, DATABASE_URL, LOGGER
 from bot.helper.ext_utils.db_handler import DbManger
