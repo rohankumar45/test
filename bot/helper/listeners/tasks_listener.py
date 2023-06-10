@@ -231,12 +231,12 @@ class MirrorLeechListener:
                 up_path = dl_path
 
         if self.compress is not None:
-            if self.user_dict.get('merge_vid'):
-                if not await Merge(self).merge_vids(up_path, gid):
-                    return
-            pswd = self.compress
             if up_path:
                 dl_path = up_path
+            if self.user_dict.get('merge_vid'):
+                if not await Merge(self).merge_vids(dl_path, gid):
+                    return
+            pswd = self.compress
             zipmode = self.user_dict.get('zipmode', 'zfolder')
             if zipmode in ['zfolder', 'zfpart']:
                 async with download_dict_lock:
