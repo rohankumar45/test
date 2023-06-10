@@ -10,9 +10,10 @@ next_page = False
 next_page_token = ''
 
 
-async def func(payload_input, url, username, password):
+async def func(payload_input, url: str, username: str, password: str):
     global next_page, next_page_token
-    url = url + '/' if  url[-1] != '/' else url
+    if not url.endswith('/'):
+        url = url + '/'
     try:
         user_pass = f'{username}:{password}'
         headers = {'authorization': 'Basic '+ b64encode(user_pass.encode()).decode()}
@@ -52,7 +53,7 @@ async def func(payload_input, url, username, password):
     return result
 
 
-async def index_scrapper(url, username='none', password='none'):
+async def index_scrapper(url, username, password):
     x = 0
     payload = {'page_token':next_page_token, 'page_index': x}
     res = await func(payload, url, username, password)

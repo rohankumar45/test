@@ -187,7 +187,7 @@ class ScrapeHelper():
                 await sleep(5)
             await self.__OnScrapSuccess(len(links), mode)
         else:
-            ussr, pssw = ' '.join(args.auth_user), ' '.join(args.auth_pswd)
+            ussr, pssw = ' '.join(args.auth_user).strip(), ' '.join(args.auth_pswd).strip()
             links = await index_scrapper(self.link, ussr, pssw)
             if 'wrong' in links:
                 await self.OnScrapError(links)
