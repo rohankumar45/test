@@ -28,6 +28,7 @@ async def bypass(client: Client, message: Message):
     except:
         await sendMessage('Send link along with command or reply to link', message)
         return
+
     reply_to = message.reply_to_message
     user_id = message.from_user.id
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
