@@ -54,7 +54,7 @@ async def bypass(client: Client, message: Message):
     run_multi(bypass, client, message, multi, input_list, '')
 
     sites = SiteList()
-    if not (url:= get_link(message)) and not is_url(url) and not is_media(reply_to):
+    if not (url:= get_link(message)) and not is_url(url) or is_media(reply_to):
         text = '<b>Send link along with command or by replying to the link by command\n'
         text += f"GDSharer List:</b>\n{' ~ '.join(sites.gd_sharer)}\n\n"
         text += f"<b>DDL List:</b>\n{' ~ '.join(sites.ddl_list)}\n\n"
