@@ -16,13 +16,9 @@ from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage,
 
 @new_task
 async def countNode(_, message: Message):
-    buttons = ButtonMaker()
-    user_id = message.from_user.id
     reply_to = message.reply_to_message
-    tag = message.from_user.mention
-    args = message.text.split()
     isSuperGoup = message.chat.title in ['SUPERGROUP', 'CHANNEL']
-    link = ''
+
     fmode = ForceMode(message)
     if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
         await auto_delete_message(message, fmsg, reply_to)
@@ -30,17 +26,17 @@ async def countNode(_, message: Message):
     if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
         await auto_delete_message(message, fmsg, reply_to)
         return
+
+    user_id = message.from_user.id
     if user_data.get(user_id, {}).get('enable_pm') and isSuperGoup and not await fmode.clone_pm_message:
         return
-    if len(args) > 1:
-        link = args[1]
+
+    tag = message.from_user.mention
     if reply_to:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
-        if not is_media(reply_to) and len(link) == 0:
-            link = reply_to.text.split(maxsplit=1)[0].strip()
 
-    if is_gdrive_link(link):
+    if (link:= get_link(message)) and is_gdrive_link(link):
         TIME_ZONE_TITLE = config_dict['TIME_ZONE_TITLE']
         dt_date, dt_time = get_date_time(message)
         msg = await sendMessage(f'<i>Counting:</i> <code>{link}</code>', message)
@@ -61,9 +57,9 @@ async def countNode(_, message: Message):
         text += f'<b>├ Cc: </b>{tag}\n'
         text += f'<b>├ Add: </b>{dt_date}\n'
         text += f'<b>└ At: </b>{dt_time} ({TIME_ZONE_TITLE})'
-        scr_link = get_link(message)
         if config_dict['SOURCE_LINK']:
-            buttons.button_link('Source', scr_link)
+            buttons = ButtonMaker()
+            buttons.button_link('Source', get_link(message))
         msg = await sendingMessage(text, message, choice(config_dict['IMAGE_COMPLETE'].split()), buttons.build_menu(2))
         if STICKERID_COUNT:= config_dict['STICKERID_COUNT']:
             await sendSticker(STICKERID_COUNT, message)
@@ -77,6 +73,7 @@ async def countNode(_, message: Message):
                 return
         else:
             msg = await sendMessage(countmsg, message)
+
     if reply_to and isSuperGoup and (stime:= config_dict['AUTO_DELETE_UPLOAD_MESSAGE_DURATION']):
         await auto_delete_message(message, msg, reply_to, stime=stime)
 
