@@ -285,12 +285,13 @@ class MirrorLeechListener:
                     return
                 up_path = org_path
 
-        if self.compress is None and self.user_dict.get('merge_vid'):
-            if not await Merge(self).merge_vids(up_path, gid):
-                return
 
         if self.compress is None and self.extract is None:
             up_path = dl_path
+
+        if self.compress is None and self.user_dict.get('merge_vid'):
+            if not await Merge(self).merge_vids(up_path, gid):
+                return
 
         up_dir, up_name = up_path.rsplit('/', 1)
         size = await get_path_size(up_dir)
