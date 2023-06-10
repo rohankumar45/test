@@ -69,6 +69,7 @@ async def bypass(client: Client, message: Message):
     bpmsg = await sendMessage(f'<i>Bypassing {host} link, please wait...</i>', message)
     LOGGER.info(f'Bypassing: {url}')
     result, start_time = '', time()
+
     try:
         if 'gofile.io' in host:
             result, _ = await sync_to_async(bypass_link, url)
@@ -95,6 +96,7 @@ async def bypass(client: Client, message: Message):
     bmsg += f"<b>├ At: </b>{get_date_time(message)[1]} ({config_dict['TIME_ZONE_TITLE']})\n"
     bmsg += f'<b>├ Elapsed: </b>{get_readable_time(time() - start_time) or "1s"}\n'
     bmsg += f'<b>└ Bypass Result:</b>\{result}'
+
     if config_dict['ENABLE_IMAGE_MODE']:
         pmsg = await sendPhoto(bmsg, message, choice(config_dict['IMAGE_COMPLETE'].split()), buttons.build_menu(1))
         if pmsg:
