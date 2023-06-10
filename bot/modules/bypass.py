@@ -74,27 +74,6 @@ async def bypass(client: Client, message: Message):
             result, _ = await sync_to_async(bypass_link, url)
         else:
             result = await sync_to_async(bypass_link, url)
-        if 'filecrypt.co' in url or 'psa.' in url or any(x in url for x in sites.fembed_list):
-            result = result
-        else:
-            result = f'<code>{result}</code>'
-        bp_mesg = '<b>BYPASS RESULT</b>\n'
-        bp_mesg += f'<b>┌ Cc: </b>{message.from_user.mention}\n'
-        bp_mesg += f'<b>├ ID: </b><code>{user_id}</code>\n'
-        bp_mesg += f'<b>├ Action: </b>{action(message)}\n'
-        bp_mesg += f'<b>├ Add: </b>{get_date_time(message)[0]}\n'
-        bp_mesg += f"<b>├ At: </b>{get_date_time(message)[1]} ({config_dict['TIME_ZONE_TITLE']})\n"
-        bp_mesg += f'<b>├ Elapsed: </b>{get_readable_time(time() - start_time) or "1s"}\n'
-        bp_mesg += '<b>└ Bypass Result:</b>\n'
-        if config_dict['ENABLE_IMAGE_MODE']:
-            pmsg = await sendPhoto(bp_mesg + result, message, choice(config_dict['IMAGE_COMPLETE'].split()), buttons.build_menu(1))
-            if not pmsg:
-                await editMessage(bp_mesg + result, bpmsg, buttons.build_menu(1))
-            else:
-                await deleteMessage(bpmsg)
-                bpmsg = pmsg
-        else:
-            await editMessage(bp_mesg + result, bpmsg, buttons.build_menu(1))
     except DirectDownloadLinkException as err:
         LOGGER.info(f'Failed to bypass: {url}')
         if str(err).startswith('ERROR:'):
@@ -102,11 +81,34 @@ async def bypass(client: Client, message: Message):
         elif 'No direct link function' in str(err):
             err = str(err).replace('No direct link function found for', 'Unsupport site for')
         await editMessage(f'{message.from_user.mention}, {err}', bpmsg)
+        return
 
-    if (chat_id := config_dict['OTHER_LOG']) and result:
+    if 'filecrypt.co' in url or 'psa.' in url or any(x in url for x in sites.fembed_list):
+        result = result
+    else:
+        result = f'<code>{result}</code>'
+    bmsg = '<b>BYPASS RESULT</b>\n'
+    bmsg += f'<b>┌ Cc: </b>{message.from_user.mention}\n'
+    bmsg += f'<b>├ ID: </b><code>{user_id}</code>\n'
+    bmsg += f'<b>├ Action: </b>{action(message)}\n'
+    bmsg += f'<b>├ Add: </b>{get_date_time(message)[0]}\n'
+    bmsg += f"<b>├ At: </b>{get_date_time(message)[1]} ({config_dict['TIME_ZONE_TITLE']})\n"
+    bmsg += f'<b>├ Elapsed: </b>{get_readable_time(time() - start_time) or "1s"}\n'
+    bmsg += f'<b>└ Bypass Result:</b>\{result}'
+    if config_dict['ENABLE_IMAGE_MODE']:
+        pmsg = await sendPhoto(bmsg, message, choice(config_dict['IMAGE_COMPLETE'].split()), buttons.build_menu(1))
+        if pmsg:
+            await deleteMessage(bpmsg)
+            bpmsg = pmsg
+        else:
+            await editMessage(bmsg, bpmsg, buttons.build_menu(1))
+    else:
+        await editMessage(bmsg, bpmsg, buttons.build_menu(1))
+
+    if chat_id:= config_dict['OTHER_LOG']:
         await copyMessage(chat_id, bpmsg, buttons.build_menu(1))
 
-    if user_data.get(user_id, {}).get('enable_pm') and isSuperGroup and result:
+    if user_data.get(user_id, {}).get('enable_pm') and isSuperGroup:
         await copyMessage(user_id, bpmsg, buttons.build_menu(1))
 
     if isSuperGroup and (stime:= config_dict['AUTO_DELETE_UPLOAD_MESSAGE_DURATION']):
