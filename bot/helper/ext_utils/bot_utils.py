@@ -402,7 +402,7 @@ async def update_user_ldata(id_: int, key: str, value):
         await DbManger().update_user_data(id_)
 
 
-async def get_link(message: Message):
+def get_link(message: Message):
     link = ''
     pattern = r'https?:\/\/(www.)?\S+\.[a-z]{2,6}\b(\S*)|magnet:\?xt=urn:(btih|btmh):[-a-zA-Z0-9@:%_\+.~#?&//=]*\s*'
     if match:= re_search(pattern, message.text.strip()):

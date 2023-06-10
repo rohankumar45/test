@@ -400,7 +400,7 @@ class MirrorLeechListener:
             drive_mode = self.multiId[0]
         if self.isLeech and not self.newname and await aiopath.isfile(f'{self.dir}/{name}'):
             name = presuf_remname_name(self.user_dict, name)
-        scr_link = await get_link(self.message)
+        scr_link = get_link(self.message)
         if (chat_id:= config_dict['LINK_LOG']) and self.isSuperGroup:
             msg_log = '<b>LINK LOGS</b>\n'
             msg_log += f'<code>{escape(name)}</code>\n'
@@ -629,7 +629,7 @@ class MirrorLeechListener:
             msg_log += f"<b>├ On: </b>{'#clone' if isClone else '#download'}\n"
             msg_log += f'<b>├ Add: </b>{dt_date}\n'
             msg_log += f'<b>├ At: </b>{dt_time} ({TIME_ZONE_TITLE})\n'
-            msg_log += f'<b>└ Source Link:</b>\n<code>{await get_link(self.message)}</code>'
+            msg_log += f'<b>└ Source Link:</b>\n<code>{get_link(self.message)}</code>'
             if reply_to and is_media(reply_to):
                 await sendMedia(msg_log, chat_id, reply_to)
             else:
@@ -718,7 +718,7 @@ class MirrorLeechListener:
             msg_log += f"<b>├ On: </b>{'#clone' if isClone else '#upload'}\n"
             msg_log += f'<b>├ Add: </b>{dt_date}\n'
             msg_log += f'<b>├ At: </b>{dt_time} ({TIME_ZONE_TITLE})\n'
-            msg_log += f'<b>└ Source Link:</b>\n<code>{await get_link(self.message)}</code>'
+            msg_log += f'<b>└ Source Link:</b>\n<code>{get_link(self.message)}</code>'
             if reply_to and is_media(reply_to):
                 await sendMedia(msg_log, chat_id, reply_to)
             else:

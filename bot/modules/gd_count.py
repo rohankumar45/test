@@ -61,7 +61,7 @@ async def countNode(_, message: Message):
         text += f'<b>├ Cc: </b>{tag}\n'
         text += f'<b>├ Add: </b>{dt_date}\n'
         text += f'<b>└ At: </b>{dt_time} ({TIME_ZONE_TITLE})'
-        scr_link = await get_link(message)
+        scr_link = get_link(message)
         if config_dict['SOURCE_LINK']:
             buttons.button_link('Source', scr_link)
         msg = await sendingMessage(text, message, choice(config_dict['IMAGE_COMPLETE'].split()), buttons.build_menu(2))

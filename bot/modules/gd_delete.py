@@ -12,7 +12,7 @@ from bot.helper.telegram_helper.message_utils import auto_delete_message, sendMe
 
 @new_task
 async def deletefile(_, message: Message):
-    link = await get_link(message)
+    link = get_link(message)
     if is_gdrive_link(link):
         LOGGER.info(link)
         drive = GoogleDriveHelper()

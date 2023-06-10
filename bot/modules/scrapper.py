@@ -241,7 +241,7 @@ async def scrapper(_, message: Message):
     try:
         args = parser.parse_args(message.text.split('\n')[0].split()[1:])
     except:
-        await sendMessage('Invalid argument, reply to link or .txt file.', message)
+        await sendMessage('Send link along with command or reply to link or .txt file.', message)
         return
 
     user_id = message.from_user.id
@@ -266,7 +266,7 @@ async def scrapper(_, message: Message):
     if reply_to and is_media(reply_to):
         isFile = True
     else:
-        link = await get_link(message)
+        link = get_link(message)
     editabale = await sendMessage(f"<i>Scrapping {'file' if isFile else 'link'}, please wait...</i>", message)
     scrape = ScrapeHelper(message, editabale, link, isFile)
     if isFile:
@@ -294,6 +294,5 @@ parser = ArgumentParser(description='Scrape args usage:', argument_default='')
 parser.add_argument('link', nargs='*')
 parser.add_argument('-au', nargs='+', dest='auth_user')
 parser.add_argument('-ap', nargs='+', dest='auth_pswd')
-
 
 bot.add_handler(MessageHandler(scrapper, filters=command(BotCommands.ScrapperCommand) & CustomFilters.authorized))

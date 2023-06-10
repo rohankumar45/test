@@ -31,7 +31,7 @@ async def wayback(_, message: Message):
         return
     if user_data.get(user_id, {}).get('enable_pm') and isSuperGroup and not await fmode.wayback_pm_message:
         return
-    link = await get_link(message)
+    link = get_link(message)
     if not is_url(link):
         msg = await sendMessage(f'{tag}, send link along with command or by replying to the link by command', message)
         await auto_delete_message(message, msg)
