@@ -256,8 +256,7 @@ async def scrapper(_, message: Message):
 
     fmode = ForceMode(message)
     if fmsg:= await fmode.run_force('fsub', 'funame', pm_mode='scrapper_pm_message'):
-        if isinstance(fmsg, Message):
-            await auto_delete_message(message, fmsg, reply_to)
+        await auto_delete_message(message, fmsg, reply_to)
         return
 
     if reply_to and is_media(reply_to):

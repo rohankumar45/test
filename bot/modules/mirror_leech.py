@@ -55,8 +55,7 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
 
     fmode = ForceMode(message)
     if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', pm_mode='mirror_leech_pm_message'):
-        if not isinstance(fmsg, bool):
-            await auto_delete_message(message, fmsg, reply_to)
+        await auto_delete_message(message, fmsg, reply_to)
         return
 
     if config_dict['DAILY_MODE']:

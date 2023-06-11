@@ -206,8 +206,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
 
     fmode = ForceMode(message)
     if fmsg:= await fmode.run_force('fsub', 'funame', 'mute', pm_mode='clone_pm_message'):
-        if isinstance(fmsg, Message):
-            await auto_delete_message(message, fmsg, reply_to)
+        await auto_delete_message(message, fmsg, reply_to)
         return
 
     isBulk = args['-b']

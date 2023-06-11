@@ -22,8 +22,7 @@ async def countNode(_, message: Message):
     tag = message.from_user.mention
 
     if fmsg:= await ForceMode(message).run_force('fsub', 'funame', pm_mode='count_pm_message'):
-        if isinstance(fmsg, Message):
-            await auto_delete_message(message, fmsg, reply_to)
+        await auto_delete_message(message, fmsg, reply_to)
         return
 
     if reply_to:

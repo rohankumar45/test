@@ -24,8 +24,7 @@ async def wayback(_, message: Message):
     link = ''
 
     if fmsg:= await ForceMode(message).run_force('fsub', 'funame', pm_mode='wayback_pm_message'):
-        if isinstance(fmsg, Message):
-            await auto_delete_message(message, fmsg, reply_to)
+        await auto_delete_message(message, fmsg, reply_to)
         return
 
     link = get_link(message)

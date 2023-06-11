@@ -39,8 +39,7 @@ async def bypass(client: Client, message: Message):
             return
 
     if fmsg:= await ForceMode(message).run_force('fsub', 'funame', pm_mode='bypass_pm_message'):
-        if isinstance(fmsg, Message):
-            await auto_delete_message(message, fmsg, reply_to)
+        await auto_delete_message(message, fmsg, reply_to)
         return
 
     multi = args.multi

@@ -257,8 +257,7 @@ async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, b
 
     fmode = ForceMode(message)
     if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', pm_mode='ytdlp_pm_message'):
-        if isinstance(fmsg, Message):
-            await auto_delete_message(message, fmsg, reply_to)
+        await auto_delete_message(message, fmsg, reply_to)
         return
 
     if config_dict['DAILY_MODE']:
