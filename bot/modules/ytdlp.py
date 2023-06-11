@@ -254,20 +254,13 @@ async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, b
     user_id = message.from_user.id
     user_dict = user_data.get(user_id, {})
     tag = message.from_user.mention
-    isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
 
     fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
-        await auto_delete_message(message, fmsg, reply_to)
+    if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', pm_mode='ytdlp_pm_message'):
+        if isinstance(fmsg, Message):
+            await auto_delete_message(message, fmsg, reply_to)
         return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if fmsg:= await fmode.task_limiter:
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if user_dict.get('enable_pm') and isSuperGroup and not await fmode.ytdlp_pm_message:
-        return
+
     if config_dict['DAILY_MODE']:
         if not is_premium_user(user_id) and await UserDaily(user_id).get_daily_limit():
             text = f'Upss, {tag} u have reach daily limit for today ({config_dict["DAILY_LIMIT_SIZE"]}GB), check ur status in /{BotCommands.UserSetCommand}'
@@ -338,11 +331,6 @@ async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, b
 
     path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
 
-    if config_dict['AUTO_MUTE'] and isSuperGroup:
-        if fmsg:= await fmode.auto_muted():
-            await auto_delete_message(message, fmsg, reply_to)
-            return
-
     opt = opt or config_dict['YT_DLP_OPTIONS']
 
     if not link and reply_to:
@@ -353,7 +341,7 @@ async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, b
 
     if not is_url(link):
         help_msg = f'Invalid argument, type /{BotCommands.HelpCommand} for more details.'
-        if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(help_msg)):
+        if message.chat.type.name in ['SUPERGROUP', 'CHANNEL'] and (fmsg:= await fmode.auto_muted(help_msg)):
             await auto_delete_message(message, fmsg, reply_to)
             return
         msg = await sendMessage(help_msg, message)

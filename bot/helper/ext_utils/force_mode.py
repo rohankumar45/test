@@ -13,6 +13,25 @@ class ForceMode:
         self.__reply_to = message.reply_to_message
         self.__uid = message.from_user.id
         self.__tag = message.from_user.mention
+        self.__user_dict = user_data.get(self.__uid, {})
+
+    async def run_force(self, *args, pm_mode='None'):
+        isSuperGroup = self.__message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
+        msg = None
+
+        if 'fsub' in args:
+            msg = await self.__force_sub()
+        if not msg and 'funame' in args:
+            msg = await self.__force_username()
+        if not msg and 'limit' in args:
+            msg = await self.__task_limiter()
+        if not msg and self.__user_dict.get('enable_pm') and isSuperGroup and (mode:= getattr(self, pm_mode, None)):
+            if not await mode():
+                msg = True
+        if not msg and 'mute' in args and isSuperGroup:
+            msg = await self.auto_muted()
+
+        return msg
 
     @property
     async def bypass_pm_message(self):
@@ -79,26 +98,26 @@ class ForceMode:
         warn_msg = 'All <b>YT-DLP</b> mirror and leech file(s) will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg)
 
-    @property
-    async def force_username(self):
-        if not self.__message.from_user.username:
-            return await sendMessage('Upss... Set username first! 😑\nGo to Settings -> Edit Profile -> Username', self.__message)
-        if not user_data.get(self.__uid, {}).get('user_name'):
-            await update_user_ldata(self.__uid, 'user_name', self.__message.from_user.username)
+    async def __force_username(self):
+        if config_dict['FUSERNAME']:
+            uname = self.__message.from_user.username
+            if not uname:
+                return await sendMessage('Upss... Set username first! 😑\nGo to Settings -> Edit Profile -> Username', self.__message)
+            if not (duname:= self.__user_dict.get('user_name', '')) and duname != uname:
+                await update_user_ldata(self.__uid, 'user_name', self.__message.from_user.username)
 
-    @property
-    async def force_sub(self):
-        try:
-            await bot.get_chat_member(config_dict['FSUB_CHANNEL_ID'], self.__uid)
-        except:
-            CHANNEL_USERNAME = config_dict['CHANNEL_USERNAME']
-            buttons = ButtonMaker()
-            buttons.button_link(f"{config_dict['FSUB_BUTTON_NAME']}", f'https://t.me/{CHANNEL_USERNAME}')
-            fsub_msg = f"<b>Upss...</b>\n{self.__tag}, you should join <a href='https://t.me/{CHANNEL_USERNAME}'>{CHANNEL_USERNAME}</a> to use this bot."
-            return await sendingMessage(fsub_msg, self.__message, config_dict['IMAGE_FSUB'], buttons.build_menu(1))
+    async def __force_sub(self):
+        if config_dict['FSUB']:
+            try:
+                await bot.get_chat_member(config_dict['FSUB_CHANNEL_ID'], self.__uid)
+            except:
+                CHANNEL_USERNAME = config_dict['CHANNEL_USERNAME']
+                buttons = ButtonMaker()
+                buttons.button_link(f"{config_dict['FSUB_BUTTON_NAME']}", f'https://t.me/{CHANNEL_USERNAME}')
+                fsub_msg = f"<b>Upss...</b>\n{self.__tag}, you should join <a href='https://t.me/{CHANNEL_USERNAME}'>{CHANNEL_USERNAME}</a> to use this bot."
+                return await sendingMessage(fsub_msg, self.__message, config_dict['IMAGE_FSUB'], buttons.build_menu(1))
 
-    @property
-    async def task_limiter(self):
+    async def __task_limiter(self):
         if not is_premium_user(self.__uid):
             if USER_TASKS_LIMIT := config_dict['USER_TASKS_LIMIT']:
                 if await get_user_task(self.__uid) >= USER_TASKS_LIMIT:
@@ -110,17 +129,18 @@ class ForceMode:
                     return await sendingMessage(f'Upss, {self.__tag} task limit is {TOTAL_TASKS_LIMIT}, wait until some task done and try again!', self.__message, config_dict['IMAGE_LIMIT'])
 
     async def auto_muted(self, help_msg=''):
-        authuser = (await bot.get_chat_member(config_dict['MUTE_CHAT_ID'], self.__uid)).status.name in ['OWNER', 'ADMINISTRATOR']
-        if help_msg:
-            if authuser:
-                return await sendMessage(f'Hmm...\n{self.__tag}, you are a <b>Admin</b>, please take your time to read! /{BotCommands.HelpCommand}\n\n{help_msg}', self.__message)
+        if config_dict['AUTO_MUTE']:
+            authuser = (await bot.get_chat_member(config_dict['MUTE_CHAT_ID'], self.__uid)).status.name in ['OWNER', 'ADMINISTRATOR']
+            if help_msg:
+                if authuser:
+                    return await sendMessage(f'Hmm...\n{self.__tag}, you are a <b>Admin</b>, please take your time to read! /{BotCommands.HelpCommand}\n\n{help_msg}', self.__message)
+                else:
+                    mute_msg = f"<b>Upss...</b>\n{self.__tag}, you are <b>MUTED</b> ({config_dict['AUTO_MUTE_DURATION']}s)\nLearn before use or watch others and read /{BotCommands.HelpCommand}\n\n{help_msg}"
+                    await startRestrict(self.__message)
+                    return await sendMessage(mute_msg, self.__message)
             else:
-                mute_msg = f"<b>Upss...</b>\n{self.__tag}, you are <b>MUTED</b> ({config_dict['AUTO_MUTE_DURATION']}s)\nLearn before use or watch others and read /{BotCommands.HelpCommand}\n\n{help_msg}"
-                await startRestrict(self.__message)
-                return await sendMessage(mute_msg, self.__message)
-        else:
-            if not authuser:
-                await startRestrict(self.__message)
+                if not authuser:
+                    await startRestrict(self.__message)
 
     async def __send_pm_message(self, msg_nolink, msg_media, msg_link, warn_msg, msg_txt=''):
         pmmsg = None

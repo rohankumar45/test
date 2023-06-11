@@ -205,16 +205,9 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
 
     fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if user_dict.get('enable_pm') and isSuperGroup and not await fmode.clone_pm_message:
-        return
-    if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted()):
-        await auto_delete_message(message, fmsg, reply_to)
+    if fmsg:= await fmode.run_force('fsub', 'funame', 'mute', pm_mode='clone_pm_message'):
+        if isinstance(fmsg, Message):
+            await auto_delete_message(message, fmsg, reply_to)
         return
 
     isBulk = args['-b']
@@ -245,7 +238,6 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             tag = reply_to.from_user.mention
         link = reply_to.text.split('\n', 1)[0].strip()
 
-
     if isBulk:
         await run_bulk(cloneNode, client, message, input_list, bulk_start, bulk_end, bulk)
         return
@@ -265,7 +257,7 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
             await editMessage(f'{tag}, {e}', check_)
             return
     if not is_url(link) and not is_rclone_path(link):
-        if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(HelpString.CLONE)):
+        if isSuperGroup and (fmsg:= await fmode.auto_muted(HelpString.CLONE)):
             await deleteMessage(check_)
             check_ = fmsg
         else:

@@ -34,8 +34,7 @@ async def cancel_mirror(_, message: Message):
     elif len(msg) == 1:
         cancelmsg = f'Reply to an active <code>/{BotCommands.MirrorCommand}</code> message which was used to start the download or send <code>/{BotCommands.CancelMirror} GID</code> to cancel it!'
         if config_dict['AUTO_MUTE'] and message.chat.type.name in ['SUPERGROUP', 'CHANNEL']:
-            fmode = ForceMode(message)
-            if fmsg:= await fmode.auto_muted(cancelmsg):
+            if fmsg:= await ForceMode(message).auto_muted(cancelmsg):
                 await auto_delete_message(message, fmsg, reply_to)
                 return
         else:

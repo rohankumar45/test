@@ -37,17 +37,16 @@ async def list_buttons(_, message: Message):
     reply_to = message.reply_to_message
     mid = message.id
     args = message.text.split(maxsplit=1)
-    fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
+
+    if fmsg:= await ForceMode(message).run_force('fsub', 'funame'):
         await auto_delete_message(message, fmsg, reply_to)
         return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
+
     if reply_to and is_media(reply_to) or not reply_to and len(args) == 1:
         msg = await sendMessage(f'{message.from_user.mention}, send a search key along with command or by reply with command.', message)
         await auto_delete_message(message, msg, reply_to)
         return
+
     key = reply_to.text.strip() if reply_to else args[1]
     tele = TeleContent(message, key)
     content_dict.update({mid: {'content': tele, 'recursive': False}})

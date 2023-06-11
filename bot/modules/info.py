@@ -417,13 +417,11 @@ async def update_data(query: CallbackQuery, mid: int, data=None, movid=None):
 async def search_info(_, message: Message):
     reply_to = message.reply_to_message
     args = message.text.split(maxsplit=1)
-    fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
+
+    if fmsg:= await ForceMode(message).run_force('fsub', 'funame'):
         await auto_delete_message(message, fmsg, reply_to)
         return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
+
     if reply_to and is_media(reply_to) or not reply_to and len(args) == 1:
         query = ''
     elif reply_to :

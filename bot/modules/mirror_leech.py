@@ -52,23 +52,13 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
     reply_to = message.reply_to_message
     user_id = message.from_user.id
     user_dict = user_data.get(user_id, {})
-    isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
 
     fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
-        await auto_delete_message(message, fmsg, reply_to)
+    if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', pm_mode='mirror_leech_pm_message'):
+        if not isinstance(fmsg, bool):
+            await auto_delete_message(message, fmsg, reply_to)
         return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if fmsg:= await fmode.task_limiter:
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if user_dict.get('enable_pm') and isSuperGroup and not await fmode.mirror_leech_pm_message:
-        return
-    if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted()):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
+
     if config_dict['DAILY_MODE']:
         if not is_premium_user(user_id) and await UserDaily(user_id).get_daily_limit():
             text = f"Upss, {tag} u have reach daily limit for today ({config_dict['DAILY_LIMIT_SIZE']}GB), check ur status in /{BotCommands.UserSetCommand}"
@@ -186,9 +176,10 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and not file_:
         help_msg = f'Invalid argument, type /{BotCommands.HelpCommand} for more details.'
-        if config_dict['AUTO_MUTE'] and isSuperGroup and (fmsg:= await fmode.auto_muted(help_msg)):
+        if message.chat.type.name in ['SUPERGROUP', 'CHANNEL'] and (fmsg:= await fmode.auto_muted(help_msg)):
             await deleteMessage(editable)
-            await auto_delete_message(message, fmsg, reply_to)
+            if isinstance(fmsg, Message):
+                await auto_delete_message(message, fmsg, reply_to)
             return
         msg = await editMessage(help_msg, editable)
         await auto_delete_message(message, msg)

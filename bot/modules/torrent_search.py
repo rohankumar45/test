@@ -57,14 +57,12 @@ async def torrentSearch(_, message: Message):
     user_id = message.from_user.id
     reply_to = message.reply_to_message
     tag = message.from_user.mention
-    fmode = ForceMode(message)
     key = None
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
+
+    if fmsg:= await ForceMode(message).run_force('fsub', 'funame'):
         await auto_delete_message(message, fmsg, reply_to)
         return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
+
     if reply_to and reply_to.text:
         key = reply_to.text.strip()
     elif not reply_to and len(args:= message.text.split(maxsplit=1)) != 1:

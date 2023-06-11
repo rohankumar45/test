@@ -255,20 +255,19 @@ async def scrapper(_, message: Message):
     reply_to = message.reply_to_message
 
     fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
-        await auto_delete_message(message, fmsg, reply_to)
+    if fmsg:= await fmode.run_force('fsub', 'funame', pm_mode='scrapper_pm_message'):
+        if isinstance(fmsg, Message):
+            await auto_delete_message(message, fmsg, reply_to)
         return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if user_dict.get('enable_pm') and message.chat.type.name in ['SUPERGROUP', 'CHANNEL'] and not await fmode.scrapper_pm_message:
-        return
+
     if reply_to and is_media(reply_to):
         isFile = True
     else:
         link = get_link(message)
+
     editabale = await sendMessage(f"<i>Scrapping {'file' if isFile else 'link'}, please wait...</i>", message)
     scrape = ScrapeHelper(message, editabale, link, isFile)
+
     if isFile:
         await scrape.txt_file()
     elif is_url(link):

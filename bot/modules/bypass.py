@@ -33,18 +33,14 @@ async def bypass(client: Client, message: Message):
     user_id = message.from_user.id
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
 
-    fmode = ForceMode(message)
     if config_dict['PREMIUM_MODE']:
         if not is_premium_user(user_id):
             await sendMessage('This feature only for <b>Premium User</b>!', message)
             return
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if user_data.get(user_id, {}).get('enable_pm') and isSuperGroup and not await fmode.bypass_pm_message:
+
+    if fmsg:= await ForceMode(message).run_force('fsub', 'funame', pm_mode='bypass_pm_message'):
+        if isinstance(fmsg, Message):
+            await auto_delete_message(message, fmsg, reply_to)
         return
 
     multi = args.multi

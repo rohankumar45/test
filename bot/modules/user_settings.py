@@ -600,7 +600,7 @@ async def event_handler(client: Client, query: CallbackQuery, pfunc: partial, ph
 
 @new_task
 async def user_settings(_, message: Message):
-    if config_dict['FUSERNAME'] and (fmsg:= await ForceMode(message).force_username):
+    if fmsg:= await ForceMode(message).run_force('funame'):
         await auto_delete_message(message, fmsg)
         return
     msg, image, buttons = await get_user_settings(message.from_user, None, None)

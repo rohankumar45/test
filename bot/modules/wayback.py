@@ -22,15 +22,12 @@ async def wayback(_, message: Message):
     tag = message.from_user.mention
     isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
     link = ''
-    fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
-        await auto_delete_message(message, fmsg, reply_to)
+
+    if fmsg:= await ForceMode(message).run_force('fsub', 'funame', pm_mode='wayback_pm_message'):
+        if isinstance(fmsg, Message):
+            await auto_delete_message(message, fmsg, reply_to)
         return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if user_data.get(user_id, {}).get('enable_pm') and isSuperGroup and not await fmode.wayback_pm_message:
-        return
+
     link = get_link(message)
     if not is_url(link):
         msg = await sendMessage(f'{tag}, send link along with command or by replying to the link by command', message)

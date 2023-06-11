@@ -18,20 +18,14 @@ from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage,
 async def countNode(_, message: Message):
     reply_to = message.reply_to_message
     isSuperGoup = message.chat.title in ['SUPERGROUP', 'CHANNEL']
-
-    fmode = ForceMode(message)
-    if config_dict['FSUB'] and (fmsg:= await fmode.force_sub):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-    if config_dict['FUSERNAME'] and (fmsg:= await fmode.force_username):
-        await auto_delete_message(message, fmsg, reply_to)
-        return
-
     user_id = message.from_user.id
-    if user_data.get(user_id, {}).get('enable_pm') and isSuperGoup and not await fmode.clone_pm_message:
+    tag = message.from_user.mention
+
+    if fmsg:= await ForceMode(message).run_force('fsub', 'funame', pm_mode='count_pm_message'):
+        if isinstance(fmsg, Message):
+            await auto_delete_message(message, fmsg, reply_to)
         return
 
-    tag = message.from_user.mention
     if reply_to:
         if not reply_to.sender_chat and not getattr(reply_to.from_user, 'is_bot', None):
             tag = reply_to.from_user.mention
@@ -66,13 +60,7 @@ async def countNode(_, message: Message):
         if user_data.get(user_id, {}).get('enable_pm') and isSuperGoup:
             await copyMessage(user_id, msg)
     else:
-        countmsg = 'Send <b>GDrive</b> link along with command or by replying to the link by command'
-        if config_dict['AUTO_MUTE'] and isSuperGoup:
-            if fmsg:= await fmode.auto_muted(countmsg):
-                await auto_delete_message(message, fmsg, reply_to)
-                return
-        else:
-            msg = await sendMessage(countmsg, message)
+        msg = await sendMessage('Send <b>GDrive</b> link along with command or by replying to the link by command', message)
 
     if reply_to and isSuperGoup and (stime:= config_dict['AUTO_DELETE_UPLOAD_MESSAGE_DURATION']):
         await auto_delete_message(message, msg, reply_to, stime=stime)
