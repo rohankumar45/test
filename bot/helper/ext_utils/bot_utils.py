@@ -391,7 +391,7 @@ def arg_parser(items, arg_base):
                 arg_base[part] = True
             else:
                 sub_list = []
-                start = i + 1 if t > 2 else i
+                start = i + 1 if t >= 2 else i
                 for j in range(start, t):
                     item = items[j]
                     if item in arg_base:
