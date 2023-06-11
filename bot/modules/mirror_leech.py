@@ -30,14 +30,12 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message, deleteMessage, editMessage, sendingMessage, get_tg_link_content
 
 
-arg_base = {'link': '', '-i': 0, '-m': '', '-d': False, '-j': False, '-s': False, '-b': False, '-n': '',
-            '-e': False, '-z': False, '-gf': False, '-up': '', '-rcf': '', '-au': '', '-ap': ''}
-
-
 @new_task
 async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
     input_list = text[0].split(' ')
+    arg_base = {'link': '', '-i': 0, '-m': '', '-d': False, '-j': False, '-s': False, '-b': False, '-n': '',
+                '-e': False, '-z': False, '-gf': False, '-up': '', '-rcf': '', '-au': '', '-ap': ''}
     args = arg_parser(input_list[1:], arg_base)
     LOGGER.info(args)
 

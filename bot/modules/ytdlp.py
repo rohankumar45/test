@@ -23,10 +23,6 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, auto_delete_message, deleteMessage, sendingMessage
 
 
-arg_base = {'link': '', '-i': 0, '-m': '', '-s': False, '-opt': '', '-b': False,
-            '-gf': False, '-n': '', '-z': False, '-up': '', '-rcf': ''}
-
-
 class YtSelection:
     def __init__(self, client: Client, message: Message, user_id: int):
         self.__message = message
@@ -240,6 +236,8 @@ async def _mdisk(link: str, name: str):
 async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
     input_list = text[0].split(' ')
+    arg_base = {'link': '', '-i': 0, '-m': '', '-s': False, '-opt': '', '-b': False,
+                '-gf': False, '-n': '', '-z': False, '-up': '', '-rcf': ''}
     args = arg_parser(input_list[1:], arg_base)
 
     if len(text) > 1 and text[1].startswith('Tag: '):
