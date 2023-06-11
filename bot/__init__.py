@@ -754,7 +754,7 @@ LOGGER.info(f'Running on Pyrogram V{__version__}')
 kwargs = {'parse_mode': enums.ParseMode.HTML}
 if __version__ != '2.0.73':
     kwargs.update({'max_concurrent_transmissions': 1000, 'workers': 1000})
-bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN, **kwargs).start()
+bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN, **kwargs)
 
 bot_loop = bot.loop
 bot_name = bot.me.username

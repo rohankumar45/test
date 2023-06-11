@@ -34,7 +34,7 @@ class ForceMode:
 
     async def __chec_pm(self):
         try:
-            await bot.get_users(self.__uid)
+            await bot.get_chat(self.__uid)
         except:
             buttons = ButtonMaker()
             buttons.button_link('Click Here', f'http://t.me/{bot_name}')
