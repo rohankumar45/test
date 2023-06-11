@@ -391,7 +391,7 @@ def arg_parser(items, arg_base):
                 arg_base[part] = True
             else:
                 sub_list = []
-                for j in range(i+1, t):
+                for j in range(i, t):
                     item = items[j]
                     if item in arg_base:
                         if part in ['-b', '-e', '-z', '-s', '-j', '-d', '-gf']:
