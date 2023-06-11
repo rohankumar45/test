@@ -46,9 +46,10 @@ async def download_gclone():
             LOGGER.info('GClone failed to download!')
 
 
-async def clean_target(path: str):
+async def clean_target(path: str, log=False):
     if await aiopath.exists(path):
-        LOGGER.info(f'Cleaning Target: {path}')
+        if log:
+            LOGGER.info(f'Cleaning Target: {path}')
         cleaned = False
         if await aiopath.isdir(path):
             try:

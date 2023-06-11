@@ -3,7 +3,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from io import FileIO
-from os import makedirs, path as ospath, listdir
+from os import makedirs, path as ospath, listdir, remove as osremove
 from pickle import load as pload
 from random import randrange
 from re import search as re_search
@@ -13,7 +13,7 @@ from urllib.parse import parse_qs, urlparse, quote as rquote
 
 from bot import config_dict, INDEX_URLS, GLOBAL_EXTENSION_FILTER, DRIVES_NAMES, DRIVES_IDS, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, setInterval, async_to_sync
-from bot.helper.ext_utils.fs_utils import get_mime_type, clean_target, get_path_size
+from bot.helper.ext_utils.fs_utils import get_mime_type, get_path_size
 from bot.helper.ext_utils.html_helper import hmtl_content
 from bot.helper.ext_utils.shortenurl import short_url
 from bot.helper.ext_utils.telegraph_helper import telegraph
@@ -238,7 +238,7 @@ class GoogleDriveHelper:
                 self.__total_files += 1
                 new_id = dest_id
             else:
-                async_to_sync(clean_target, current_file_name)
+                osremove(current_file_name)
                 new_id = 'filter'
             if self.__is_cancelled:
                 break
@@ -310,7 +310,10 @@ class GoogleDriveHelper:
         if self.__is_cancelled:
             return
         if not self.__listener.seed or self.__listener.newDir:
-            async_to_sync(clean_target, file_path)
+            try:
+                osremove(file_path)
+            except:
+                pass
         self.__file_processed_bytes = 0
         # Insert new permissions
         if not config_dict['IS_TEAM_DRIVE']:

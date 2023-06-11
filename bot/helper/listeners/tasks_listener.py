@@ -104,7 +104,7 @@ class MirrorLeechListener:
         if code == -9:
             return
         elif not self.seed:
-            await clean_target(scr_path)
+            await clean_target(scr_path, True)
         return True
 
     async def onDownloadStart(self):
@@ -499,7 +499,7 @@ class MirrorLeechListener:
                     await sendSticker(STICKERID_LEECH, self.message)
             if self.seed:
                 if self.newDir:
-                    await clean_target(self.newDir)
+                    await clean_target(self.newDir, True)
                 async with queue_dict_lock:
                     if self.uid in non_queued_up:
                         non_queued_up.remove(self.uid)
@@ -578,9 +578,9 @@ class MirrorLeechListener:
                     await copyMessage(self.user_id, uploadmsg, button)
             if self.seed:
                 if self.newDir:
-                    await clean_target(self.newDir)
-                elif not self.compress:
-                    await clean_target(self.newDir)
+                    await clean_target(self.newDir, True)
+                elif self.compress:
+                    await clean_target(f'{self.dir}/{name}', True)
                 async with queue_dict_lock:
                     if self.uid in non_queued_up:
                         non_queued_up.remove(self.uid)
