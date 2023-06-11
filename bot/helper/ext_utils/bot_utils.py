@@ -387,7 +387,7 @@ def arg_parser(items, arg_base):
     while i + 1 <= t:
         part = items[i]
         if part in arg_base:
-            if part in ['-s', '-j']:
+            if part in ['-s', '-j', '-gf']:
                 arg_base[part] = True
             elif t == i + 1:
                 if part in ['-b', '-e', '-z', '-s', '-j', '-d', '-gf']:
