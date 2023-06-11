@@ -33,7 +33,6 @@ class ForceMode:
 
         return msg
 
-    @property
     async def bypass_pm_message(self):
         msg_nolink = 'No <b>link</b> given to bypass 😑'
         msg_media = f'<code>/{BotCommands.BypassCommand}</code> not for file/media! Link only 😑'
@@ -41,7 +40,6 @@ class ForceMode:
         warn_msg = 'All <b>Bypass</b> result will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg)
 
-    @property
     async def clone_pm_message(self):
         msg_nolink = 'No <b>GDrive or Sharer</b> link given 😑'
         msg_media = f'<code>/{BotCommands.CloneCommand}</code> not for file/media! <b>GDrive or Sharer</b> link only 😑'
@@ -49,7 +47,6 @@ class ForceMode:
         warn_msg = 'All <b>Clone</b> result will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg)
 
-    @property
     async def count_pm_message(self):
         msg_nolink = 'No <b>GDrive</b> link given to count 😑'
         msg_media = f'<code>/{BotCommands.CountCommand}</code> not for file/media! <b>GDrive</b> link only 😑'
@@ -57,7 +54,6 @@ class ForceMode:
         warn_msg = 'All <b>Count</b> result will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg)
 
-    @property
     async def hash_pm_message(self):
         msg_no_media ='No <b>file/media</b> given 😑'
         msg_link = f'<code>/{BotCommands.HashCommand}</code> not for link! <b>media/file</b> only 😑'
@@ -65,7 +61,6 @@ class ForceMode:
         warn_msg = 'nAll <b>Hash</b> result will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_no_media, msg_media, msg_link, warn_msg)
 
-    @property
     async def mirror_leech_pm_message(self):
         msg_nolink = 'No <b>link</b> given 😑'
         msg_media = 'Your requested for <b>file/media</b> has been added, will send once done 😊'
@@ -73,7 +68,6 @@ class ForceMode:
         warn_msg = 'All mirror and leech file(s) will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg)
 
-    @property
     async def scrapper_pm_message(self):
         msg_nolink = 'No <b>link</b> or <b>.txt</b> file given to scrapper 😑'
         msg_media = f'<code>/{BotCommands.ScrapperCommand}</code> only for link and txt file'
@@ -82,7 +76,6 @@ class ForceMode:
         warn_msg = 'All <b>Scrapper</b> result will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg, msg_txt)
 
-    @property
     async def wayback_pm_message(self):
         msg_nolink = 'No <b>link</b> given to save 😑'
         msg_media = f'<code>/{BotCommands.WayBackCommand}</code> not for file/media! Link only 😑'
@@ -90,7 +83,6 @@ class ForceMode:
         warn_msg = 'All <b>Bypass</b> result will send in bot PM and log channel\n<b>Start me first in PM</b>'
         return await self.__send_pm_message(msg_nolink, msg_media, msg_link, warn_msg)
 
-    @property
     async def ytdlp_pm_message(self):
         msg_nolink = 'No <b>YT-DLP</b> link given 😑'
         msg_media = '<code>/watchcmds</code> not for file/media! <b>YT-DLP</b> link only 😑'
