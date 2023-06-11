@@ -162,7 +162,8 @@ class MirrorLeechListener:
                 if self.uid in non_queued_dl:
                     non_queued_dl.remove(self.uid)
         await start_from_queued()
-        if self.join:
+
+        if self.join and aiopath.isdir(dl_path):
             await join_files(dl_path)
 
         if self.extract:
