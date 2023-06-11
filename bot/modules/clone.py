@@ -29,6 +29,9 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, deleteMessage, sendStatusMessage, auto_delete_message
 
 
+arg_base = {'link': '', '-i': 0, '-b': False, '-n': '', '-up': '', '-rcf': ''}
+
+
 async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, tag):
     if link == 'rcl':
         link = await RcloneList(client, editable, user_id).get_rclone_path('rcd')
@@ -193,8 +196,7 @@ async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSu
 @new_task
 async def cloneNode(client: Client, message: Message, bulk=[]):
     input_list = message.text.split()
-    arg_base = {'link': '', '-i': 0, '-b': False, '-n': '', '-up': '', '-rcf': ''}
-    args = arg_parser(input_list[1:], arg_base)
+    args = arg_parser(input_list[1:], arg_base.copy())
 
     reply_to = message.reply_to_message
     tag = message.from_user.mention
