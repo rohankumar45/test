@@ -26,12 +26,21 @@ class ForceMode:
         if not msg and 'limit' in args:
             msg = await self.__task_limiter()
         if not msg and self.__user_dict.get('enable_pm') and isSuperGroup and (mode:= getattr(self, pm_mode, None)):
-            if not await mode():
-                msg = True
+            msg = await self.__chec_pm()
         if not msg and 'mute' in args and isSuperGroup:
             msg = await self.auto_muted()
 
         return msg
+
+    async def __chec_pm(self):
+        try:
+            await bot.get_users(self.__uid)
+        except:
+            buttons = ButtonMaker()
+            buttons.button_link('Click Here', f'http://t.me/{bot_name}')
+            warn_msg = 'Message will send in pm'
+            return await sendingMessage(f'{self.__tag}...\n{warn_msg}', self.__message, config_dict['IMAGE_PM'], buttons.build_menu(1))
+
 
     async def bypass_pm_message(self):
         msg_nolink = 'No <b>link</b> given to bypass 😑'
