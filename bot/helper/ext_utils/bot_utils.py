@@ -384,15 +384,17 @@ def arg_parser(items, arg_base):
         return arg_base
     t = len(items)
     i = 0
-    while True:
+    while i + 1 <= t:
         part = items[i]
         if part in arg_base:
-            if part in ['-s', '-j', '-gf']:
+            if part in ['-s', '-j']:
                 arg_base[part] = True
+            elif t == i + 1:
+                if part in ['-b', '-e', '-z', '-s', '-j', '-d', '-gf']:
+                    arg_base[part] = True
             else:
                 sub_list = []
-                start = i + 1 if (t > 1 and items[0] in arg_base or t > 2 and items[0] not in arg_base) else i
-                for j in range(start, t):
+                for j in range(i+1, t):
                     item = items[j]
                     if item in arg_base:
                         if part in ['-b', '-e', '-z', '-s', '-j', '-d', '-gf']:
@@ -401,9 +403,7 @@ def arg_parser(items, arg_base):
                     sub_list.append(item)
                     i += 1
                 if sub_list:
-                    arg_base[part] = ' '.join(sub_list)
-        if t == i + 1:
-            break
+                    arg_base[part] = " ".join(sub_list)
         i += 1
     if items[0] not in arg_base:
         arg_base['link'] = items[0]
