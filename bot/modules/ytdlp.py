@@ -240,7 +240,7 @@ async def _mdisk(link: str, name: str):
 async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
     input_list = text[0].split(' ')
-    args = arg_parser(input_list[1:], arg_base)
+    args = arg_parser(input_list[1:], arg_base.copy())
 
     if len(text) > 1 and text[1].startswith('Tag: '):
         try:
