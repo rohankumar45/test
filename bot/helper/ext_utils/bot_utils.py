@@ -393,7 +393,7 @@ def arg_parser(items, arg_base):
                 sub_list = []
                 start = i + 1 if t > 2 else i
                 for j in range(start, t):
-                    item = items[j+1]
+                    item = items[j]
                     if item in arg_base:
                         if part in ['-b', '-e', '-z', '-s', '-j', '-d', '-gf']:
                             arg_base[part] = True
