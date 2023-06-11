@@ -1,5 +1,4 @@
 from aiofiles.os import path as aiopath
-from argparse import ArgumentParser
 from asyncio import gather
 from json import loads
 from os import path as ospath
@@ -13,7 +12,7 @@ from urllib.parse import urlparse
 
 from bot import bot, download_dict, download_dict_lock, config_dict, user_data, LOGGER
 from bot.helper.ddl_bypass.direct_link_generator import direct_link_generator
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_gdrive_link, is_premium_user, is_sharar, sync_to_async, new_task, is_rclone_path, cmd_exec, is_url, get_multiid, get_link
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_gdrive_link, is_premium_user, is_sharar, sync_to_async, new_task, is_rclone_path, cmd_exec, is_url, get_multiid, arg_parser
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.help_messages import HelpString
@@ -28,6 +27,9 @@ from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, deleteMessage, sendStatusMessage, auto_delete_message
+
+
+arg_base = {'link': '', '-i': 0, '-b': False, '-n': '', '-up': '', '-rcf': ''}
 
 
 async def rcloneNode(client, message, editable, user_id, link, dst_path, rcf, tag):
@@ -194,11 +196,7 @@ async def gdcloneNode(client, message, editable, newname, multi, link, tag, isSu
 @new_task
 async def cloneNode(client: Client, message: Message, bulk=[]):
     input_list = message.text.split()
-    try:
-        args = parser.parse_args(input_list[1:])
-    except:
-        await sendMessage(HelpString.CLONE, message)
-        return
+    args = arg_parser(input_list[1:], arg_base)
 
     reply_to = message.reply_to_message
     tag = message.from_user.mention
@@ -219,22 +217,24 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
         await auto_delete_message(message, fmsg, reply_to)
         return
 
-    link, newname, dst_path, rcf = ' '.join(args.link), ' '.join(args.newName), ' '.join(args.upload), ' '.join(args.rcloneFlags)
-    multi, isBulk = args.multi, args.bulk
+    isBulk = args['-b']
+    newname = args['-n']
+    dst_path = args['-up']
+    rcf = args['-rcf']
+    link = args['link']
     bulk_start = bulk_end = 0
 
-    if isinstance(multi, list):
-        multi = multi[0]
+    try:
+        multi = int(args['-i'])
+    except:
+        multi = 0
 
-    if isBulk:
+    if not isinstance(isBulk, bool):
         dargs = isBulk.split(':')
         bulk_start = dargs[0] or None
         if len(dargs) == 2:
             bulk_end = dargs[1] or None
         isBulk = True
-    elif isBulk is None:
-        isBulk = True
-
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or isBulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
@@ -288,14 +288,5 @@ async def cloneNode(client: Client, message: Message, bulk=[]):
         else:
             await gdcloneNode(client, message, check_, newname, multi, link, tag, isSuperGroup, gdrive_sharer)
 
-
-parser = ArgumentParser(description='Clone args usage:', argument_default='')
-
-parser.add_argument('link', nargs='*', default='')
-parser.add_argument('-n', nargs='+', dest='newName')
-parser.add_argument('-b', nargs='?', default=False, dest='bulk')
-parser.add_argument('-i', nargs='+', default=0, dest='multi', type=int)
-parser.add_argument('-up', nargs='+', default='', dest='upload')
-parser.add_argument('-rcf', nargs='+', default='', dest='rcloneFlags')
 
 bot.add_handler(MessageHandler(cloneNode, filters=command(BotCommands.CloneCommand) & CustomFilters.authorized))

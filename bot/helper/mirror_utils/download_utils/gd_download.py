@@ -28,11 +28,10 @@ async def add_gd_download(link, path, listener, newname, gdrive_sharer):
     torddl, zuzdl, leechdl, storage = config_dict['TORRENT_DIRECT_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
     if config_dict['PREMIUM_MODE'] and not is_premium_user(listener.user_id):
         torddl = zuzdl = leechdl = config_dict['NONPREMIUM_LIMIT']
-    compress, extract = listener.compress is not None, listener.extract is not None
-    arch = any([compress, listener.isLeech, extract])
+    arch = any([listener.compress, listener.isLeech, listener.extract])
     if torddl and not arch and size >= torddl * 1024**3:
         msgerr = f'Torrent/direct limit is {torddl}GB'
-    elif zuzdl and any([compress, extract]) and size >= zuzdl * 1024**3:
+    elif zuzdl and any([listener.compress, listener.extract]) and size >= zuzdl * 1024**3:
         msgerr = f'Zip/Unzip limit is {zuzdl}GB'
     elif leechdl and listener.isLeech and size >= leechdl * 1024**3:
         msgerr = f'Leech limit is {leechdl}GB'

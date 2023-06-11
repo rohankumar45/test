@@ -39,7 +39,7 @@ from bot.helper.telegram_helper.message_utils import sendCustom, sendMedia, send
 
 
 class MirrorLeechListener:
-    def __init__(self, message: Message, compress=None, extract=None, isQbit=False, isLeech=False, isGofile=False, tag=None, select=False, seed=False, newname='', multiId=None, sameDir=None, rcFlags=None, upPath=None, join=False):
+    def __init__(self, message: Message, compress=False, extract=False, isQbit=False, isLeech=False, isGofile=False, tag=None, select=False, seed=False, newname='', multiId=None, sameDir=None, rcFlags=None, upPath=None, join=False):
         if sameDir is None:
             sameDir = {}
         self.message = message
@@ -115,7 +115,7 @@ class MirrorLeechListener:
         multi_links = False
         while True:
             if self.sameDir:
-                if self.sameDir['total'] == 1 or self.sameDir['total'] > 1 and len(self.sameDir['tasks']) > 1:
+                if self.sameDir['total'] in [1, 0] or self.sameDir['total'] > 1 and len(self.sameDir['tasks']) > 1:
                     break
             else:
                 break
@@ -151,7 +151,7 @@ class MirrorLeechListener:
                 name = files[0]
         dl_path = f'{self.dir}/{name}'
         up_path = ''
-        if await aiopath.isdir(dl_path) or self.extract is None and await aiopath.isfile(dl_path):
+        if await aiopath.isdir(dl_path) or await aiopath.isfile(dl_path) and not self.extract:
             dl_path = await self.__rename(dl_path)
         size = await get_path_size(dl_path)
         LEECH_SPLIT_SIZE = config_dict['LEECH_SPLIT_SIZE']
@@ -165,8 +165,8 @@ class MirrorLeechListener:
         if self.join:
             await join_files(dl_path)
 
-        if self.extract is not None:
-            pswd = self.extract
+        if self.extract:
+            pswd = self.extract if isinstance(self.extract, str) else ''
             try:
                 if await aiopath.isfile(dl_path):
                     up_path = get_base_name(dl_path)
@@ -230,13 +230,13 @@ class MirrorLeechListener:
                 self.newDir = ''
                 up_path = dl_path
 
-        if self.compress is not None:
+        if self.compress:
             if up_path:
                 dl_path = up_path
             if self.user_dict.get('merge_vid'):
                 if not await Merge(self).merge_vids(dl_path, gid):
                     return
-            pswd = self.compress
+            pswd = self.compress if isinstance(self.compress, str) else ''
             zipmode = self.user_dict.get('zipmode', 'zfolder')
             if zipmode in ['zfolder', 'zfpart']:
                 async with download_dict_lock:
@@ -286,10 +286,10 @@ class MirrorLeechListener:
                 up_path = org_path
 
 
-        if self.compress is None and self.extract is None:
+        if not self.compress and not self.extract:
             up_path = dl_path
 
-        if self.compress is None and self.user_dict.get('merge_vid'):
+        if not self.compress and self.user_dict.get('merge_vid'):
             if not await Merge(self).merge_vids(up_path, gid):
                 return
 
@@ -297,7 +297,7 @@ class MirrorLeechListener:
         size = await get_path_size(up_dir)
         if self.isLeech:
             o_files, m_size = [], []
-            if self.compress is None:
+            if not self.compress:
                 checked = False
                 self.total_size = 0
                 for dirpath, _, files in await sync_to_async(walk, up_dir, topdown=False):
@@ -578,7 +578,7 @@ class MirrorLeechListener:
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
-                elif self.compress is not None:
+                elif not self.compress:
                     await clean_target(self.newDir)
                 async with queue_dict_lock:
                     if self.uid in non_queued_up:

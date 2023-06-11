@@ -1,6 +1,5 @@
 from aiofiles.os import path as aiopath
 from aiohttp import ClientSession
-from argparse import ArgumentParser
 from asyncio import wait_for, Event, wrap_future
 from functools import partial
 from os import path as ospath
@@ -12,7 +11,7 @@ from time import time
 from yt_dlp import YoutubeDL
 
 from bot import bot, config_dict, user_data, DOWNLOAD_DIR, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_url, is_premium_user, is_media, UserDaily, sync_to_async, new_task, is_rclone_path, get_multiid, get_readable_time, new_thread
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_url, is_premium_user, is_media, UserDaily, sync_to_async, new_task, is_rclone_path, get_multiid, get_readable_time, new_thread, arg_parser
 from bot.helper.ext_utils.force_mode import ForceMode
 from bot.helper.ext_utils.multi import run_multi, run_bulk, MultiSelect
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
@@ -22,6 +21,10 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, auto_delete_message, deleteMessage, sendingMessage
+
+
+arg_base = {'link': '', '-i': 0, '-m': '', '-s': False, '-opt': '', '-b': False,
+            '-gf': False, '-n': '', '-z': False, '-up': '', '-rcf': ''}
 
 
 class YtSelection:
@@ -236,12 +239,8 @@ async def _mdisk(link: str, name: str):
 @new_task
 async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
-    input_list = text[0].split()
-    try:
-        args = parser.parse_args(input_list[1:])
-    except:
-        await sendMessage(f'Invalid argument, type /{BotCommands.HelpCommand} for more details.', message)
-        return
+    input_list = text[0].split(' ')
+    args = arg_parser(input_list[1:], arg_base)
 
     if len(text) > 1 and text[1].startswith('Tag: '):
         try:
@@ -293,11 +292,38 @@ async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, b
             await auto_delete_message(message, msg, reply_to)
             return
 
-    multi, isBulk, isGofile, select, compress = args.multi, args.bulk, args.goFile, args.select, args.zipPswd
-    link, name, folder_name, up, rcf, opt = ' '.join(args.link), ' '.join(args.newName), ' '.join(args.sameDir), ' '.join(args.upload), ' '.join(args.rcloneFlags), ' '.join(args.options)
+    select = args['-s']
+    isBulk = args['-b']
+    opt = args['-opt']
+    isGofile = args['-gf']
+    folder_name = args['-m']
+    name = args['-n']
+    up = args['-up']
+    rcf = args['-rcf']
+    link = args['link']
+    compress = args['-z']
+
     multiid = get_multiid(user_id)
     bulk_start = bulk_end = 0
     qual = ''
+
+    try:
+        multi = int(args['-i'])
+    except:
+        multi = 0
+
+    if not isinstance(isBulk, bool):
+        dargs = isBulk.split(':')
+        bulk_start = dargs[0] or None
+        if len(dargs) == 2:
+            bulk_end = dargs[1] or None
+        isBulk = True
+
+    if folder_name and not isBulk:
+        folder_name = f'/{folder_name}'
+        if not sameDir:
+            sameDir = {'total': multi, 'tasks': set(), 'name': folder_name}
+        sameDir['tasks'].add(message.id)
 
     if config_dict['PREMIUM_MODE'] and not is_premium_user(user_id) and (multi > 0 or isBulk):
         await sendMessage('Upss, multi/bulk mode for premium user only', message)
@@ -416,21 +442,6 @@ async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, b
     playlist = 'entries' in result
     ydl = YoutubeDLHelper(listener)
     await ydl.add_download(link, path, name, qual, playlist, opt)
-
-
-parser = ArgumentParser(description='YT-DLP args usage:', argument_default='')
-
-parser.add_argument('link', nargs='*')
-parser.add_argument('-s', action='store_true', default=False, dest='select')
-parser.add_argument('-o', nargs='+', dest='options')
-parser.add_argument('-m', nargs='+', dest='sameDir')
-parser.add_argument('-i', nargs='+', default=0, dest='multi', type=int)
-parser.add_argument('-b', nargs='?', default=False, dest='bulk')
-parser.add_argument('-n', nargs='+', dest='newName')
-parser.add_argument('-z', nargs='*', default=None, dest='zipPswd')
-parser.add_argument('-gf', action='store_true', default=False, dest='goFile')
-parser.add_argument('-up', nargs='+', dest='upload')
-parser.add_argument('-rcf', nargs='+', dest='rcloneFlags')
 
 
 async def ytdl(client, message):

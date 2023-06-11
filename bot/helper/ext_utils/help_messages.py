@@ -171,6 +171,7 @@ Super: <code>https://t.me/c/channel_id/message_id</code>
 <code>/cmd</code> link -z password (zip password protected)
 <code>/cmd</code> link -z password -e (extract and zip password protected)
 <code>/cmd</code> link -e password -z password (extract password protected and zip password protected)
+
 Note: When both extract and zip added with cmd it will extract first and then zip, so always extract first
 '''
 
@@ -191,8 +192,9 @@ Example:
 link1 -n new name -up remote1:path1 -rcf |key:value|key:value
 link2 -z -n new name -up remote2:path2
 link3 -e -n new name -up remote2:path2
+
 Note: You can't add -m arg for some links only, do it for all links or use multi without bulk!
-Reply to this example by this cmd for example <code>/cmd</code> -b(bulk)
+Reply to this example by this cmd <code>/cmd</code> -b(bulk)
 You can set start and end of the links from the bulk like seed, with -b start:end or only end by -b :end or only start by -b start. The default start is from zero(first link) to inf.
 '''
 
@@ -204,7 +206,8 @@ You can set start and end of the links from the bulk like seed, with -b start:en
 6. Translate: Translate from text or image.
 7. Pahe: Find movie by title from Pahe website.
 8. Convert: Convert non animation sticker from image or from sticker to image.
-9. Thumbnail: Genearte some thumbnail poster.\n
+9. Thumbnail: Genearte some thumbnail poster.
+
 <b>Note</b>\nAvailable code for TTS and Translate <b><a href='https://graph.org/Support-Site-12-07-2'>Here</a></b>.
 <b>Example:</b> <code>/{BotCommands.MiscCommand} id</code>, result will in id (Indonesia) language.
 <i>*Some laguage may not work for TTS.</i>
@@ -229,11 +232,9 @@ Send support sites or rclone path along with command or by replying to the link/
 <code>/cmd</code> gdrivelink
 
 <b>RClone:</b>
-<code>/cmd</code> (rcl or rclone_path) -up (rcl or rclone_path) -rcf |flagkey:flagvalue|flagkey|flagkey:flagvalue
+<code>/cmd</code> (rcl or rclone_path) -up (rcl or rclone_path) -rcf flagkey:flagvalue|flagkey|flagkey:flagvalue
 
-Notes:
-1. If -up not specified then rclone destination will be the RCLONE_PATH from config.env
-2. When use -rcf start it with `|` to avoid reading it as bot argument.
+Note: If -up not specified then rclone destination will be the RCLONE_PATH from config.env
 '''
 
     RCLONE = '''
@@ -253,9 +254,8 @@ If you want to add path manually from your config (uploaded from usetting) add <
 <code>/cmd</code> link -up <code>mrcc:</code>main:dump
 
 <b>Rclone Flags</b>: -rcf
-<code>/cmd</code> link -up path|rcl -rcf |--buffer-size:8M|--drive-starred-only|key|key:value
+<code>/cmd</code> link -up path|rcl -rcf --buffer-size:8M|--drive-starred-only|key|key:value
 This will override all other flags except --exclude
-Note: When use -rcf start it with `|` to avoid reading it as bot argument.
 Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
 '''
 
@@ -323,8 +323,8 @@ link3 -e -n new name -opt ytdlpoptions
 
 Note: You can't add -m arg for some links only, do it for all links or use multi without bulk!
 link pswd: pass(zip/unzip) opt: ytdlpoptions up: remote2:path2
-Reply to this example by this cmd for example <code>/cmd</code> b(bulk) m:folder_name(same dir)
-You can set start and end of the links from the bulk with b:start:end or only end by b::end or only start by b:start. The default start is from zero(first link) to inf.
+Reply to this example by this cmd <code>/cmd</code> b(bulk)
+You can set start and end of the links from the bulk with -b start:end or only end by -b :end or only start by -b start. The default start is from zero(first link) to inf.
 '''
 
     YTOPT = '''

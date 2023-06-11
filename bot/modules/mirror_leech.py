@@ -1,5 +1,4 @@
 from aiofiles.os import path as aiopath
-from argparse import ArgumentParser
 from asyncio import sleep
 from base64 import b64encode
 from os import path as ospath
@@ -13,7 +12,7 @@ from urllib.parse import urlparse
 from bot import bot, config_dict, user_data, LOGGER, DOWNLOAD_DIR
 from bot.helper.ddl_bypass.direct_link_generator import direct_link_generator
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_media, is_mega_link, is_gdrive_link, is_sharar, get_content_type, \
-     is_premium_user, UserDaily, sync_to_async, new_task, is_rclone_path, is_tele_link, get_multiid
+     is_premium_user, UserDaily, sync_to_async, new_task, is_rclone_path, is_tele_link, get_multiid, arg_parser
 from bot.helper.ext_utils.conf_loads import intialize_savebot
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.force_mode import ForceMode
@@ -31,15 +30,15 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, auto_delete_message, deleteMessage, editMessage, sendingMessage, get_tg_link_content
 
 
+arg_base = {'link': '', '-i': 0, '-m': '', '-d': False, '-j': False, '-s': False, '-b': False, '-n': '',
+            '-e': False, '-z': False, '-gf': False, '-up': '', '-rcf': '', '-au': '', '-ap': ''}
+
+
 @new_task
 async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
-    input_list = text[0].split()
-    try:
-        args = parser.parse_args(input_list[1:])
-    except:
-        await sendMessage(f'Invalid argument, type /{BotCommands.HelpCommand} for more details.', message)
-        return
+    input_list = text[0].split(' ')
+    args = arg_parser(input_list[1:], arg_base)
 
     if len(text) > 1 and text[1].startswith('Tag: '):
         try:
@@ -94,44 +93,48 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
             await auto_delete_message(message, msg, reply_to)
             return
 
-    select, seed, multi, isBulk, isGofile, compress, extract, join = args.select, args.seed, args.multi, args.bulk, args.goFile, args.zipPswd, args.extractPswd, args.join
-    link, name, folder_name, up, rcf = ' '.join(args.link), ' '.join(args.newName), ' '.join(args.sameDir), ' '.join(args.upload), ' '.join(args.rcloneFlags)
+    select = args['-s']
+    seed = args['-d']
+    isBulk = args['-b']
+    isGofile = args['-gf']
+    folder_name = args['-m']
+    name = args['-n']
+    up = args['-up']
+    rcf = args['-rcf']
+    link = args['link']
+    compress = args['-z']
+    extract = args['-e']
+    join = args['-j']
+
     file_ = tg_client = ratio = seed_time = headers = None
     multiid = get_multiid(user_id)
     bulk_start = bulk_end = 0
     gdrive_sharer = False
 
-    if isinstance(multi, list):
-        multi = multi[0]
+    try:
+        multi = int(args['-i'])
+    except:
+        multi = 0
 
-    if compress is not None:
-        compress = ' '.join(compress)
-    if extract is not None:
-        extract = ' '.join(extract)
-
-    if seed:
+    if not isinstance(seed, bool):
         dargs = seed.split(':')
         ratio = dargs[0] or None
         if len(dargs) == 2:
             seed_time = dargs[1] or None
         seed = True
-    elif seed is None:
-        seed = True
 
-    if isBulk:
+    if not isinstance(isBulk, bool):
         dargs = isBulk.split(':')
         bulk_start = dargs[0] or None
         if len(dargs) == 2:
             bulk_end = dargs[1] or None
-        isBulk = True
-    elif isBulk is None:
         isBulk = True
 
     if folder_name and not isBulk:
         seed = False
         ratio = seed_time = None
         folder_name = f'/{folder_name}'
-        if sameDir is None:
+        if not sameDir:
             sameDir = {'total': multi, 'tasks': set(), 'name': folder_name}
         sameDir['tasks'].add(message.id)
 
@@ -278,7 +281,7 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
         await deleteMessage(editable)
         await add_rclone_download(link, config_path, f'{path}/', name, listener)
     elif is_gdrive_link(link):
-        if compress is None and extract is None and not isLeech and up == 'gd':
+        if not compress and not extract and not isLeech and up == 'gd':
             gmsg = f'Use /{BotCommands.CloneCommand} to clone Google Drive file/folder\n\n'
             gmsg += 'Use arg <code>-z</code> to make zip of Google Drive folder\n\n'
             gmsg += 'Use <code>-e</code> to extracts Google Drive archive folder/file'
@@ -292,7 +295,7 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
     elif isQbit:
         await add_qb_torrent(link, path, listener, ratio, seed_time)
     else:
-        ussr, pssw = ' '.join(args.auth_user), ' '.join(args.auth_pswd)
+        ussr, pssw = args['-au'], args['-ap']
         if ussr or pssw:
             auth = f'{ussr}:{pssw}'
             auth = 'Basic ' + b64encode(auth.encode()).decode('ascii')
@@ -301,25 +304,6 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
         if 'static.romsget.io' in link:
             headers = 'Referer: https://www.romsget.io/'
         await add_aria2c_download(link, path, listener, name, auth, ratio, seed_time, headers)
-
-
-parser = ArgumentParser(description='Mirror-Leech args usage:', argument_default='')
-
-parser.add_argument('link', nargs='*')
-parser.add_argument('-s', action='store_true', default=False, dest='select')
-parser.add_argument('-d', nargs='?', default=False, dest='seed')
-parser.add_argument('-m', nargs='+', dest='sameDir')
-parser.add_argument('-i', nargs='+', default=0, dest='multi', type=int)
-parser.add_argument('-b', nargs='?', default=False, dest='bulk')
-parser.add_argument('-n', nargs='+', dest='newName')
-parser.add_argument('-e', nargs='*', default=None, dest='extractPswd')
-parser.add_argument('-z', nargs='*', default=None, dest='zipPswd')
-parser.add_argument('-j', action='store_true', default=False, dest='join')
-parser.add_argument('-up', nargs='+', dest='upload')
-parser.add_argument('-gf', action='store_true', default=False, dest='goFile')
-parser.add_argument('-rcf', nargs='+', dest='rcloneFlags')
-parser.add_argument('-au', nargs='+', dest='auth_user')
-parser.add_argument('-ap', nargs='+', dest='auth_pswd')
 
 
 async def mirror(client, message):

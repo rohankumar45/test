@@ -106,7 +106,7 @@ class TelegramDownloadHelper:
                 size = media.file_size
                 gid = media.file_unique_id
                 if (storage := config_dict['STORAGE_THRESHOLD']) and not \
-                    await check_storage_threshold(size, any([self.__listener.compress is not None, self.__listener.isLeech, self.__listener.extract is not None])):
+                    await check_storage_threshold(size, any([self.__listener.compress, self.__listener.isLeech, self.__listener.extract])):
                     await self.__onDownloadError(f'Need {storage}GB free storage. File size is {get_readable_file_size(size)}', ename=name)
                     return
                 file, sname = await stop_duplicate_check(name, self.__listener)
