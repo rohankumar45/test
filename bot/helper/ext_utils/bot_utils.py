@@ -382,7 +382,6 @@ async def get_content_type(url):
 def arg_parser(items, arg_base):
     if not items:
         return arg_base
-    LOGGER.info(items)
     t = len(items)
     i = 0
     while True:
