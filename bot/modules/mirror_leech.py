@@ -39,6 +39,7 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
     text = message.text.split('\n')
     input_list = text[0].split(' ')
     args = arg_parser(input_list[1:], arg_base)
+    LOGGER.info(args)
 
     if len(text) > 1 and text[1].startswith('Tag: '):
         try:
