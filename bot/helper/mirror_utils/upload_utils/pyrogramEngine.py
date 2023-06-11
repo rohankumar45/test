@@ -244,13 +244,13 @@ class TgUploader:
                     else:
                         self.__last_msg_in_group = True
 
-            if not self.__thumb and thumb and await aiopath.exists(thumb):
+            if not self.__thumb and thumb:
                 await clean_target(thumb)
         except FloodWait as f:
             LOGGER.warning(str(f))
             await sleep(f.value)
         except Exception as err:
-            if not self.__thumb and thumb and await aiopath.exists(thumb):
+            if not self.__thumb and thumb:
                 await clean_target(thumb)
             err_type = 'RPCError: ' if isinstance(err, RPCError) else ''
             LOGGER.error(f'{err_type}{err}. Path: {self.__up_path}')
