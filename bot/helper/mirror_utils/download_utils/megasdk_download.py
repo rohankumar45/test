@@ -28,6 +28,7 @@ class MegaAppListener(MegaListener):
         self.__name = ''
         self.__bytes_transferred = 0
         self.__speed = 0
+        self.__retry = 0
         super().__init__()
 
     @property
@@ -59,12 +60,16 @@ class MegaAppListener(MegaListener):
             self.continue_event.set()
 
     def onRequestTemporaryError(self, api, request, error: MegaError):
+        error = error.toString()
         LOGGER.error(f'Mega Request error in {error}')
-        if not self.is_cancelled:
-            self.is_cancelled = True
-            async_to_sync(self.listener.onDownloadError, f'RequestTempError: {error.toString()}', ename=self.__name)
-        self.error = error.toString()
-        self.continue_event.set()
+        if 'retrying' in error.lower() and self.__retry < 4:
+            self.__retry +=1
+        else:
+            if not self.is_cancelled:
+                self.is_cancelled = True
+                async_to_sync(self.listener.onDownloadError, f'RequestTempError: {error}', ename=self.__name)
+            self.error = error.toString()
+            self.continue_event.set()
 
     def onTransferUpdate(self, api: MegaApi, transfer: MegaTransfer):
         if self.is_cancelled:
