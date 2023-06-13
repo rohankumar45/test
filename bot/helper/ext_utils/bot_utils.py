@@ -464,14 +464,14 @@ def new_task(func):
 
 
 async def sync_to_async(func, *args, wait=True, **kwargs):
-    '''Run sync function in async coroutine'''
+    """Run sync function in async coroutine"""
     pfunc = partial(func, *args, **kwargs)
     future = bot_loop.run_in_executor(THREADPOOL, pfunc)
     return await future if wait else future
 
 
 def async_to_sync(func, *args, wait=True, **kwargs):
-    '''Run Async function in sync'''
+    """Run Async function in sync"""
     future = run_coroutine_threadsafe(func(*args, **kwargs), bot_loop)
     return future.result() if wait else future
 
