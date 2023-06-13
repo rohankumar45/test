@@ -1,7 +1,7 @@
 from aiofiles import open as aiopen
 from aiohttp import ClientSession
 from argparse import ArgumentParser
-from asyncio import sleep
+from asyncio import sleep, Event
 from bs4 import BeautifulSoup
 from functools import partial
 from pyrogram.filters import command, regex, user
@@ -30,21 +30,20 @@ class ScrapeHelper():
         self.__isSuperGroup = message.chat.type.name in ['SUPERGROUP', 'CHANNEL']
         self.__pm = user_data.get(self.__user_id, {}).get('enable_pm')
         self.__buttons = None
-        self.__done = False
         self.reply_to = message.reply_to_message
         self.link = link
         self.is_cancelled = False
+        self.event = Event()
 
     @new_thread
     async def __event_handler(self):
         pfunc = partial(stop_scrapper, obj=self)
         handler = bot.add_handler(CallbackQueryHandler(pfunc, filters=regex('^scrap') & user(self.__user_id)), group=-1)
-        while not self.is_cancelled or not self.__done:
-            await sleep(0.5)
+        self.event.wait()
         bot.remove_handler(*handler)
 
     async def __OnScrapSuccess(self, totals: int, mode: str):
-        self.__done = True
+        self.event.set()
         log_msg = '<b>SCRAPPER LOGS</b>\n'
         log_msg += f'<b>┌ Cc: </b>{self.message.from_user.mention}\n'
         log_msg += f'<b>├ ID: </b><code>{self.__user_id}</code>\n'
@@ -70,7 +69,7 @@ class ScrapeHelper():
             await auto_delete_message(self.message, self.reply_to, stime=stime)
 
     async def OnScrapError(self, error=None):
-        self.__done = True
+        self.event.set()
         if not error:
             error = f'''
 <b>Send link along with command line:</b>
@@ -285,6 +284,7 @@ async def scrapper(_, message: Message):
 async def stop_scrapper(_, query: CallbackQuery, obj: ScrapeHelper):
     await query.answer('Trying to stop...')
     obj.is_cancelled = True
+    obj.event.set()
 
 
 parser = ArgumentParser(description='Scrape args usage:', argument_default='')
