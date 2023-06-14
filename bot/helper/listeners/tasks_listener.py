@@ -151,8 +151,6 @@ class MirrorLeechListener:
                 name = files[0]
         dl_path = f'{self.dir}/{name}'
         up_path = ''
-        if await aiopath.isdir(dl_path) or await aiopath.isfile(dl_path) and not self.extract:
-            dl_path = await self.__rename(dl_path)
         size = await get_path_size(dl_path)
         LEECH_SPLIT_SIZE = config_dict['LEECH_SPLIT_SIZE']
         if config_dict['PREMIUM_MODE'] and not is_premium_user(self.user_id):
@@ -237,6 +235,7 @@ class MirrorLeechListener:
             if self.user_dict.get('merge_vid'):
                 if not await Merge(self).merge_vids(dl_path, gid):
                     return
+            dl_path = await self.__rename(dl_path)
             pswd = self.compress if isinstance(self.compress, str) else ''
             zipmode = self.user_dict.get('zipmode', 'zfolder')
             if zipmode in ['zfolder', 'zfpart']:
@@ -289,6 +288,7 @@ class MirrorLeechListener:
 
         if not self.compress and not self.extract:
             up_path = dl_path
+            up_path = await self.__rename(up_path)
 
         if not self.compress and self.user_dict.get('merge_vid'):
             if not await Merge(self).merge_vids(up_path, gid):
