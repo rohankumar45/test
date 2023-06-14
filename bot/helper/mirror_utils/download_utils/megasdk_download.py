@@ -62,7 +62,7 @@ class MegaAppListener(MegaListener):
     def onRequestTemporaryError(self, api, request, error: MegaError):
         error = error.toString()
         LOGGER.error(f'Mega Request error in {error}')
-        if 'retrying' in error.lower() and self.__retry < 4:
+        if 'retrying' in error.lower() and self.__retry < 5:
             self.__retry +=1
         else:
             if not self.is_cancelled:
