@@ -423,7 +423,7 @@ BUTTON_SIX_URL = environ.get('BUTTON_SIX_URL', '')
 
 #=========================== QBITTORRENT ==============================
 BASE_URL = environ.get('BASE_URL', '').rstrip('/')
-PORT = environ.get('PORT', '80')
+PORT = environ.get('PORT', '8080')
 WEB_PINCODE = environ.get('WEB_PINCODE', 'False').lower() == 'true'
 #======================================================================
 
