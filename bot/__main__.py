@@ -47,8 +47,7 @@ async def stats(_, message: Message):
 <b>├ Bot Uptime:</b> {get_readable_time(time() - botStartTime)}
 <b>└ OS Uptime:</b> {get_readable_time(time() - boot_time())}\n
 <b>SYSTEM STATUS</b>
-<b>┌ SWAP:</b> {get_readable_file_size(swap_memory().total)}
-<b>├ Total Cores:</b> {cpu_count(logical=True)}
+<b>┌ STotal Cores:</b> {cpu_count(logical=True)}
 <b>├ Physical Cores:</b> {cpu_count(logical=False)}
 <b>├ Upload:</b> {get_readable_file_size(net_io_counters().bytes_sent)}
 <b>├ Download:</b> {get_readable_file_size(net_io_counters().bytes_recv)}
@@ -57,6 +56,7 @@ async def stats(_, message: Message):
 <b>├ Disk Space:</b> {get_readable_file_size(disk_usage('/')[0])}
 <b>├ Memory Free:</b> {get_readable_file_size(virtual_memory().available)}
 <b>├ Memory Used:</b> {get_readable_file_size(virtual_memory().used)}
+<b>├ Memory Swap:</b> {get_readable_file_size(swap_memory().total)}
 <b>├ Memory Total:</b> {get_readable_file_size(virtual_memory().total)}
 <b>├ CPU:</b> {get_progress_bar_string(cpu)} {cpu}
 <b>├ RAM:</b> {get_progress_bar_string(mem)} {mem}
