@@ -4,7 +4,7 @@ from pyrogram import Client
 from time import time
 
 from bot import bot, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock, config_dict, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_media
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, is_media, is_premium_user
 from bot.helper.ext_utils.fs_utils import check_storage_threshold
 from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
@@ -105,15 +105,31 @@ class TelegramDownloadHelper:
                     path = path + name
                 size = media.file_size
                 gid = media.file_unique_id
-                if (storage := config_dict['STORAGE_THRESHOLD']) and not \
-                    await check_storage_threshold(size, any([self.__listener.compress, self.__listener.isLeech, self.__listener.extract])):
-                    await self.__onDownloadError(f'Need {storage}GB free storage. File size is {get_readable_file_size(size)}', ename=name)
-                    return
+
                 file, sname = await stop_duplicate_check(name, self.__listener)
                 if file:
                     LOGGER.info('File/folder already in Drive!')
                     await self.__onDownloadError('File already in Drive!', file, sname)
                     return
+
+                msgerr = None
+                torddl, zuzdl, leechdl, storage = config_dict['TORRENT_DIRECT_LIMIT'], config_dict['ZIP_UNZIP_LIMIT'], config_dict['LEECH_LIMIT'], config_dict['STORAGE_THRESHOLD']
+                if config_dict['PREMIUM_MODE'] and not is_premium_user(self.__listener.user_id):
+                    torddl = zuzdl = leechdl = config_dict['NONPREMIUM_LIMIT']
+                arch = any([self.__listener.compress, self.__listener.isLeech, self.__listener.extract])
+                if torddl and not arch and size >= torddl * 1024**3:
+                    msgerr = f'Torrent/direct limit is {torddl}GB'
+                elif zuzdl and any([self.__listener.compress, self.__listener.extract]) and size >= zuzdl * 1024**3:
+                    msgerr = f'Zip/Unzip limit is {zuzdl}GB'
+                elif leechdl and self.__listener.isLeech and size >= leechdl * 1024**3:
+                    msgerr = f'Leech limit is {leechdl}GB'
+                if storage and not await check_storage_threshold(size, arch):
+                    msgerr = f'Need {storage}GB free storage'
+                if msgerr:
+                    LOGGER.info('File/folder size over the limit size!')
+                    await self.__onDownloadError(f'{msgerr}. File/folder size is {get_readable_file_size(size)}.', ename=name)
+                    return
+
                 added_to_queue, event = await is_queued(self.__listener.uid)
                 if added_to_queue:
                     LOGGER.info(f"Added to Queue/Download: {name}")
