@@ -47,7 +47,7 @@ async def stats(_, message: Message):
 <b>├ Bot Uptime:</b> {get_readable_time(time() - botStartTime)}
 <b>└ OS Uptime:</b> {get_readable_time(time() - boot_time())}\n
 <b>SYSTEM STATUS</b>
-<b>┌ STotal Cores:</b> {cpu_count(logical=True)}
+<b>┌ Total Cores:</b> {cpu_count(logical=True)}
 <b>├ Physical Cores:</b> {cpu_count(logical=False)}
 <b>├ Upload:</b> {get_readable_file_size(net_io_counters().bytes_sent)}
 <b>├ Download:</b> {get_readable_file_size(net_io_counters().bytes_recv)}
