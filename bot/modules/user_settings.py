@@ -628,9 +628,14 @@ async def set_premium_users(_, message: Message):
         premi_id = int(args[2])
         if args[1] == 'add':
             day = int(args[3])
+    elif len(args) == 2 and args[1] == 'list':
+        text = 'Premium List:\n'
+        text += '\n'.join(f"{value.get('user_name')} (<code>{id_}</code>) ~ {get_readable_time(value.get('premium_left') - time())}" for id_, value in user_data.items())
+        await sendMessage(text, message)
     else:
         await sendMessage(text, message)
         return
+
     user_text = ''
     if args[1] == 'add':
         duartion = int(time() + (86400 * day))
