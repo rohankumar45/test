@@ -247,8 +247,8 @@ class TgUploader:
             if not self.__thumb and thumb:
                 await clean_target(thumb)
         except FloodWait as f:
-            LOGGER.warning(str(f))
-            await sleep(f.value)
+            LOGGER.warning(f)
+            await sleep(f.value * 1.2)
         except Exception as err:
             if not self.__thumb and thumb:
                 await clean_target(thumb)
