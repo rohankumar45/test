@@ -630,7 +630,7 @@ async def set_premium_users(_, message: Message):
             day = int(args[3])
     elif len(args) == 2 and args[1] == 'list':
         text = 'Premium List:\n'
-        text += '\n'.join(f"@{value.get('user_name')} (<code>{id_}</code>) ~ {get_readable_time(value.get('premium_left', 1) - time())}"
+        text += '\n'.join(f"@{value.get('user_name')} (<code>{id_}</code>) ~ {get_readable_time(value['premium_left'] - time())}"
                           for id_, value in user_data.items() if value.get('is_premium'))
     else:
         await sendMessage(text, message)
