@@ -308,7 +308,7 @@ class RcloneTransferHelper:
                     '--transfers=256', '--drive-pacer-min-sleep=1ms', '--drive-pacer-burst=5000', '--drive-acknowledge-abuse'))
         if config_path == 'rclone.conf' and config_dict['USE_SERVICE_ACCOUNTS']:
             LOGGER.info('Gclone with service accounts.')
-            cmd.extend(('--drive-random-pick-sa', '--drive-rolling-sa', '--drive-rolling-count=1'))
+            cmd.extend(('--drive-random-pick-sa', '--drive-rolling-sa', '--drive-rolling-count=4'))
         self.__proc = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
         _, return_code = await gather(self.__progress(), self.__proc.wait())
         if self.__is_cancelled:
