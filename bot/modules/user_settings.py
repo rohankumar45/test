@@ -93,7 +93,6 @@ async def get_user_settings(from_user, data: str, uset_data: str):
 
         capmode = user_dict.get('user_cap', 'mono')
         custom_cap = 'ENABLE ✅' if user_dict.get('user_caption') else 'NOT SET'
-        await ForceMode()
         if config_dict['PREMIUM_MODE']:
             if (user_premi:= is_premium_user(user_id)) and (time_data:= user_dict.get('premium_left')):
                 if time_data - time() <= 0:
