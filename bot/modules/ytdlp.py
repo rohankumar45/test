@@ -256,7 +256,7 @@ async def _ytdl(client: Client, message: Message, isLeech=False, sameDir=None, b
     tag = message.from_user.mention
 
     fmode = ForceMode(message)
-    if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', pm_mode='ytdlp_pm_message'):
+    if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', 'premium_left', pm_mode='ytdlp_pm_message'):
         await auto_delete_message(message, fmsg, reply_to)
         return
 

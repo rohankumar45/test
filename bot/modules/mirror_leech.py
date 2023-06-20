@@ -54,7 +54,7 @@ async def _mirror_leech(client: Client, message: Message, isQbit=False, isLeech=
     user_dict = user_data.get(user_id, {})
 
     fmode = ForceMode(message)
-    if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', pm_mode='mirror_leech_pm_message'):
+    if fmsg:= await fmode.run_force('fsub', 'funame', 'limit', 'mute', 'premium_left', pm_mode='mirror_leech_pm_message'):
         await auto_delete_message(message, fmsg, reply_to)
         return
 

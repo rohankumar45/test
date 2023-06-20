@@ -1,4 +1,5 @@
 from pyrogram.types import Message
+from time import time
 
 from bot import bot, bot_loop, bot_name, download_dict, download_dict_lock, config_dict, user_data
 from bot.helper.ext_utils.bot_utils import get_user_task, is_premium_user, is_media, update_user_ldata
@@ -29,8 +30,17 @@ class ForceMode:
             msg = await mode()
         if not msg and 'mute' in args and isSuperGroup:
             msg = await self.auto_muted()
+        if 'premium_left' in args:
+            await self.__check_limit()
 
         return msg
+
+    async def __check_limit(self):
+        if config_dict['PREMIUM_MODE']:
+            if is_premium_user(self.__uid) and (time_data:= self.__user_dict.get('premium_left')):
+                if time_data - time() <= 0:
+                    await update_user_ldata(self.__uid, 'is_premium', False)
+                    await update_user_ldata(self.__uid, 'premium_left', 0)
 
     async def bypass_pm_message(self):
         msg_nolink = 'No <b>link</b> given to bypass 😑'
