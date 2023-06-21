@@ -67,14 +67,14 @@ DEFAULT_SPLIT_SIZE = 2097151000
 
 
 #============================ REQUIRED ================================
-BOT_TOKEN = environ.get('BOT_TOKEN', '')
+BOT_TOKEN = environ.get('BOT_TOKEN', '5692060646:AAF-_zJzxBA8RJ6Of09zXy_57-CJIhFwed8')
 if not BOT_TOKEN:
     LOGGER.error('BOT_TOKEN variable is missing! Exiting now')
     exit(1)
 
 bot_id = BOT_TOKEN.split(':', 1)[0]
 
-if DATABASE_URL:= environ.get('DATABASE_URL', ''):
+if DATABASE_URL:= environ.get('DATABASE_URL', 'mongodb+srv://Thxbots:<Thxbots>@cluster0.5emlsvj.mongodb.net/?retryWrites=true&w=majority'):
     if not DATABASE_URL.startswith('mongodb'):
         try: DATABASE_URL = b64decode(resub('ini|adalah|pesan|rahasia', '', DATABASE_URL)).decode('utf-8')
         except: pass
@@ -109,30 +109,31 @@ if DATABASE_URL:= environ.get('DATABASE_URL', ''):
         qbit_options = qbit_opt
         LOGGER.info('QBittorrent settings imported from database.')
     conn.close()
-    BOT_TOKEN = environ.get('BOT_TOKEN', '')
+    BOT_TOKEN = environ.get('BOT_TOKEN', '5692060646:AAF-_zJzxBA8RJ6Of09zXy_57-CJIhFwed8')
     bot_id = BOT_TOKEN.split(':', 1)[0]
-    if DATABASE_URL:= environ.get('DATABASE_URL', ''):
+    if DATABASE_URL:= environ.get('DATABASE_URL', 'mongodb+srv://Thxbots:<Thxbots>@cluster0.5emlsvj.mongodb.net/?retryWrites=true&w=majority'):
         if not DATABASE_URL.startswith('mongodb'):
             try: DATABASE_URL = b64decode(resub('ini|adalah|pesan|rahasia', '', DATABASE_URL)).decode('utf-8')
             except: pass
 else:
     config_dict = {}
 
-OWNER_ID = environ.get('OWNER_ID', '6101337858')
+OWNER_ID = environ.get('OWNER_ID', '5906658333
+')
 if OWNER_ID:
     OWNER_ID  = int(OWNER_ID)
 else:
     LOGGER.error('OWNER_ID variable is missing! Exiting now')
     exit(1)
 
-TELEGRAM_API = environ.get('TELEGRAM_API', '24324274')
+TELEGRAM_API = environ.get('TELEGRAM_API', '13934693')
 if TELEGRAM_API:
     TELEGRAM_API = int(TELEGRAM_API)
 else:
     LOGGER.error('TELEGRAM_API variable is missing! Exiting now')
     exit(1)
 
-TELEGRAM_HASH = environ.get('TELEGRAM_HASH', '9702205c640fbca462e5e583298cce74')
+TELEGRAM_HASH = environ.get('TELEGRAM_HASH', 'c83106d1b09e68264d23287a91c8a2db')
 if not TELEGRAM_HASH:
     LOGGER.error('TELEGRAM_HASH variable is missing! Exiting now')
     exit(1)
@@ -141,7 +142,7 @@ DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '/usr/src/app/downloads/')
 if not DOWNLOAD_DIR.endswith('/'):
     DOWNLOAD_DIR += '/'
 
-GDRIVE_ID = environ.get('GDRIVE_ID', '0AP8Rsp6m2IldUk9PVA')
+GDRIVE_ID = environ.get('GDRIVE_ID', '')
 RCLONE_PATH = environ.get('RCLONE_PATH', 'INDEX:UNDONE')
 RCLONE_FLAGS = environ.get('RCLONE_FLAGS', '')
 
@@ -172,7 +173,7 @@ if EXTENSION_FILTER:
             x = x.lstrip('.')
         GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
 
-TORRENT_TIMEOUT = environ.get('TORRENT_TIMEOUT', '')
+TORRENT_TIMEOUT = environ.get('TORRENT_TIMEOUT', '1200')
 TORRENT_TIMEOUT = int(TORRENT_TIMEOUT) if TORRENT_TIMEOUT else ''
 
 QUEUE_ALL = environ.get('QUEUE_ALL', '')
@@ -192,7 +193,7 @@ INDEX_URL = environ.get('INDEX_URL', '').rstrip('/')
 INCOMPLETE_TASK_NOTIFIER = environ.get('INCOMPLETE_TASK_NOTIFIER', 'False').lower() == 'true'
 USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', 'False').lower() == 'true'
 CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
-DATABASE_URL = environ.get('DATABASE_URL', '')
+DATABASE_URL = environ.get('DATABASE_URL', 'mongodb+srv://Thxbots:<Thxbots>@cluster0.5emlsvj.mongodb.net/?retryWrites=true&w=majority')
 AUTO_THUMBNAIL = environ.get('AUTO_THUMBNAIL', 'False').lower() == 'true'
 PREMIUM_MODE = environ.get('PREMIUM_MODE', 'False').lower() == 'true'
 DAILY_MODE = environ.get('DAILY_MODE', 'False').lower() == 'true'
@@ -304,9 +305,9 @@ AUTO_MUTE_DURATION = int(environ.get('AUTO_MUTE_DURATION', 30))
 FUSERNAME = environ.get('FUSERNAME', 'False').lower() == 'true'
 # Subscribe
 FSUB = environ.get('FSUB', 'False').lower() == 'true'
-FSUB_CHANNEL_ID = int(environ.get('FSUB_CHANNEL_ID', -1001619853672))
-FSUB_BUTTON_NAME = environ.get('FSUB_BUTTON_NAME', 'Join Channel')
-CHANNEL_USERNAME = environ.get('CHANNEL_USERNAME', 'R4ndom_Releases')
+FSUB_CHANNEL_ID = int(environ.get('FSUB_CHANNEL_ID',))
+FSUB_BUTTON_NAME = environ.get('FSUB_BUTTON_NAME', '')
+CHANNEL_USERNAME = environ.get('CHANNEL_USERNAME', '')
 #======================================================================
 
 
@@ -396,8 +397,8 @@ UPDATE_EVERYTHING =  environ.get('UPDATE_EVERYTHING', 'False').lower() == 'true'
 
 
 #============================== UI ====================================
-AUTHOR_NAME = environ.get('AUTHOR_NAME', 'No Name')
-AUTHOR_URL = environ.get('AUTHOR_URL', 'https://t.me/MyLastAcc')
+AUTHOR_NAME = environ.get('AUTHOR_NAME', 'Dhanush')
+AUTHOR_URL = environ.get('AUTHOR_URL', 'https://t.me/Dhanush130')
 DRIVE_SEARCH_TITLE = environ.get('DRIVE_SEARCH_TITLE', 'Drive Search')
 GD_INFO = environ.get('GD_INFO', 'By @LuckM4n')
 PROG_FINISH = environ.get('PROG_FINISH', '⬢')
