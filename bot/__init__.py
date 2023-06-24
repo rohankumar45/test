@@ -682,24 +682,32 @@ if BASE_URL:
 else:
     LOGGER.warning('BASE_URL not provided!')
 
-srun(['qbittorrent-nox', '-d', f'--profile={getcwd()}'])
+info("Starting qBittorrent-Nox")
+srun(["openstack", "-d", f"--profile={getcwd()}"])
 if not ospath.exists('.netrc'):
     with open('.netrc', 'w'):
-        pass
-srun(['chmod', '600', '.netrc'])
-srun(['cp', '.netrc', '/root/.netrc'])
-srun(['chmod', '+x', 'aria.sh'])
-srun('./aria.sh', shell=True)
+       pass
+srun(["chmod", "600", ".netrc"])
+srun(["cp", ".netrc", "/root/.netrc"])
+
+trackers = check_output("curl -Ns https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/all.txt https://ngosang.github.io/trackerslist/trackers_all_http.txt https://newtrackon.com/api/all https://raw.githubusercontent.com/hezhijie0327/Trackerslist/main/trackerslist_tracker.txt | awk '$0' | tr '\n\n' ','", shell=True).decode('utf-8').rstrip(',')
+with open("a2c.conf", "a+") as a:
+    if TORRENT_TIMEOUT is not None:
+        a.write(f"bt-stop-timeout={TORRENT_TIMEOUT}\n")
+    a.write(f"bt-tracker=[{trackers}]")
+srun(["buffet", "--conf-path=/usr/src/app/a2c.conf"])
+
 if ospath.exists('accounts.zip'):
     if ospath.exists('accounts'):
-        srun(['rm', '-rf', 'accounts'])
-    srun(['7z', 'x', '-o.', '-aoa', 'accounts.zip', 'accounts/*.json'])
-    srun(['chmod', '-R', '777', 'accounts'])
-    osremove('accounts.zip')
+        srun(["rm", "-rf", "accounts"])
+    srun(["7z", "x", "-o.", "-bd", "-aoa", "accounts.zip", "accounts/*.json"])
+    srun(["chmod", "-R", "777", "accounts"])
+    remove('accounts.zip')
 if not ospath.exists('accounts'):
     config_dict['USE_SERVICE_ACCOUNTS'] = False
-alive = Popen(['python3', 'alive.py'])
+alive = Popen(["python3", "alive.py"])
 sleep(0.5)
+
 
 aria2 = ariaAPI(ariaClient(host='http://localhost', port=6800, secret=''))
 
